@@ -1,0 +1,18 @@
+# 测试环境
+test:
+  domain:
+    qyh: "http://testadmin.qyhnet.com"
+  redis:
+    qyh:
+      ip : "120.55.125.94"
+      password : "4A$2QgF4g7Orz*"
+  database:
+    jdbcurl: jdbc:mysql://118.31.184.240:3306
+    user: root
+    password: 3wHNY2Bq
+
+
+# 线上环境
+online:
+  domain:
+    qyh: "http://testadmin.qyhnet.com"

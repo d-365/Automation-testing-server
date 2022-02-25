@@ -1,0 +1,53 @@
+server:
+  port: 1997
+
+spring:
+  # 数据源
+  datasource:
+    dynamic:
+      primary: master
+      datasource:
+        master:
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://localhost:3306/mall?allowMultiQueries=true&serverTimezone=GMT%2B8&characterEncoding=utf8&useSSL=false
+          username: dujun
+          password: test1997
+#        qsTest:
+#            driver-class-name: com.mysql.cj.jdbc.Driver
+#            url: jdbc:mysql://118.31.184.240:3306?useUnicode=true&useSSL=false&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+#            username: root
+#            password: 3wHNY2Bq
+
+  devtools:
+    restart:
+      enabled: true
+      additional-paths: src/main/java
+      additional-exclude: WEB-INF/**
+  freemarker:
+    cache: false
+
+# mybatis-plus
+mybatis-plus:
+
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  mapper-locations: classpath:**/*Mapper.xml
+
+  global-config:
+    db-config:
+      id-type: auto
+
+# 测试环境
+test:
+  domain:
+    qyh: "http://testadmin.qyhnet.com"
+  redis:
+    qyh:
+      ip : "120.55.125.94"
+      password : "4A$2QgF4g7Orz*"
+
+# 线上环境
+online:
+  domain:
+    qyh: "http://testadmin.qyhnet.com"
+

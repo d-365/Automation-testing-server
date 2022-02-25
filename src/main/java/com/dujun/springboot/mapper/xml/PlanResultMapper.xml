@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dujun.springboot.mapper.PlanResultMapper">
+    <select id="planResultList" resultType="com.dujun.springboot.entity.PlanResult">
+        SELECT * FROM `plan_result`
+
+
+        WHERE 1=1
+        <if test="resultStatus != null">
+            and result_status = #{resultStatus}
+        </if>
+
+        <if test="planName != null and planName != ''">
+            and plan_name=#{planName}
+        </if>
+
+        <if test="startTime != null and startTime != ''">
+            and start_time LIKE concat(#{startTime},'%')
+        </if>
+
+        ORDER BY `id` DESC
+        <if test="size != null and size != ''">
+            LIMIT #{page}, #{size}
+        </if>
+
+    </select>
+
+    <select id="planResultTotal" resultType="java.lang.Long">
+        SELECT COUNT(id) FROM plan_result WHERE 1=1
+        <if test="resultStatus != null">
+            and result_status = #{resultStatus}
+        </if>
+
+        <if test="planName != null and planName != ''">
+            and plan_name=#{planName}
+        </if>
+        <if test="startTime != null and startTime != ''">
+            and start_time LIKE concat(#{startTime},'%')
+        </if>
+    </select>
+</mapper>

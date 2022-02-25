@@ -1,0 +1,11 @@
+server:
+  port: 9999
+
+spring:
+  # 环境配置
+  profiles:
+    #激活指定的profile
+    active: test
+#    active: online
+
+
