@@ -78,7 +78,6 @@ public class ApiOrderData {
                 put("month_income",0);
                 put("income_type",0);
                 put("workage",0);
-
             }}));
             put("socialSecurity", 2);
             put("accumulationFund", 1);
@@ -88,6 +87,9 @@ public class ApiOrderData {
                 put("house_price",0);
             }}) );
             put("isHasCar", 1);
+            put("carData",JSON.toJSONString(new HashMap<String,Object>(){{
+                put("car_price",1);
+            }}) );
             put("creditLimit", 1);
             put("wld", 1);
             put("zmf", 1);

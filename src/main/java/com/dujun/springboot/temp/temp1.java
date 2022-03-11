@@ -1,38 +1,29 @@
-/**
- * author     : dujun
- * date       : 2022/1/4 10:27
- * description: 告诉大家我是干啥的
- */
-
 package com.dujun.springboot.temp;
 
-import com.mysql.cj.x.protobuf.MysqlxCrud;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import java.lang.reflect.Field;
+import java.util.zip.DeflaterOutputStream;
 
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+@Target(ElementType.FIELD)
+@Retention(RetentionPolicy.RUNTIME)
 
-
-interface task{
-
-    void run();
-    default void run2(){
-        System.out.println("jjj");
-    };
+@interface ZhuJie {
+    int check() default 1;
 }
 
+class ZhuJieTest {
 
-class Main{
+    @ZhuJie
+    private int value;
 
-    public static void main(String[] args) {
-
+    public static void main(String []args){
+        Field[] fields=ZhuJieTest.class.getDeclaredFields();
+        System.out.println(fields[0].getAnnotation(ZhuJie.class).check());
 
 
     }
+
 }

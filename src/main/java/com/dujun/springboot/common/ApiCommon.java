@@ -667,12 +667,8 @@ public  class ApiCommon {
                 case "query":
                     MysqlTools mysqlTools = new MysqlTools(jdbcUrl,userName,password);
                     if(mysqlTools.result){
-                        try {
-                            ResultSet result = mysqlTools.executeQuery(sql);
-                            mysqlTools.close();
-                        }catch (SQLException sqlException){
-                            return  new ApiConsole(false,"SQL执行失败"+sqlException,name);
-                        }
+                        ResultSet result = mysqlTools.executeQuery(sql);
+                        mysqlTools.close();
                         return  new ApiConsole(true,"执行成功",name);
                     }else {
                         return  new ApiConsole(false,"数据库链接失败",name);
@@ -712,12 +708,8 @@ public  class ApiCommon {
             if ("query".equals(o)) {
                 MysqlTools mysqlTools = new MysqlTools(jdbcUrl, userName, password);
                 if (mysqlTools.result) {
-                    try {
-                        ResultSet result = mysqlTools.executeQuery(sql);
-                        mysqlTools.close();
-                    } catch (SQLException sqlException) {
-                        return new ApiConsole(false, "SQL执行失败" + sqlException, name);
-                    }
+                    ResultSet result = mysqlTools.executeQuery(sql);
+                    mysqlTools.close();
                     return new ApiConsole(true, "执行成功", name);
                 } else {
                     return new ApiConsole(false, "数据库链接失败", name);

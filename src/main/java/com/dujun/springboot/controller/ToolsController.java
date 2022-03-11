@@ -5,23 +5,16 @@
  */
 
 package com.dujun.springboot.controller;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.baomidou.dynamic.datasource.annotation.DS;
-import com.dujun.springboot.VO.Result;
-import com.dujun.springboot.entity.sonEntity.EnvDataBase;
-import com.dujun.springboot.entity.tools.TmkApply;
-import com.dujun.springboot.mapper.ToolsMapper;
-import com.dujun.springboot.service.ToolsService;
-import com.dujun.springboot.service.impl.ToolsServiceImpl;
-import com.mysql.cj.protocol.x.CompressionSplittedOutputStream;
-import com.mysql.cj.xdevapi.JsonString;
-import com.sun.org.apache.bcel.internal.generic.ReturnInstruction;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
-import javax.smartcardio.CardTerminal;
+import com.alibaba.fastjson.JSONObject;
+import com.dujun.springboot.VO.Result;
+import com.dujun.springboot.entity.tools.TmkApply;
+import com.dujun.springboot.service.impl.ToolsServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /*
     工具类

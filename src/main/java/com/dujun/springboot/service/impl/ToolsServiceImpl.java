@@ -172,9 +172,11 @@ public class ToolsServiceImpl implements ToolsService {
     public Result qyhApply(String phone, String city ){
         //填单数据
         HashMap payload = ApiOrderData.qyh_applyData(city);
+        System.out.println(payload);
+        System.out.println(JSON.toJSONString(payload));
         //用户填单
         JSONObject result = new Qyh(phone).fillForm(phone,JSON.toJSONString(payload));
-        log.debug(String.valueOf(result));
+        log.info(String.valueOf(result));
         String msg = result.getString("message");
         if(!msg.contains("系统异常")){
             //  获取填单ID

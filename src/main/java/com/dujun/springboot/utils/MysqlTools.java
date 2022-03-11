@@ -7,8 +7,12 @@
 package com.dujun.springboot.utils;
 
 import com.dujun.springboot.tools.YmlTools;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+import javafx.scene.Parent;
 import org.apache.http.client.methods.CloseableHttpResponse;
 
+import javax.sql.DataSource;
 import java.sql.*;
 
 public class MysqlTools {
@@ -21,11 +25,20 @@ public class MysqlTools {
     Statement statement = null;
     public String msg = "";
     public boolean result ;
+    HikariConfig config = new HikariConfig();
+
 
     public MysqlTools() {
+        config.setJdbcUrl(JDBC_URL);
+        config.setUsername(USER);
+        config.setPassword(PASSWORD);
+        config.addDataSourceProperty("connectionTimeout", "1000"); // 连接超时：1秒
+        config.addDataSourceProperty("idleTimeout", "60000"); // 空闲超时：60秒
+        config.addDataSourceProperty("maximumPoolSize", "10"); // 最大连接数：10
+        DataSource ds = new HikariDataSource(config);
         try {
-            this.connection = DriverManager.getConnection(JDBC_URL,USER,PASSWORD);
-            this.statement = connection.createStatement();
+            connection = ds.getConnection();
+            statement = connection.createStatement();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
@@ -33,12 +46,18 @@ public class MysqlTools {
 
     public MysqlTools(String jdbcUrl,String user,String password){
         try {
-            this.connection = DriverManager.getConnection(jdbcUrl, user, password);
-            this.statement = connection.createStatement();
+            config.setJdbcUrl(jdbcUrl);
+            config.setUsername(user);
+            config.setPassword(password);
+            config.addDataSourceProperty("connectionTimeout", "1000"); // 连接超时：1秒
+            config.addDataSourceProperty("idleTimeout", "60000"); // 空闲超时：60秒
+            config.addDataSourceProperty("maximumPoolSize", "10"); // 最大连接数：10
+            DataSource ds = new HikariDataSource(config);
+            connection = ds.getConnection();
+            statement = connection.createStatement();
             result = true;
         } catch (SQLException sqlException) {
-//            sqlException.printStackTrace();
-            System.out.println(sqlException);
+            sqlException.printStackTrace();
             result = false;
             msg = String.valueOf(sqlException);
         }
@@ -46,17 +65,22 @@ public class MysqlTools {
 
     //更新操作
     public void execute(String sql){
+
         try {
             this.statement.execute(sql);
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
+        } catch (SQLException sqlException) {
+            sqlException.printStackTrace();
         }
     }
 
     //查询操作
-    public ResultSet executeQuery(String sql) throws SQLException {
+    public ResultSet executeQuery(String sql){
         ResultSet resultSet = null;
-        resultSet = statement.executeQuery(sql);
+        try {
+            resultSet = connection.prepareStatement(sql).executeQuery();
+        } catch (SQLException sqlException) {
+            sqlException.printStackTrace();
+        }
         return resultSet;
     }
 
@@ -76,8 +100,6 @@ public class MysqlTools {
                 sqlException.printStackTrace();
             }
         }
-
-
     }
 
 }
@@ -86,6 +108,14 @@ public class MysqlTools {
 class Tests{
     public static void main(String[] args) {
         MysqlTools mysqlTools = new MysqlTools();
-        mysqlTools.msg = "操作成功";
+        String sql = "select * from crm.crm_config WHERE name = 'crm_electricity_status'";
+        ResultSet resultSet = mysqlTools.executeQuery(sql);
+        try {
+            if (resultSet.next()){
+                System.out.println(resultSet.getString("name"));
+            }
+        } catch (SQLException sqlException) {
+            sqlException.printStackTrace();
+        }
     }
 }
