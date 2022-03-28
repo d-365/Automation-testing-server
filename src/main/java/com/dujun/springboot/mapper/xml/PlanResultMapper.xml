@@ -3,8 +3,6 @@
 <mapper namespace="com.dujun.springboot.mapper.PlanResultMapper">
     <select id="planResultList" resultType="com.dujun.springboot.entity.PlanResult">
         SELECT * FROM `plan_result`
-
-
         WHERE 1=1
         <if test="resultStatus != null">
             and result_status = #{resultStatus}

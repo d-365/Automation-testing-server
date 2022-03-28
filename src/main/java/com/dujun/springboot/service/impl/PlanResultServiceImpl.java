@@ -62,7 +62,7 @@ public class PlanResultServiceImpl extends ServiceImpl<PlanResultMapper, PlanRes
 
     // 删除选中的计划列表
     @Transactional
-    public Result delPlanResult(ArrayList<Integer> checkResultId){
+    public Result<?> delPlanResult(ArrayList<Integer> checkResultId){
         for (Integer planResultId : checkResultId) {
             // 删除计划结果详情
             planResultDetailMapper.delete(new QueryWrapper<PlanResultDetail>().eq("plan_result_id",planResultId));

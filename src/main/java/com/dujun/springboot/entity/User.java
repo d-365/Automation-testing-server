@@ -1,6 +1,7 @@
 package com.dujun.springboot.entity;
 
 import com.alibaba.fastjson.annotation.JSONField;
+import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -51,6 +52,7 @@ public class User implements Serializable {
     /**
      * 管理员显示昵称
      */
+    @TableField()
     private String nickName;
 
     /**
@@ -61,6 +63,8 @@ public class User implements Serializable {
     //登录token
     @TableField(exist = false)
     private String token;
+
+    private Integer roleId;
 
 
 }

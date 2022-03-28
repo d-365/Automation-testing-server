@@ -2,10 +2,18 @@ package com.dujun.springboot.controller;
 
 
 import com.dujun.springboot.VO.Result;
+import com.dujun.springboot.entity.Menu;
+import com.dujun.springboot.entity.RespPageEntity;
+import com.dujun.springboot.entity.Role;
 import com.dujun.springboot.entity.User;
+import com.dujun.springboot.service.impl.MenuServiceImpl;
+import com.dujun.springboot.service.impl.RoleServiceImpl;
 import com.dujun.springboot.service.impl.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 import java.util.Objects;
 
@@ -24,6 +32,12 @@ public class UserController {
 
     @Autowired
     private UserServiceImpl userService;
+    @Autowired
+    private RoleServiceImpl roleService;
+
+    @Autowired
+    private MenuServiceImpl menuService;
+
 
     //用户登录
     @PostMapping(value = "/login")
@@ -42,8 +56,9 @@ public class UserController {
 
     //用户列表
     @GetMapping(value = "/userList")
-    public Result<List<User>> userList(String account){
-        return userService.userList(account);
+    public Result<List<User>> userList(String account,Integer roleId){
+        System.out.println("用户列表");
+        return userService.userList(account,roleId);
     }
 
     //更新用户
@@ -62,6 +77,46 @@ public class UserController {
     @PostMapping("/loginInfo")
     public Result<?> userInfo(@RequestBody int userId){
         return userService.userInfo(userId);
+    }
+
+    /**
+     * 角色列表
+     * @return RoleList
+     */
+    @GetMapping("/roleList")
+    public RespPageEntity roleList(Role role,@RequestParam(defaultValue = "1") Integer page, @RequestParam(defaultValue = "10") Integer size){
+        return roleService.roleList(role,page,size);
+    }
+
+    @GetMapping("/roles")
+    public Result<List<Role>> roles(){
+        return roleService.roles();
+    }
+
+
+    @PostMapping("/addRole")
+    public Result<?> addRole(@RequestBody Role role){
+        return roleService.addRole(role);
+    }
+
+    @GetMapping("/roleInfo/{roleId}")
+    public Result<Role> roleInfo(@PathVariable("roleId") Integer roleId){
+        return roleService.roleInfo(roleId);
+    }
+
+    @DeleteMapping("/delRole/{roleId}")
+    public Result<?> delRole(@PathVariable("roleId") Integer roleId){
+        return roleService.delRole(roleId);
+    }
+
+    @GetMapping("/menuList")
+    public Result<List<Menu>> menuList(){
+        return menuService.menuList();
+    }
+
+    @GetMapping("/userRole/{uId}")
+    public Result<List<Menu>> UserRole(@PathVariable("uId") Integer uId){
+        return roleService.UserRole(uId);
     }
 
 

@@ -15,10 +15,8 @@ import org.springframework.scheduling.annotation.SchedulingConfigurer;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Component;
-
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicReference;
 
 
 @Component
@@ -37,21 +35,22 @@ public class PlanTiming  implements SchedulingConfigurer {
         taskRegistrar.addTriggerTask(
                 //1.添加任务内容(Runnable)
                 () -> {
-                    List<RunPlan> runPlanList = commonService.getPlanList();
-                    for (RunPlan planDetail : runPlanList) {
-                        runPlanService.runPlan(planDetail);
-                    }
+//                    List<RunPlan> runPlanList = commonService.getPlanList();
+//                    for (RunPlan planDetail : runPlanList) {
+//                        runPlanService.runPlan(planDetail);
+//                    }
+//                    System.out.println("执行定时任务了");
                 },
                 //2.设置执行周期(Trigger)
                 triggerContext -> {
-                    String cron = "0 0 0 1/1 * ?";
-                    List<RunPlan> runPlanList = commonService.getPlanList();
-                    if (runPlanList.size()!=0){
-                        String newCron =  runPlanList.get(0).getClock();
-                        if (!Objects.equals(newCron, "")){
-                            cron = newCron;
-                        }
-                    }
+                    String cron = "0/10 * * * * ?";
+//                    List<RunPlan> runPlanList = commonService.getPlanList();
+//                    if (runPlanList.size()!=0){
+//                        String newCron =  runPlanList.get(0).getClock();
+//                        if (!Objects.equals(newCron, "")){
+//                            cron = newCron;
+//                        }
+//                    }
                     //2.1 从数据库获取执行周期
                     //2.2 合法性校验
                     //2.3 返回执行周期(Date)

@@ -67,16 +67,20 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
     }
 
-    public Result<List<User>> userList(String account){
+    public Result<List<User>> userList(String account,Integer roleId){
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         if(!Objects.equals(account, "") && account !=null ){
             queryWrapper.eq("account",account);
+        }
+        if (roleId !=null){
+            queryWrapper.eq("role_id",roleId);
         }
         List<User> userList = userMapper.selectList(queryWrapper);
         return Result.success(userList);
     }
 
     public Integer updateUser(User user){
+        user.setPassword(encryptionUtils.md5Encryption(user.getPassword()));
         return userMapper.updateById(user);
     }
 

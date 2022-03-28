@@ -12,17 +12,25 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Configuration
+//@Configuration
 public class MyWebConfig implements WebMvcConfigurer {
+
     @Autowired
     MyInterceptor myInterceptor;
 
+    @Bean
+    public MyInterceptor getMyInterceptor(){
+        return new MyInterceptor();
+    }
+
+    /*注册监听器*/
     @Bean
     public ServletListenerRegistrationBean<MyListener> myListener(){
         ServletListenerRegistrationBean<MyListener> registrationBean = new ServletListenerRegistrationBean<>();
@@ -30,11 +38,8 @@ public class MyWebConfig implements WebMvcConfigurer {
         return registrationBean;
     }
 
-    @Bean
-    public MyInterceptor getMyInterceptor(){
-        return new MyInterceptor();
-    }
 
+    /*注册过滤器*/
     @Bean
     public FilterRegistrationBean<MyFilter> filterRegistrationBean(){
         FilterRegistrationBean<MyFilter> filterRegistration = new FilterRegistrationBean<>();
@@ -44,6 +49,7 @@ public class MyWebConfig implements WebMvcConfigurer {
     }
 
 
+    /*注册拦截器*/
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         List<String> excludePath = new ArrayList<String>(){{
@@ -52,6 +58,17 @@ public class MyWebConfig implements WebMvcConfigurer {
             add("/loginPlus");
         }};
         registry.addInterceptor(myInterceptor).excludePathPatterns(excludePath).addPathPatterns("/**");
+    }
+
+    /*跨域处理*/
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedOrigins("*")
+                .allowedMethods("GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS")
+                .allowCredentials(true)
+                .maxAge(3600)
+                .allowedHeaders("*");
     }
 
 
