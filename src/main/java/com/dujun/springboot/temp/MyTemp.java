@@ -7,15 +7,10 @@
 package com.dujun.springboot.temp;
 
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.net.InetSocketAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.util.HashMap;
 
 class myTest{
     public static void main(String[] args) throws Exception {
-        ServerSocket serverSocket = new ServerSocket(9999);
-        System.out.println(serverSocket.getReuseAddress());
+       HashMap<String,String> s = new HashMap<String, String>(){{put("","");}};
     }
 }

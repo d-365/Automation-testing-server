@@ -1,12 +1,9 @@
 package com.dujun.springboot.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
+import java.util.Date;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -17,24 +14,43 @@ import lombok.experimental.Accessors;
  * </p>
  *
  * @author dujun
- * @since 2022-03-28
+ * @since 2022-04-06
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-public class WebPage implements Serializable {
+public class PageElement implements Serializable {
 
     private static final long serialVersionUID=1L;
 
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
-    private String name;
+    /**
+     * 元素名称
+     */
+    private String elementName;
 
-    private Integer parentId;
+    /**
+     * 定位方式
+     */
+    private String locationWay;
 
-    @TableField(exist = false)
-    private List<WebPage>  children = new ArrayList<>();
+    /**
+     * 定位值
+     */
+    private String locationValue;
+
+    /**
+     * 备注
+     */
+    private String remark;
+
+    private Date createTime;
+
+    private Date updateTime;
+
+    private Integer pageId;
 
 
 }

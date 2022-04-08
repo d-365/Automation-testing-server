@@ -1,7 +1,11 @@
 package com.dujun.springboot.service;
 
+import com.dujun.springboot.VO.Result;
 import com.dujun.springboot.entity.WebPage;
 import com.baomidou.mybatisplus.extension.service.IService;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <p>
@@ -13,4 +17,13 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface WebPageService extends IService<WebPage> {
 
+    /**
+     *
+     * @return WebPage
+     */
+    Result<List<WebPage>> PAGE_LIST();
+
+    Result<?> pageUpdate(WebPage Page);
+
+    Result<?> pageDel(Integer pageId);
 }

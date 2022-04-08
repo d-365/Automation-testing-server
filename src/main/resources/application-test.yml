@@ -21,6 +21,7 @@ spring:
       druid:
         test-on-borrow: true
         test-while-idle: true
+        init-connection-sqls: set names utf8mb4
   devtools:
     restart:
       enabled: true

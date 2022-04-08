@@ -6,6 +6,7 @@
 
 package com.dujun.springboot.config;
 
+import com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor;
 import com.dujun.springboot.config.inteceptor.MyInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -19,7 +20,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import java.util.ArrayList;
 import java.util.List;
 
-//@Configuration
+@Configuration
 public class MyWebConfig implements WebMvcConfigurer {
 
     @Autowired
@@ -64,12 +65,23 @@ public class MyWebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("*")
+                .allowedOriginPatterns("*")
                 .allowedMethods("GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowCredentials(true)
                 .maxAge(3600)
                 .allowedHeaders("*");
     }
+
+    /**
+     * MybatisPlus分页
+     */
+    @Bean
+    public PaginationInterceptor paginationInterceptor() {
+        return new PaginationInterceptor();
+    }
+
+
+
 
 
 }

@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.concurrent.Callable;
 
 /*
@@ -66,6 +67,12 @@ public class ToolsServiceImpl implements ToolsService {
     @DS("qsTest")
     public Result tmkApply(String phone, String city ){
         MysqlTools mysqlTools = ToolsServiceImpl.mysqlConnection();
+        if (phone == null || Objects.equals(phone, "")){
+            phone = RandomValue.getTel();
+        }
+        if (city == null || Objects.equals(city,"")){
+            city = RandomValue.getAddress();
+        }
 
         ToolsServiceImpl.deleteUserOrder(phone);
         //用户填单
