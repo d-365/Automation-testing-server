@@ -32,6 +32,14 @@ public class AutoConfigController {
         return configService.locationWay();
     }
 
+    /**
+     * 定位方式列表
+     */
+    @PostMapping("/elementType")
+    public Result<?> elementType(){
+        return configService.elementType();
+    }
+
 
 
 }

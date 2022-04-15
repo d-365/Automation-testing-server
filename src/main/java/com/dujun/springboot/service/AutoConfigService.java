@@ -16,4 +16,6 @@ public interface AutoConfigService extends IService<AutoConfig> {
 
     Result<?> locationWay();
 
+    Result<?> elementType();
+
 }

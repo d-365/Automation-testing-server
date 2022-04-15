@@ -14,6 +14,7 @@ import com.dujun.springboot.tools.dateTools;
 import com.dujun.springboot.utils.MyRedis;
 import com.dujun.springboot.utils.MysqlTools;
 import com.dujun.springboot.utils.request;
+import com.mysql.cj.jdbc.MysqlSavepoint;
 import org.apache.http.client.methods.CloseableHttpResponse;
 
 import java.util.HashMap;
@@ -23,7 +24,10 @@ public class Qyh {
     YmlTools ymlTools = new YmlTools("globalConfig.yml");
     MyRedis myRedis = new MyRedis(ymlTools.getValueByKey("test.redis.qyh.ip",""),ymlTools.getValueByKey("test.redis.qyh.password",""));
     String domain = ymlTools.getValueByKey("test.domain.qyh","");
+
     private String token = "";
+
+    static MysqlTools mysqlTools = new MysqlTools();
 
 
     public Qyh (String phone){
@@ -32,12 +36,13 @@ public class Qyh {
 
     // 执行sql操作(对应手机号订单改为3天前)
     public static void apply_step(String phone){
-        String beforeTime = dateTools.currentTime(-3);
-        new MysqlTools().execute(String.format("UPDATE qyh.qyh_order as a INNER JOIN (SELECT id from qyh.qyh_order WHERE customer_phone = %s order BY id DESC  LIMIT 1) as b  on a.id =b.id  SET refresh_time='%s',create_time='%s',update_time='%s'; ",phone,beforeTime,beforeTime,beforeTime));
+        String beforeTime = dateTools.currentTime(-5);
+        mysqlTools.execute(String.format("UPDATE qyh.qyh_order SET dock_time ='%1$s', refresh_time='%1$s',create_time='%1$s',update_time='%1$s'  WHERE customer_phone =%2$s",beforeTime,phone));
     }
 
     // 登录
     public void login(String phone){
+
         myRedis.set(String.format("customer_%s",phone),"1234");
         String url = domain+"/api/customer/v1/user/code/login";
         HashMap<String,String> header = new HashMap<String, String>(){{

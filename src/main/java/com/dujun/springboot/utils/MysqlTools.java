@@ -65,7 +65,7 @@ public class MysqlTools {
 
     //更新操作
     public void execute(String sql){
-
+        System.out.println("打印下sql"+sql);
         try {
             this.statement.execute(sql);
         } catch (SQLException sqlException) {

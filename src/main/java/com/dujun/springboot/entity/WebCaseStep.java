@@ -1,15 +1,12 @@
 package com.dujun.springboot.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.IdType;
-
-import java.util.ArrayList;
 import java.util.Date;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.io.Serializable;
-import java.util.List;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -20,12 +17,12 @@ import lombok.experimental.Accessors;
  * </p>
  *
  * @author dujun
- * @since 2022-04-06
+ * @since 2022-04-14
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-public class Action implements Serializable {
+public class WebCaseStep implements Serializable {
 
     private static final long serialVersionUID=1L;
 
@@ -33,41 +30,44 @@ public class Action implements Serializable {
     private Integer id;
 
     /**
-     * 动作名称
+     * WEB自动化用例ID
      */
-    private String name;
+    private Integer caseId;
+
+    // 步骤排序
+    private Integer sort;
 
     /**
-     * 0  WEB自动化  1 APP自动化  2 接口自动化
+     * 用例描述
      */
-    private Integer type;
+    private String stepDescribe;
 
     /**
-     * 动作类型
+     * action操作ID
      */
-    private String actionKey;
+    private Integer actionId;
 
     /**
-     * 备注
+     * action操作概述
      */
-    private String remark;
+    private String actionSummary;
 
     /**
-     * 父类ID
+     * 元素信息
      */
-    private Integer parentId;
+    @TableField(updateStrategy= FieldStrategy.IGNORED)
+    private Integer elementId;
+
+    /**
+     * 用例步骤启用 0 启用 1 禁用
+     */
+    private Integer status;
 
     private Date createTime;
 
     private Date updateTime;
 
-    /**
-     * 0  启用  1 已删除
-     */
-    private Integer delFlag;
-
-    @TableField(exist = false)
-    private List<Action> children = new ArrayList<>();
+    private String actionValue;
 
 
 }

@@ -2,8 +2,10 @@ package com.dujun.springboot.controller;
 
 
 import com.dujun.springboot.VO.Result;
+import com.dujun.springboot.entity.WebCaseStep;
 import com.dujun.springboot.entity.WebPage;
 import com.dujun.springboot.service.impl.WebPageServiceImpl;
+import org.hibernate.boot.jaxb.hbm.spi.PluralAttributeInfoIdBagAdapter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,6 +43,17 @@ public class WebPageController {
         return webPageService.pageDel(pageId);
     }
 
+    // 页面元素级联选择
+    @PostMapping("/webPageElement")
+    public Result<?> webPageElement(){
+        return webPageService.webPageElement();
+    }
+
+    // 更新用例步骤
+    @PostMapping("/caseStep/update")
+    public Result<?> upCaseStep(@RequestBody List<WebCaseStep> caseSteps){
+        return webPageService.upCaseStep(caseSteps);
+    }
 
 
 }

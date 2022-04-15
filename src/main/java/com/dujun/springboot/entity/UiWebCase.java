@@ -20,54 +20,41 @@ import lombok.experimental.Accessors;
  * </p>
  *
  * @author dujun
- * @since 2022-04-06
+ * @since 2022-04-11
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-public class Action implements Serializable {
+public class UiWebCase implements Serializable {
 
     private static final long serialVersionUID=1L;
 
-    @TableId(value = "id", type = IdType.AUTO)
+    @TableId(value = "id")
     private Integer id;
 
     /**
-     * 动作名称
+     * 用例名称
      */
     private String name;
 
-    /**
-     * 0  WEB自动化  1 APP自动化  2 接口自动化
-     */
-    private Integer type;
+    private Integer parentId;
 
     /**
-     * 动作类型
+     * 0  文件夹  1 用例
      */
-    private String actionKey;
+    private Integer type;
 
     /**
      * 备注
      */
     private String remark;
 
-    /**
-     * 父类ID
-     */
-    private Integer parentId;
-
     private Date createTime;
 
     private Date updateTime;
 
-    /**
-     * 0  启用  1 已删除
-     */
-    private Integer delFlag;
-
     @TableField(exist = false)
-    private List<Action> children = new ArrayList<>();
+    private List<UiWebCase> children = new ArrayList<>();
 
 
 }

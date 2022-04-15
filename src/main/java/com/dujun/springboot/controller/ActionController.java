@@ -40,7 +40,10 @@ public class ActionController {
         return actionService.updateAction(action);
     }
 
-
+    @PostMapping("/actionTree")
+    public Result<?> actionTree(@RequestBody Action action){
+        return actionService.actionTree(action);
+    }
 
 }
 

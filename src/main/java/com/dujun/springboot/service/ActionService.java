@@ -23,4 +23,6 @@ public interface ActionService extends IService<Action> {
 
     Result<?> updateAction(Action action);
 
+    Result<?> actionTree(Action action);
+
 }

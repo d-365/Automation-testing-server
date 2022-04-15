@@ -40,8 +40,24 @@ public class AutoConfigServiceImpl extends ServiceImpl<AutoConfigMapper, AutoCon
         String[] strings = seleniumLocation.split(",");
         List<HashMap<String,String>> locationWays = new ArrayList<>();
         for (String locationWay : strings) {
-            locationWays.add(new HashMap<String, String>(){{ put("location",locationWay); }});
+            locationWays.add(new HashMap<String, String>(){{ put("value",locationWay); }});
         }
         return Result.success(locationWays);
     }
+
+    /**
+     * selenium定位方式
+     * @return
+     */
+    @Override
+    public Result<?> elementType() {
+        String seleniumLocation = configMapper.ValueByNAme("elementType");
+        String[] strings = seleniumLocation.split(",");
+        List<HashMap<String,String>> locationWays = new ArrayList<>();
+        for (String locationWay : strings) {
+            locationWays.add(new HashMap<String, String>(){{ put("value",locationWay.trim()); }});
+        }
+        return Result.success(locationWays);
+    }
+
 }

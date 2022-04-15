@@ -32,6 +32,11 @@ public class PageElement implements Serializable {
     private String elementName;
 
     /**
+     * 元素类型
+     */
+    private String elementType;
+
+    /**
      * 定位方式
      */
     private String locationWay;
