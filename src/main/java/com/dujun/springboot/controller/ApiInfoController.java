@@ -66,9 +66,7 @@ public class ApiInfoController {
 //        apiInfo.setReqParams(reqParams);
 //        apiInfo.setName(name);
 //        apiInfoMapper.insert(apiInfo);
-        System.out.println(obj);
         List<ApiInfo> list = apiInfoMapper.selectList(null);
-        System.out.println(list);
     }
 
     @PostMapping("/debug")

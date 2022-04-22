@@ -17,7 +17,7 @@ public class HomeStatics {
     private ApiAutoStatics ApiAutoStatics;
 
     // UI自动化统计
-    private String UIAutoStatics;
+    private ApiAutoStatics webAutoStatics;
 
     // App自动化统计
     private String AppAutoStatics;

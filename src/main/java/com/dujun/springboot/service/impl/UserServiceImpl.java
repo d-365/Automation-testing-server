@@ -96,7 +96,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             envId = userEnvMapper.selectOne(new QueryWrapper<UserEnv>().eq("user_id",userId)).getEnvId();
             EnvName = envMapper.selectById(envId).getEnvName();
         }catch (NullPointerException e){
-            System.out.println(e);
+            e.printStackTrace();
         }
         userInfo.setEnvId(envId);
         userInfo.setEnvName(EnvName);

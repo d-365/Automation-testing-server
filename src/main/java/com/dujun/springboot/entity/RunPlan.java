@@ -86,5 +86,8 @@ public class RunPlan implements Serializable {
     // 定时任务执行次数
     private Integer clockExecCount;
 
+    // UI自动化执行 浏览器类型
+    private String browserType;
+
 
 }

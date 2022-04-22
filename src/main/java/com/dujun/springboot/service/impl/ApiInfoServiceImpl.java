@@ -46,9 +46,7 @@ public class ApiInfoServiceImpl extends ServiceImpl<ApiInfoMapper, ApiInfo> impl
     //接口详情(分类ID)
     public Result<ApiInfo> detail(int suiteId){
         ApiInfo apiInfo = apiInfoMapper.selectOne(new QueryWrapper<ApiInfo>().eq("api_suite_id",suiteId));
-        System.out.println(apiInfo);
         ArrayList<ApiExec> beforeExec = apiInfo.getBeforeExec();
-        System.out.println(beforeExec);
 
         // 增加默认值（reqAssert/reqExtract）
         ArrayList arrayList = new ArrayList<>();
@@ -84,8 +82,6 @@ public class ApiInfoServiceImpl extends ServiceImpl<ApiInfoMapper, ApiInfo> impl
         Long apiID = apiInfo.getApiSuiteId();
         ApiInfo result = apiInfoMapper.selectOne(new QueryWrapper<ApiInfo>().eq("api_suite_id",apiID));
         ArrayList<ApiExec> apiExecs = apiInfo.getBeforeExec();
-
-        System.out.println(apiExecs);
         for (ApiExec apiExec : apiExecs) {
             String s = apiExec.getDbConfig();
         }

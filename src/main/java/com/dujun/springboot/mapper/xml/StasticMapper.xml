@@ -26,6 +26,6 @@
 					result_status != 1
 			) AS failed
 		FROM
-			plan_result;
+			plan_result where plan_type = #{planType};
     </select>
 </mapper>

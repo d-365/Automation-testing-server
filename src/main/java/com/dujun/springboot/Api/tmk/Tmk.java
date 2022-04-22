@@ -62,6 +62,7 @@ public class Tmk {
         HashMap<String,String> headers = getHeaders(token);
         String login_url = "http://testdrktm.wanqiandaikuan.com/api/tmk/electricity/telemarketing/apply";
         CloseableHttpResponse response = request.post(login_url,headers,payload);
+        System.out.println(request.getResponseJson(response));
         return request.getResponseJson(response);
     }
 
@@ -78,6 +79,5 @@ class hh{
 
         HashMap<Object,Object> data = ApiOrderData.tmk_data("15622222222","杭州市");
         JSONObject jsonObject = new Tmk().apply(data);
-        System.out.println(jsonObject);
     }
 }

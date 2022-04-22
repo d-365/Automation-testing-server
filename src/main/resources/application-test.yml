@@ -2,7 +2,6 @@ server:
   port: 1997
 
 spring:
-
   # 数据源
   datasource:
     dynamic:
@@ -32,15 +31,22 @@ spring:
 
 # mybatis-plus
 mybatis-plus:
-
-  configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  # 打印sql执行结果
+#  configuration:
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
   mapper-locations: classpath:**/*Mapper.xml
 
   global-config:
     db-config:
       id-type: auto
 
+# 简洁配置-不打印sql执行结果
+logging:
+  level:
+    com:
+      dujun:
+        springboot:
+          DEBUG
 # 测试环境
 test:
   domain:

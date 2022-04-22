@@ -16,8 +16,8 @@ import java.util.List;
  */
 public interface PlanResultMapper extends BaseMapper<PlanResult> {
 
-    List<PlanResult> planResultList(Integer page,Integer size,String planName,Integer resultStatus,String startTime);
+    List<PlanResult> planResultList(Integer page, Integer size, String planName, Integer planType, Integer resultStatus, String startTime);
 
-    Long planResultTotal(Integer resultStatus,String planName,String startTime);
+    Long planResultTotal(Integer resultStatus, String planName, Integer planType, String startTime);
 
 }

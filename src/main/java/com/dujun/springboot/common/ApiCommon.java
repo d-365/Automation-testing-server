@@ -99,7 +99,6 @@ public  class ApiCommon {
                             realValue = ApiCommon.parseJson(rspJson,extractExpress);
                             System.out.println("解析出的值是: "+realValue);
                         }catch (NullPointerException nullPointerException){
-                            System.out.println(nullPointerException);
                             consoleMsg .add(new ApiConsole(false,"表达式有误",extractExpress));
                         }
                         //进行断言
@@ -195,7 +194,6 @@ public  class ApiCommon {
                                 try {
                                     parseJsonArray = ParseJsonObject.getJSONArray(s);
                                 } catch (ClassCastException castException) {
-                                    System.out.println(castException);
                                     return "无法解析表达式值" + s;
                                 }
 
@@ -205,7 +203,6 @@ public  class ApiCommon {
                         try{
                             ParseJsonObject = JSONObject.parseObject((ParseJsonObject.getString(strings[i])));
                         }catch (JSONException jsonException){
-                            System.out.println(jsonException);
                             return "无法解析表达式值:"+ strings[i];
                         }
                     }
@@ -223,7 +220,7 @@ public  class ApiCommon {
                                 try {
                                     parseJsonArray = ParseJsonObject.getJSONArray(s);
                                 } catch (ClassCastException castException) {
-                                    System.out.println(castException);
+                                    castException.printStackTrace();
                                     return "无法解析表达式值" + s;
                                 }
 
@@ -248,7 +245,7 @@ public  class ApiCommon {
                         try {
                             parseJsonArray = ParseJsonObject.getJSONArray(s);
                         } catch (ClassCastException castException) {
-                            System.out.println(castException);
+                            castException.printStackTrace();
                             return "无法解析表达式值" + s;
                         }
 
@@ -419,7 +416,6 @@ public  class ApiCommon {
             apiInfo.setRspBodyJson(rspJson);
             apiInfo.setRspBodySize(rspJson.size());
         } catch (JSONException jsonException){
-            System.out.println(jsonException);
             // text格式响应体
             try {
                 apiInfo.setTextBody(EntityUtils.toString(response.getEntity()));
@@ -835,7 +831,6 @@ public  class ApiCommon {
                 response = request.delete(url,headers);
                 break;
             case "PUT":
-                System.out.println(method);
                 break;
             case "GET":
                 //params
@@ -846,10 +841,8 @@ public  class ApiCommon {
                 try {
                     response = request.get(url,headers,params);
                     endTime = new Date().getTime();
-                } catch (URISyntaxException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
-                } catch (IllegalArgumentException illegalArgumentException){
-                    System.out.println(illegalArgumentException);
                 }
                 break;
             case "POST":
@@ -882,7 +875,6 @@ public  class ApiCommon {
             apiInfo.setRspBodyJson(rspJson);
             apiInfo.setRspBodySize(rspJson.size());
         } catch (JSONException jsonException){
-            System.out.println(jsonException);
             // text格式响应体
             try {
                 apiInfo.setTextBody(EntityUtils.toString(response.getEntity()));
@@ -987,7 +979,6 @@ public  class ApiCommon {
                             realValue = ApiCommon.parseJson(rspJson,extractExpress);
                             System.out.println("解析出的值是: "+realValue);
                         }catch (NullPointerException nullPointerException){
-                            System.out.println(nullPointerException);
                             consoleMsg .add(new ApiConsole(false,"表达式有误",extractExpress));
                         }
                         //进行断言

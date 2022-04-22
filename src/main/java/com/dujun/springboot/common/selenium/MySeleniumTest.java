@@ -11,8 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class MySeleniumTest {
     @Test
     public void test1() throws Exception {
-        WebDriver driver = MySelenium.getDriver("chrome");
-        MySelenium.findElement(ExpectedConditions.visibilityOfElementLocated(By.xpath("ff")));
+        WebDriver driver = MySelenium.getRemoteDriver("http://192.168.2.161:8585","fireFox");
     }
 
 }

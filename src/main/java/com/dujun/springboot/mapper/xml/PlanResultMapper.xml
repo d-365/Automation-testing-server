@@ -12,6 +12,10 @@
             and plan_name=#{planName}
         </if>
 
+        <if test="planType != null">
+            and plan_type=#{planType}
+        </if>
+
         <if test="startTime != null and startTime != ''">
             and start_time LIKE concat(#{startTime},'%')
         </if>
@@ -31,6 +35,9 @@
 
         <if test="planName != null and planName != ''">
             and plan_name=#{planName}
+        </if>
+        <if test="planType != null">
+            and plan_type=#{planType}
         </if>
         <if test="startTime != null and startTime != ''">
             and start_time LIKE concat(#{startTime},'%')

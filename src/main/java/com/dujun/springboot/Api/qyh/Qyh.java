@@ -54,7 +54,6 @@ public class Qyh {
         }};
         CloseableHttpResponse response =  request.post_url(url,header,payload);
         JSONObject jsonObject = request.getResponseJson(response);
-        System.out.println(jsonObject);
         this.token = JsonTools.parseJson("data.token",jsonObject);
     }
 

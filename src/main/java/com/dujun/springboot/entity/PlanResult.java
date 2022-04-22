@@ -81,6 +81,9 @@ public class PlanResult implements Serializable {
     // 用例执行失败数量
     private Integer caseFailedCount;
 
+    // 计划类型
+    private Integer planType;
+
 
 
 }

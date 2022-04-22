@@ -1,17 +1,18 @@
 package com.dujun.springboot.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.dujun.springboot.VO.Result;
 import com.dujun.springboot.entity.*;
-import com.dujun.springboot.mapper.ApiCaseMapper;
-import com.dujun.springboot.mapper.CategoryApiMapper;
-import com.dujun.springboot.mapper.PlanResultDetailMapper;
-import com.dujun.springboot.mapper.PlanResultMapper;
+import com.dujun.springboot.mapper.*;
 import com.dujun.springboot.service.PlanResultService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.testng.collections.Lists;
+
 import javax.annotation.Resource;
+import javax.swing.plaf.metal.MetalBorders;
 import java.util.*;
 
 /**
@@ -37,6 +38,9 @@ public class PlanResultServiceImpl extends ServiceImpl<PlanResultMapper, PlanRes
     @Resource
     private ApiCaseMapper apiCaseMapper;
 
+    @Resource
+    private WebCaseStepMapper webCaseStepMapper;
+
     //计划运行结果列表
     @Transactional
     public RespPageEntity result_list(PlanResult planResult,Integer page ,Integer size){
@@ -46,6 +50,8 @@ public class PlanResultServiceImpl extends ServiceImpl<PlanResultMapper, PlanRes
         Integer  resultStatus = planResult.getResultStatus();
         String startTime = planResult.getStartTime();
 
+        Integer planType = planResult.getPlanType();
+
         RespPageEntity pageEntity = new RespPageEntity();
 
         // 默认从0开始
@@ -53,9 +59,9 @@ public class PlanResultServiceImpl extends ServiceImpl<PlanResultMapper, PlanRes
             page = (page-1)*size;
         }
 
-        List<PlanResult> planResultList = planResultMapper.planResultList(page,size,planName,resultStatus,startTime);
+        List<PlanResult> planResultList = planResultMapper.planResultList(page,size,planName,planType,resultStatus,startTime);
         pageEntity.setData(planResultList);
-        pageEntity.setTotal(planResultMapper.planResultTotal(resultStatus,planName,startTime));
+        pageEntity.setTotal(planResultMapper.planResultTotal(resultStatus,planName,planType,startTime));
 
         return  pageEntity;
     }
@@ -99,7 +105,7 @@ public class PlanResultServiceImpl extends ServiceImpl<PlanResultMapper, PlanRes
         }
         // 封装caseReport
         for (Integer caseId : caseIds) {
-            Boolean result = true;
+            boolean result = true;
             ApiCase apiCase = apiCaseMapper.selectCase(caseId);
             List<PlanResultDetail> caseResult = planResultDetailMapper.selectList(new QueryWrapper<PlanResultDetail>().eq("plan_result_id",planResultId).eq("case_id",caseId));
             ArrayList<ApiInfo> caseStep = new ArrayList<>();
@@ -109,8 +115,10 @@ public class PlanResultServiceImpl extends ServiceImpl<PlanResultMapper, PlanRes
                     result = false;
                 }
             }
-            apiCase.setResult(result);
-            apiCase.setStep(caseStep);
+            if (apiCase!=null){
+                apiCase.setResult(result);
+                apiCase.setStep(caseStep);
+            }
             caseReport.add(apiCase);
         }
         planResultReport.setApiRunResult(apiReport);
@@ -121,4 +129,37 @@ public class PlanResultServiceImpl extends ServiceImpl<PlanResultMapper, PlanRes
     }
 
 
+    // 获取计划执行结果Web自动化
+    @Override
+    public Result<?> webReport(Integer planResultId) {
+
+        planResultReport planResultReport = new planResultReport();
+        // 将计划结果信息进行封装
+        PlanResult planResult = planResultMapper.selectById(planResultId);
+        planResultReport.setPlanResult(planResult);
+
+        // 封装用例步骤信息
+        LambdaQueryWrapper<PlanResultDetail> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(PlanResultDetail::getPlanResultId,planResultId);
+        List<PlanResultDetail> caseList = planResultDetailMapper.selectList(lambdaQueryWrapper);
+
+        // 遍历用例名信息 用例步骤信息
+        for (PlanResultDetail planResultDetail : caseList) {
+            Integer caseId = planResultDetail.getCaseId();
+            // 用例名
+            String caseName = planResultDetailMapper.findCaseName(caseId);
+
+            // 用例步骤信息
+            LambdaQueryWrapper<WebCaseStep> caseStepLambda = new LambdaQueryWrapper<>();
+            caseStepLambda.eq(WebCaseStep::getCaseId,caseId);
+            caseStepLambda.orderByAsc(WebCaseStep::getSort);
+            List<WebCaseStep> caseSteps = webCaseStepMapper.selectList(caseStepLambda);
+            planResultDetail.setCaseSteps(caseSteps);
+            planResultDetail.setCaseName(caseName);
+
+        }
+        planResultReport.setCaseRunResult((ArrayList<PlanResultDetail>) caseList);
+        // 封装计划执行详情信息
+        return Result.success(planResultReport);
+    }
 }

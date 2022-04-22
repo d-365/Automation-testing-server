@@ -65,7 +65,6 @@ public class MysqlTools {
 
     //更新操作
     public void execute(String sql){
-        System.out.println("打印下sql"+sql);
         try {
             this.statement.execute(sql);
         } catch (SQLException sqlException) {
@@ -112,7 +111,6 @@ class Tests{
         ResultSet resultSet = mysqlTools.executeQuery(sql);
         try {
             if (resultSet.next()){
-                System.out.println(resultSet.getString("name"));
             }
         } catch (SQLException sqlException) {
             sqlException.printStackTrace();

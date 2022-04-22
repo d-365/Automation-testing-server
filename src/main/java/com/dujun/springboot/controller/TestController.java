@@ -7,15 +7,25 @@
 package com.dujun.springboot.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.io.IOException;
 
 @RestController
-@RequestMapping()
+@RequestMapping("/test")
 public class TestController {
 
-    @GetMapping("/test")
-    public String test(){
-        return "test";
+    @PostMapping("/upload")
+    public String test(MultipartFile file){
+        try {
+            file.transferTo(new File("C:\\Users\\dujun\\Desktop\\1.jpg"));
+        } catch (IOException ioException) {
+            ioException.printStackTrace();
+        }
+        return null;
     }
 }

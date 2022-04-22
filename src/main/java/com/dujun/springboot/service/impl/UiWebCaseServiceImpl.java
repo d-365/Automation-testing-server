@@ -1,21 +1,36 @@
 package com.dujun.springboot.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dujun.springboot.VO.Result;
+import com.dujun.springboot.VO.UIConsole;
+import com.dujun.springboot.common.selenium.MySelenium;
+import com.dujun.springboot.common.selenium.SeleniumUtils;
+import com.dujun.springboot.common.selenium.executeCases;
 import com.dujun.springboot.entity.UiWebCase;
 import com.dujun.springboot.entity.WebCaseStep;
 import com.dujun.springboot.mapper.UiWebCaseMapper;
 import com.dujun.springboot.mapper.WebCaseStepMapper;
 import com.dujun.springboot.service.UiWebCaseService;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.dujun.springboot.utils.UserHttpAgentUtils;
+import net.sf.jsqlparser.expression.operators.relational.FullTextSearch;
+import org.openqa.selenium.WebDriver;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.testng.collections.Lists;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 /**
@@ -34,6 +49,9 @@ public class UiWebCaseServiceImpl extends ServiceImpl<UiWebCaseMapper, UiWebCase
 
     @Resource
     private WebCaseStepMapper webCaseStepMapper;
+
+    @Autowired
+    private SeleniumUtils seleniumUtils;
 
     @Override
     public Result<?> caseList() {
@@ -150,6 +168,30 @@ public class UiWebCaseServiceImpl extends ServiceImpl<UiWebCaseMapper, UiWebCase
     public Result<?> delCaseStep(Integer stepId) {
         webCaseStepMapper.deleteById(stepId);
         return Result.success();
+    }
+
+    /**
+     * 调试用例
+     * @param caseId 用例ID
+     * @return Result
+     */
+    @Override
+    public Result<?> debugCase(Integer caseId,String payload, HttpServletRequest request) {
+        List<UIConsole> consoles = null;
+        ExecutorService executor = Executors.newCachedThreadPool();
+        Future<List<UIConsole>> future = executor.submit(new executeCases(caseId,payload,request));
+        try {
+            consoles = future.get();
+        } catch (Exception  e) {
+            e.printStackTrace();
+        }
+        return Result.success(consoles);
+    }
+
+    // seleniumServer下载
+    @Override
+    public void seleniumServerDownload(HttpServletResponse response) {
+
     }
 
 }

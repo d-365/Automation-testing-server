@@ -26,6 +26,8 @@ public interface RunPlanService extends IService<RunPlan> {
     Result runPlan(RunPlan planInfo);
 
     // 新增修改计划
-    Result update(RunPlan plan);
+    Result<?> update(RunPlan plan);
+
+    Result<?> webRun(Integer planId);
 
 }

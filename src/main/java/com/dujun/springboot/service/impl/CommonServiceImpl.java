@@ -45,7 +45,6 @@ public class CommonServiceImpl  implements CommonService {
         queryWrapper.eq("status","1");
         queryWrapper.eq("is_clock","1");
         List<RunPlan> planList = runPlanMapper.selectList(queryWrapper);
-        System.out.println(planList);
         return planList;
     }
 

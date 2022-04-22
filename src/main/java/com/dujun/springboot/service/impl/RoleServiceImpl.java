@@ -54,7 +54,6 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
         if(roleId != null){
             Stream<String> stringStream = role.getPermissionUrl().stream().filter(Objects::nonNull);
             List<String> filterList = stringStream.collect(Collectors.toList());
-            System.out.println(filterList);
             role.setPermissionUrl(filterList);
             roleMapper.updateById(role);
         }else {
@@ -66,7 +65,6 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
     @Override
     public Result<Role> roleInfo(Integer roleId) {
         Role role = roleMapper.selectById(roleId);
-        System.out.println(role);
         return Result.success(role);
     }
 

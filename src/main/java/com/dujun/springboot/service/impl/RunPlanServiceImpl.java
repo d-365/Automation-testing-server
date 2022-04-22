@@ -3,6 +3,7 @@ package com.dujun.springboot.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.dujun.springboot.VO.Result;
 import com.dujun.springboot.common.ApiCommon;
+import com.dujun.springboot.common.selenium.runWebPlan;
 import com.dujun.springboot.entity.*;
 import com.dujun.springboot.mapper.*;
 import com.dujun.springboot.service.RunPlanService;
@@ -14,6 +15,10 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  * <p>
@@ -40,6 +45,11 @@ public class RunPlanServiceImpl extends ServiceImpl<RunPlanMapper, RunPlan> impl
     private PlanResultDetailMapper planResultDetailMapper;
 
     @Resource
+    private UiWebCaseMapper webCaseMapper;
+    @Resource
+    private WebCaseStepMapper webCaseStepMapper;
+
+    @Resource
     // 接口详情mapper
     private ApiInfoMapper apiInfoMapper;
     @Resource
@@ -51,7 +61,11 @@ public class RunPlanServiceImpl extends ServiceImpl<RunPlanMapper, RunPlan> impl
     public Result<List<RunPlan>> planList(RunPlan planFilter) {
         String name = planFilter.getName();
         String status = planFilter.getStatus();
+        Integer planType = planFilter.getPlanType();
         QueryWrapper<RunPlan> queryWrapper = new QueryWrapper<RunPlan>(null);
+        if (planType !=null){
+            queryWrapper.eq("plan_type",planType);
+        }
         if(name != null){
             queryWrapper.eq("name",name);
         }
@@ -70,7 +84,7 @@ public class RunPlanServiceImpl extends ServiceImpl<RunPlanMapper, RunPlan> impl
 
     // 删除计划
     @Override
-    public Result deletePlan(int planId) {
+    public Result<?> deletePlan(int planId) {
         paramMapper.delByPlanId(planId);
         planInfoMapper.deleteById(planId);
         return Result.success();
@@ -78,26 +92,36 @@ public class RunPlanServiceImpl extends ServiceImpl<RunPlanMapper, RunPlan> impl
 
     // 新增修改计划
     @Override
-    public Result update(RunPlan plan){
+    public Result<?> update(RunPlan plan){
         PlanParam planParam = plan.getPlanParam();
-        System.out.println("planParam"+planParam);
+
 
         if(plan.getId() == null){
             planInfoMapper.insert(plan);
-            planParam.setPlanId(plan.getId());
-            paramMapper.insert(planParam);
+
+            if (planParam!=null){
+                planParam.setPlanId(plan.getId());
+                paramMapper.insert(planParam);
+            }
+
         }else {
             planInfoMapper.updateById(plan);
-            paramMapper.updateById(planParam);
+            if (planParam!=null){
+                paramMapper.updateById(planParam);
+
+            }
         }
-        System.out.println("打印ID"+plan.getId());
+
         return Result.success() ;
     }
 
-    // 运行计划(数据库获取数据）
-    @Override
-    public Result runPlan(RunPlan planInfo){
 
+    // 运行接口自动化计划(数据库获取数据）
+    @Override
+    public Result<?> runPlan(RunPlan planInfo){
+        // 获取计划中的apiIds 和 caseIds
+        PlanParam planParam = paramMapper.selectOne(new QueryWrapper<PlanParam>().eq("plan_id",planInfo.getId()));
+        planInfo.setPlanParam(planParam);
         PlanResult planResult = planResultInit(planInfo);
         // 解析apiId
         ArrayList<Integer> apiIds =  planInfo.getPlanParam().getApiIds();
@@ -177,12 +201,10 @@ public class RunPlanServiceImpl extends ServiceImpl<RunPlanMapper, RunPlan> impl
 
     };
 
-    // 初始化plan_result计划执行结果
+    // 初始化接口自动化plan_result计划执行结果
     public  PlanResult planResultInit(RunPlan planInfo){
-        // 获取计划中的apiIds 和 caseIds
-        PlanParam planParam = paramMapper.selectOne(new QueryWrapper<PlanParam>().eq("plan_id",planInfo.getId()));
-        planInfo.setPlanParam(planParam);
         PlanResult planResult = new PlanResult();
+        planResult.setPlanType(planInfo.getPlanType());
         planResult.setPlanName(planInfo.getName());
         planResult.setPlanId(planInfo.getId());
         planResult.setResultStatus(0);
@@ -192,7 +214,7 @@ public class RunPlanServiceImpl extends ServiceImpl<RunPlanMapper, RunPlan> impl
         return planResult;
     }
 
-    // 判断计划执行结果
+    // 判断接口计划执行结果
     public Boolean planEndResult(int apiSuccessCount ,int apiFailedCount, int caseSuccessCount, int caseFailedCount,PlanResult planResult){
         Boolean runResult = false;
         planResult.setApiSuccessCount(apiSuccessCount);
@@ -220,5 +242,31 @@ public class RunPlanServiceImpl extends ServiceImpl<RunPlanMapper, RunPlan> impl
                 "<br/>详情请点击: "+"<a href = 'http://localhost:8080/plan/report?id="+planResultId+"' >查看详情<a/>";
         MailTool.sendEmail(to,object,text);
     }
+
+
+    /**
+     * web自动化计划执行
+     * 1: planID获取用例列表
+     * 2: 遍历用例列表
+     * 3： 获取对应用例步骤列表
+     * 4： 遍历用例列表执行
+     * 5： 用例执行结果保存到数据库
+     * @param planId 计划ID
+     * @return Result
+     */
+    @Override
+    public Result<?> webRun(Integer planId) {
+        ExecutorService executor = Executors.newCachedThreadPool();
+        Future<String> futures = executor.submit(new runWebPlan(planId));
+        try {
+            futures.get();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return Result.success();
+    }
+
+
+
 
 }

@@ -7,6 +7,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 /**
  * <p>
  *  服务类
@@ -33,5 +36,11 @@ public interface UiWebCaseService extends IService<UiWebCase> {
 
     // 删除用例步骤
     Result<?> delCaseStep(Integer stepId);
+
+    // DebugCase
+    Result<?> debugCase(Integer caseId,String payload, HttpServletRequest request);
+
+    // seleniumServer下载
+    void seleniumServerDownload(HttpServletResponse response);
 
 }

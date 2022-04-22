@@ -12,7 +12,6 @@ class JwtUtilTest {
     public void test1(){
         User user = new User();
         String token = JwtUtil.sign(user);
-        System.out.println(token);
     }
 
 }

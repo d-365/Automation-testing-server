@@ -4,9 +4,11 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.io.Serializable;
+import java.util.List;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.FastjsonTypeHandler;
+import com.dujun.springboot.VO.UIConsole;
 import com.sun.org.apache.xpath.internal.operations.Bool;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -45,6 +47,15 @@ public class PlanResultDetail implements Serializable {
     private Boolean result;
 
     private String createTime;
+
+    @TableField(typeHandler= FastjsonTypeHandler.class)
+    private List<UIConsole> resultConsole;
+
+    @TableField(exist = false)
+    private String caseName;
+
+    @TableField(exist = false)
+    private List<WebCaseStep> caseSteps;
 
 
 }

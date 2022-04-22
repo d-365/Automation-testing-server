@@ -38,9 +38,14 @@ public class PlanResultController {
         return planResultService.delPlanResult(checkResultId);
     }
 
-    @PostMapping("/report")
-    public Result<?> report(@RequestBody Integer planResultId){
+    @PostMapping("/report/{planResultId}")
+    public Result<?> report(@PathVariable("planResultId") Integer planResultId){
         return planResultService.report(planResultId);
+    }
+
+    @PostMapping("/web/report/{id}")
+    public Result<?> webReport(@PathVariable("id") Integer planResultId){
+        return planResultService.webReport(planResultId);
     }
 
 

@@ -1,5 +1,6 @@
 package com.dujun.springboot.service;
 
+import com.dujun.springboot.VO.Result;
 import com.dujun.springboot.entity.PlanResult;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -13,4 +14,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface PlanResultService extends IService<PlanResult> {
 
+    Result<?> webReport(Integer planResultId);
 }
