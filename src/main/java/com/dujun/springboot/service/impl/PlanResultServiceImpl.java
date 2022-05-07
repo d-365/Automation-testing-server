@@ -80,7 +80,7 @@ public class PlanResultServiceImpl extends ServiceImpl<PlanResultMapper, PlanRes
     }
 
 
-    // 获取计划执行结果
+    // 获取接口自动化计划执行结果
     public Result<?> report(Integer planResultId){
         planResultReport planResultReport = new planResultReport();
         // 根据ID查询计划执行结果
@@ -155,11 +155,14 @@ public class PlanResultServiceImpl extends ServiceImpl<PlanResultMapper, PlanRes
             caseStepLambda.orderByAsc(WebCaseStep::getSort);
             List<WebCaseStep> caseSteps = webCaseStepMapper.selectList(caseStepLambda);
             planResultDetail.setCaseSteps(caseSteps);
-            planResultDetail.setCaseName(caseName);
+            if (planResultDetail.getCaseName() ==null){
+                planResultDetail.setCaseName(caseName);
+            }
 
         }
         planResultReport.setCaseRunResult((ArrayList<PlanResultDetail>) caseList);
         // 封装计划执行详情信息
         return Result.success(planResultReport);
     }
+
 }

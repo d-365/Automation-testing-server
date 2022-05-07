@@ -40,17 +40,14 @@ public interface StaticMapper {
 
     StaticPlan planRate(Integer planType);
 
-    // 查询当天自动化总用例数
-    @Select("SELECT COUNT(*) as count  FROM plan_result_detail WHERE create_time LIKE '${today}%'; ")
-    int planDetailCount(String today);
 
     // 查询当天自动化成功数
-    @Select("SELECT COUNT(*) as count  FROM plan_result_detail WHERE create_time LIKE '${today}%' and result = 1 ; ")
-    int planDetailSuccess(String today);
+    @Select("SELECT sum(case_success_count) as count  FROM plan_result WHERE start_time LIKE '${today}%' and plan_type = #{planType};")
+    Integer planDetailSuccess(String today,Integer planType);
 
     // 查询当天自动化总失败数
-    @Select("SELECT COUNT(*) as count  FROM plan_result_detail WHERE create_time LIKE '${today}%' and result = 0 ; ")
-    int planDetailFailed(String today);
+    @Select("SELECT sum(case_failed_count) as count  FROM plan_result WHERE start_time LIKE '${today}%' and plan_type = #{planType};")
+    Integer planDetailFailed(String today,Integer planType);
 
 
 }

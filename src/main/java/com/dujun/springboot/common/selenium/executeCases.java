@@ -1,7 +1,7 @@
 /*
  * author     : dujun
  * date       : 2022/4/19 14:53
- * description: 告诉大家我是干啥的
+ * description: 用例调式-线程
  */
 
 package com.dujun.springboot.common.selenium;
@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Callable;
 
-// 用例调式-线程
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

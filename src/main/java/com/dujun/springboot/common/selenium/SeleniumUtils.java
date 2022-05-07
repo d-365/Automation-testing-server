@@ -6,111 +6,51 @@
 
 package com.dujun.springboot.common.selenium;
 
+import com.auth0.jwt.impl.PublicClaims;
+import com.dujun.springboot.VO.AssertConsole;
 import com.dujun.springboot.VO.UIConsole;
+import com.dujun.springboot.entity.Action;
 import com.dujun.springboot.entity.PageElement;
+import com.dujun.springboot.entity.PlanRound;
 import com.dujun.springboot.entity.WebCaseStep;
 import com.dujun.springboot.mapper.PageElementMapper;
 import com.dujun.springboot.mapper.WebCaseStepMapper;
+import com.dujun.springboot.utils.BeanContext;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.Objects;
 
-@Service
+@Component
 public class SeleniumUtils {
 
     @Resource
-    WebCaseStepMapper webCaseStepMapper;
+    private WebCaseStepMapper webCaseStepMapper;
+
     @Resource
-    PageElementMapper pageElementMapper;
+    private PageElementMapper pageElementMapper;
 
-    // 执行用例信息
+    @Autowired
+    private ActionFactory actionFactory;
+
+    @Autowired
+    private ActionCommonFactory actionCommonFactory;
+
+    // 执行用例步骤
     public UIConsole execWebCase(WebDriver driver,WebCaseStep caseStep){
-        String execMsg = null;
-        UIConsole uiConsole = new UIConsole();
-        action actionKey = action.valueOf(webCaseStepMapper.getActionKey(caseStep.getActionId()).trim().toUpperCase());
-        switch (actionKey){
-            case OPENURL:
-                try {
-                    if (Objects.equals(caseStep.getActionValue(), "")|| caseStep.getActionValue()==null){
-                        execMsg= String.format("步骤ID%s,actionValue不能为空",caseStep.getId());
-                        uiConsole.setCode(1);
-                    }else {
-                        MySelenium.get(driver,caseStep.getActionValue());
-                        execMsg = String.format("步骤ID%s,执行成功---打开网址: %s",caseStep.getId(),caseStep.getActionValue());
-                        uiConsole.setCode(0);
-                    }
-                }catch (Exception e){
-                    e.printStackTrace();
-                    execMsg = String.format("步骤ID%s:---用例执行失败",caseStep.getId());
-                }
-                uiConsole.setMsg(execMsg);
-                break;
-            case CLICK:
-                try {
-                    if (caseStep.getElementId() == null){
-                        execMsg= String.format("步骤ID%s,ElementId 不能为空",caseStep.getId());
-                        uiConsole.setCode(1);
-                    }else {
-                        WebElement element = getElement(driver,caseStep.getElementId());
-                        if (element==null){
-                            execMsg= String.format("步骤ID%s,无法定位到对应element",caseStep.getId());
-                        }else {
-                            MySelenium.click(element);
-                            execMsg = String.format("步骤ID%s,执行成功---点击元素",caseStep.getId());
-                            uiConsole.setCode(0);
-                        }
-                    }
-                }catch (Exception e){
-                    e.printStackTrace();
-                    execMsg = String.format("步骤ID%s:---用例执行失败",caseStep.getId());
-                }
-                uiConsole.setMsg(execMsg);
-                break;
-            case INPUT:
-                try {
-                    if (caseStep.getElementId() == null){
-                        execMsg= String.format("步骤ID%s,ElementId 不能为空",caseStep.getId());
-                        uiConsole.setCode(1);
-                    }else if (Objects.equals(caseStep.getActionValue(), "")|| caseStep.getActionValue()==null){
-                        execMsg= String.format("步骤ID%s,actionValue不能为空",caseStep.getId());
-                        uiConsole.setCode(1);
-                    }else {
-                        WebElement element = getElement(driver,caseStep.getElementId());
-                        if (element==null){
-                            execMsg= String.format("步骤ID%s,无法定位到对应element",caseStep.getId());
-                        }else {
-                            MySelenium.sendKeys(element,caseStep.getActionValue());
-                            execMsg = String.format("步骤ID%s,执行成功--输入元素为:%s",caseStep.getId(),caseStep.getActionValue());
-                            uiConsole.setCode(0);
-                        }
-                    }
 
-                }catch (Exception e){
-                    e.printStackTrace();
-                    execMsg = String.format("步骤ID%s:---用例执行失败",caseStep.getId());
-                }
-                uiConsole.setMsg(execMsg);
-                break;
-            case SLEEP:
-                try {
-                    Thread.sleep(Long.parseLong(caseStep.getActionValue()));
-                    execMsg = String.format("步骤ID%s,执行成功----driver沉睡%s ms",caseStep.getId(),caseStep.getActionValue());
-                    uiConsole.setCode(0);
-                    uiConsole.setMsg(execMsg);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                break;
-            case execPython:
-                break;
-            default :
-                execMsg= String.format("步骤ID%s,未找到匹配的actionKey--请检查后重试",caseStep.getId());
-                uiConsole.setCode(1);
-                uiConsole.setMsg(execMsg);
+        UIConsole uiConsole;
+        actionEnum actionKey;
+        try {
+            actionKey = actionEnum.valueOf(webCaseStepMapper.getActionKey(caseStep.getActionId()).trim().toUpperCase());
+        }catch (Exception e){
+            actionKey = actionEnum.DEFAULT;
         }
+        uiConsole = actionFactory.execAction(actionKey,driver,caseStep);
         return uiConsole;
     }
 
@@ -119,13 +59,22 @@ public class SeleniumUtils {
         WebElement element = null;
         PageElement pageElement = pageElementMapper.selectById(elementId);
         String locationWay = pageElement.getLocationWay();
+        String conditions = pageElement.getConditions();
         String locationValue = pageElement.getLocationValue();
         switch (locationWay){
             case "id":
-                element = MySelenium.ById(driver,locationValue);
+                if (conditions == null || Objects.equals(conditions, "")){
+                    element = MySelenium.ById(driver,locationValue);
+                }else {
+                    element = MySelenium.findElement(driver,conditions, By.id(locationValue));
+                }
                 break;
             case "xpath":
-                element = MySelenium.ByXpath(driver,locationValue);
+                if (conditions == null || Objects.equals(conditions, "")){
+                    element = MySelenium.ByXpath(driver,locationValue);
+                } else {
+                    element = MySelenium.findElement(driver,conditions, By.xpath(locationValue));
+                }
                 break;
             default:
                 return null;
@@ -133,20 +82,100 @@ public class SeleniumUtils {
         return element;
     }
 
+    // 执行断言操作
+    public AssertConsole execAssert(WebDriver driver, WebCaseStep caseStep){
+        WebAssertType assertType = WebAssertType.valueOf(caseStep.getAssertType());
+        String assertValue = caseStep.getAssertValue().trim();
+        String msg = "";
+        boolean result =false;
+        // 初始化断言控制台
+        AssertConsole assertConsole = new AssertConsole();
+        assertConsole.setAssertType(caseStep.getAssertType());
+        assertConsole.setExpectValue(assertValue);
+
+        if (Objects.equals(assertValue, "")){
+            msg = "断言值为空,请检查后重试";
+            assertConsole.setMsg(msg);
+            assertConsole.setResult(false);
+            assertConsole.setStepId(caseStep.getId());
+            return assertConsole;
+        }
+
+        switch (assertType){
+            case urlIs:
+                String driverUrl = MySelenium.getCurrentUrl(driver);
+                if (Objects.equals(driverUrl, assertValue)){
+                    result = true;
+                }
+                assertConsole.setRealityValue(driverUrl);
+                break;
+            case titleIs:
+                String driverTitle = MySelenium.getTitle(driver);
+                if (Objects.equals(driverTitle, assertValue)){
+                    result = true;
+                }
+                assertConsole.setRealityValue(driverTitle);
+                break;
+            default:
+                msg = "未找到对应的断言方式";
+                break;
+        }
+        assertConsole.setStepId(caseStep.getId());
+        assertConsole.setResult(result);
+        assertConsole.setMsg(msg);
+        return assertConsole;
+    }
+
+    // 执行通用的Action操作
+    public UIConsole runAction(String actionType ,String actionKey, String actionValue){
+        UIConsole uiConsole;
+        actionEnum AcType;
+        try {
+            AcType = actionEnum.valueOf(actionType.trim().toUpperCase());
+        }catch (Exception e){
+            AcType = actionEnum.DEFAULT;
+        }
+        uiConsole = actionCommonFactory.execAction(AcType,actionKey,actionValue);
+        return  uiConsole;
+    }
+
 
 }
 
 // Action枚举
-enum action{
-    OPENURL,
-    CLICK,
-    SLEEP,
-    INPUT,
-    switchFrame,
-    excJs,
-    mouseAction,
-    keyboardOption,
-    selectOption,
-    execPython,
+enum actionEnum{
+    DEFAULT("默认"),
+    OPENURL("打开网址"),
+    CLICK("点击元素"),
+    SLEEP("强制等待"),
+    INPUT("文本输入"),
+    CLEAR("清除文本"),
+    BACK("driver后退"),
+    FORWARD("driver前进"),
+    REFRESH("网址刷新"),
+    GETCOLOR("获取颜色"),
+    GETBACKGROUNDCOLOR("获取背景色"),
+    GETTEXT("获取元素内显示文本"),
+    CSSVALUE("元素的指定计算样式属性的值"),
+    SENDALERTKEYS("Alert弹窗发送文本"),
+    ACCEPTALERT("接收Alert弹窗"),
+    DISMISSALERT("取消Alert弹窗"),
+    SWITCHFRAMEBYNAME("按照name切换Frame"),
+    SWITCHFRAMEBYELEMENT("按照元素切换Frame"),
+    TODEFAULTCONTENT("切换回默认内容"),
+    EXECPYTHON("执行python文件"),
+    QUERYSQL("执行查询sql"),
+    UPDATESQL("执行sql-无结果");
+
+
+
+
+    public String getDescribe() {
+        return describe;
+    }
+    private final String describe;
+    actionEnum(String describe) {
+        this.describe =describe;
+    }
 }
 

@@ -8,6 +8,7 @@ import java.util.List;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.FastjsonTypeHandler;
+import com.dujun.springboot.VO.AssertConsole;
 import com.dujun.springboot.VO.UIConsole;
 import com.sun.org.apache.xpath.internal.operations.Bool;
 import lombok.Data;
@@ -51,11 +52,16 @@ public class PlanResultDetail implements Serializable {
     @TableField(typeHandler= FastjsonTypeHandler.class)
     private List<UIConsole> resultConsole;
 
-    @TableField(exist = false)
     private String caseName;
 
     @TableField(exist = false)
     private List<WebCaseStep> caseSteps;
+
+    /**
+     * web断言结果
+     */
+    @TableField(typeHandler= FastjsonTypeHandler.class)
+    private List<AssertConsole> assertResult;
 
 
 }

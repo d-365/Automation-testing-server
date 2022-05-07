@@ -32,5 +32,6 @@ public class BeanContext implements ApplicationContextAware {
     public static <T> T getBean(Class<T> clz) throws BeansException {
         return (T)applicationContext.getBean(clz);
     }
+
 }
 

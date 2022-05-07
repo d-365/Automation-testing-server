@@ -2,13 +2,17 @@ package com.dujun.springboot.controller;
 
 
 import com.dujun.springboot.VO.Result;
+import com.dujun.springboot.common.selenium.MyConditions;
 import com.dujun.springboot.entity.WebCaseStep;
 import com.dujun.springboot.entity.WebPage;
 import com.dujun.springboot.service.impl.WebPageServiceImpl;
 import org.hibernate.boot.jaxb.hbm.spi.PluralAttributeInfoIdBagAdapter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.CacheManager;
 import org.springframework.web.bind.annotation.*;
+import org.testng.collections.Lists;
 
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -55,6 +59,20 @@ public class WebPageController {
         return webPageService.upCaseStep(caseSteps);
     }
 
+    // 获取元素定位
+    @PostMapping("/conditionsWay")
+    public Result<?> conditionsWay(){
+        List<HashMap<String,String>> myConditions = Lists.newArrayList();
+
+        for (MyConditions value : MyConditions.values()) {
+            HashMap<String,String>  condition = new HashMap<>();
+            condition.put("name",value.toString());
+            condition.put("value",value.getDescribe());
+            myConditions.add(condition);
+        }
+
+        return Result.success(myConditions);
+    }
 
 }
 

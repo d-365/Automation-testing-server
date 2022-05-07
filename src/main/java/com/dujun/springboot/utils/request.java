@@ -232,25 +232,3 @@ public class request {
     }
 
 }
-
-
-class Test{
-
-    public static void main(String[] args){
-        String login_url = "http://localhost:8080/api/interface/detail/?apiId=107";
-
-        HashMap headers = new HashMap(){{
-        }};
-        CloseableHttpResponse response = null;
-        try {
-            response = request.get(login_url,headers,headers);
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
-
-        System.out.println(request.getResponseJson(response));
-
-
-
-    }
-}

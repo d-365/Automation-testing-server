@@ -1,6 +1,7 @@
 package com.dujun.springboot.controller;
 
 
+import com.alibaba.fastjson.JSONObject;
 import com.dujun.springboot.VO.Result;
 import com.dujun.springboot.entity.Menu;
 import com.dujun.springboot.entity.RespPageEntity;
@@ -75,7 +76,8 @@ public class UserController {
 
 
     @PostMapping("/loginInfo")
-    public Result<?> userInfo(@RequestBody int userId){
+    public Result<?> userInfo(@RequestBody JSONObject user){
+        Integer userId = user.getInteger("userId");
         return userService.userInfo(userId);
     }
 

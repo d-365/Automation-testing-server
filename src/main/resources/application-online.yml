@@ -9,15 +9,18 @@ spring:
       datasource:
         master:
           driver-class-name: com.mysql.cj.jdbc.Driver
-          url: jdbc:mysql://localhost:3306/mall?allowMultiQueries=true&serverTimezone=GMT%2B8&characterEncoding=utf8&useSSL=false
+          url: jdbc:mysql://121.40.229.114:3306/mall?useUnicode=true&useSSL=false&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
           username: dujun
           password: test1997
-#        qsTest:
-#            driver-class-name: com.mysql.cj.jdbc.Driver
-#            url: jdbc:mysql://118.31.184.240:3306?useUnicode=true&useSSL=false&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
-#            username: root
-#            password: 3wHNY2Bq
-
+        qsTest:
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://118.31.184.240:3306?useUnicode=true&useSSL=false&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+          username: root
+          password: 3wHNY2Bq
+      druid:
+        test-on-borrow: true
+        test-while-idle: true
+        init-connection-sqls: set names utf8mb4
   devtools:
     restart:
       enabled: true
@@ -28,15 +31,22 @@ spring:
 
 # mybatis-plus
 mybatis-plus:
-
-  configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  # 打印sql执行结果
+  #  configuration:
+  #    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
   mapper-locations: classpath:**/*Mapper.xml
 
   global-config:
     db-config:
       id-type: auto
 
+# 简洁配置-不打印sql执行结果
+logging:
+  level:
+    com:
+      dujun:
+        springboot:
+          DEBUG
 # 测试环境
 test:
   domain:

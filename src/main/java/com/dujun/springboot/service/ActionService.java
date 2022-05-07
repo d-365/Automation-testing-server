@@ -25,4 +25,5 @@ public interface ActionService extends IService<Action> {
 
     Result<?> actionTree(Action action);
 
+    Result<?> teardown();
 }

@@ -12,6 +12,7 @@ import com.dujun.springboot.entity.sonEntity.DayRunDetail;
 import com.dujun.springboot.entity.sonEntity.StaticPlan;
 import com.dujun.springboot.entity.statics.ApiAutoStatics;
 import com.dujun.springboot.entity.statics.HomeStatics;
+import com.dujun.springboot.entity.statics.LineChat;
 import com.dujun.springboot.mapper.StaticMapper;
 import com.dujun.springboot.service.StaticService;
 import com.dujun.springboot.tools.dateTools;
@@ -91,7 +92,6 @@ public class StaticServiceImpl implements StaticService {
         }
 
 
-
         // 数据封装返回
         HomeStatics homeStatics = new HomeStatics();
         homeStatics.setApiAutoStatics(apiAutoStatics);
@@ -101,17 +101,45 @@ public class StaticServiceImpl implements StaticService {
 
     @Override
     public Result<?> line() {
-
-        HashMap<String,DayRunDetail> data = new HashMap<>();
+        LineChat lineChat  = new LineChat();
+        // Api 折线图
+        HashMap<String,DayRunDetail> ApiData = new HashMap<>();
         for (int i = 0; i> -7;i--){
             String today = dateTools.currentDay(i);
-            int count = staticMapper.planDetailCount(today);
-            int success = staticMapper.planDetailSuccess(today);
-            int failed = staticMapper.planDetailFailed(today);
+            Integer success = staticMapper.planDetailSuccess(today,0);
+            if (success ==null ){
+                success = 0;
+            }
+            Integer failed = staticMapper.planDetailFailed(today,0);
+            if (failed ==null){
+                failed = 0;
+            }
+            int count = success + failed;
             DayRunDetail dayRunDetail = new DayRunDetail(count,success,failed);
-            data.put(today,dayRunDetail);
+            ApiData.put(today,dayRunDetail);
         }
-        return Result.success(data);
+
+        // WEB 折线图
+        HashMap<String,DayRunDetail> WEBData = new HashMap<>();
+        for (int i = 0; i> -7;i--){
+            String today = dateTools.currentDay(i);
+            Integer success = staticMapper.planDetailSuccess(today,1);
+            if (success ==null ){
+                success = 0;
+            }
+            Integer failed = staticMapper.planDetailFailed(today,1);
+            if (failed ==null){
+                failed = 0;
+            }
+            int count = success + failed;
+            DayRunDetail dayRunDetail = new DayRunDetail(count,success,failed);
+            WEBData.put(today,dayRunDetail);
+        }
+
+
+        lineChat.setApiLine(ApiData);
+        lineChat.setWebLine(WEBData);
+        return Result.success(lineChat);
     }
 
 }

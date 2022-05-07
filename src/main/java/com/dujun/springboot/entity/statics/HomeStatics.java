@@ -22,8 +22,5 @@ public class HomeStatics {
     // App自动化统计
     private String AppAutoStatics;
 
-    // APi折线图数据
-    private String ApiLineChart;
-
 
 }

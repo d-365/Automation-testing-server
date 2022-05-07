@@ -14,12 +14,12 @@ import lombok.experimental.Accessors;
  * </p>
  *
  * @author dujun
- * @since 2022-04-06
+ * @since 2022-04-28
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-public class PageElement implements Serializable {
+public class PlanRound implements Serializable {
 
     private static final long serialVersionUID=1L;
 
@@ -27,39 +27,37 @@ public class PageElement implements Serializable {
     private Integer id;
 
     /**
-     * 元素名称
+     * 前置后置操作说明
      */
-    private String elementName;
+    private String name;
 
     /**
-     * 元素类型
+     * actionId
      */
-    private String elementType;
+    private Integer actionId;
 
     /**
-     * 定位方式
+     * 数据库 or 文件对象
      */
-    private String locationWay;
+    private String actionKey;
 
     /**
-     * 定位值
+     * 前置后置 value值
      */
-    private String locationValue;
+    private String actionValue;
 
     /**
-     * 备注
+     * 0 前置  1 后置
      */
-    private String remark;
+    private Integer type;
+
+    private Integer planId;
+
+    private Integer status;
 
     private Date createTime;
 
     private Date updateTime;
 
-    private Integer pageId;
-
-    /**
-     * 显示等待条件
-     */
-    private String conditions;
 
 }

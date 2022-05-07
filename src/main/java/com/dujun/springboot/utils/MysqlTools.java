@@ -9,11 +9,11 @@ package com.dujun.springboot.utils;
 import com.dujun.springboot.tools.YmlTools;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import javafx.scene.Parent;
-import org.apache.http.client.methods.CloseableHttpResponse;
-
 import javax.sql.DataSource;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 public class MysqlTools {
 
@@ -56,10 +56,10 @@ public class MysqlTools {
             connection = ds.getConnection();
             statement = connection.createStatement();
             result = true;
-        } catch (SQLException sqlException) {
-            sqlException.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
             result = false;
-            msg = String.valueOf(sqlException);
+            msg = String.valueOf(e);
         }
     }
 
@@ -73,13 +73,9 @@ public class MysqlTools {
     }
 
     //查询操作
-    public ResultSet executeQuery(String sql){
+    public ResultSet executeQuery(String sql) throws Exception {
         ResultSet resultSet = null;
-        try {
-            resultSet = connection.prepareStatement(sql).executeQuery();
-        } catch (SQLException sqlException) {
-            sqlException.printStackTrace();
-        }
+        resultSet = connection.prepareStatement(sql).executeQuery();
         return resultSet;
     }
 
@@ -101,19 +97,15 @@ public class MysqlTools {
         }
     }
 
-}
-
-
-class Tests{
     public static void main(String[] args) {
-        MysqlTools mysqlTools = new MysqlTools();
-        String sql = "select * from crm.crm_config WHERE name = 'crm_electricity_status'";
-        ResultSet resultSet = mysqlTools.executeQuery(sql);
         try {
-            if (resultSet.next()){
+            ResultSet resultSet =  new MysqlTools().executeQuery("SELECT * FROM qyh.qyh_manager_user;");
+            while (resultSet.first()){
+                System.out.println(resultSet.getString(1));
             }
-        } catch (SQLException sqlException) {
-            sqlException.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
+
 }

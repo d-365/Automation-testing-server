@@ -45,5 +45,10 @@ public class ActionController {
         return actionService.actionTree(action);
     }
 
+    @PostMapping("/teardown")
+    public Result<?> teardown(){
+        return actionService.teardown();
+    }
+
 }
 

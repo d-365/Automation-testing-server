@@ -33,7 +33,7 @@ public class PlanResultController {
 
     // 删除选中的计划列表
     @PostMapping("/delPlanResult")
-    public Result delPlanResult(@RequestBody ArrayList<Integer> checkResultId){
+    public Result<?> delPlanResult(@RequestBody ArrayList<Integer> checkResultId){
         System.out.println("打印下"+checkResultId);
         return planResultService.delPlanResult(checkResultId);
     }

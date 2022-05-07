@@ -1,11 +1,13 @@
 package com.dujun.springboot.controller;
 
 
+import com.alibaba.fastjson.JSONObject;
 import com.dujun.springboot.VO.Result;
 import com.dujun.springboot.entity.ApiCase;
 import com.dujun.springboot.entity.ApiInfo;
 import com.dujun.springboot.entity.CaseApiRelation;
 import com.dujun.springboot.service.impl.ApiCaseServiceImpl;
+import com.mysql.cj.xdevapi.JsonString;
 import com.sun.org.apache.bcel.internal.generic.ReturnInstruction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -30,7 +32,8 @@ public class ApiCaseController {
     private ApiCaseServiceImpl apiCaseService;
 
     @PostMapping("/info")
-    public Result<ApiCase> info(@RequestBody int categoryId){
+    public Result<ApiCase> info(@RequestBody JSONObject payload){
+        Integer categoryId = payload.getInteger("categoryId");
         return apiCaseService.info(categoryId);
     }
 

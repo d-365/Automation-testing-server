@@ -6,20 +6,23 @@
 
 package com.dujun.springboot.utils;
 
-import java.io.IOException;
+import org.springframework.util.ResourceUtils;
+
+import java.io.*;
 
 public class cmdTaskUtils {
 
     static Process pro= null;
 
     // 执行命令
-    public static void execCommand(String name){
+    public static Process execCommand(String name){
         Runtime runtime=Runtime.getRuntime();
         try {
             pro = runtime.exec(name);
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return pro;
     }
 
     //销毁进程
@@ -29,9 +32,10 @@ public class cmdTaskUtils {
         }
     }
 
-
-    public static void main(String[] args) {
-        cmdTaskUtils.execCommand("cmd /k start mspaint.exe");
+    // 杀死端口对应进程
+    public static void killPid(String pid){
+        execCommand(String.format("taskkill /F /pid %s",pid));
     }
+
 
 }

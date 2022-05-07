@@ -1,21 +1,28 @@
 package com.dujun.springboot.service.impl;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dujun.springboot.VO.Result;
 import com.dujun.springboot.common.ApiCommon;
 import com.dujun.springboot.common.selenium.runWebPlan;
 import com.dujun.springboot.entity.*;
 import com.dujun.springboot.mapper.*;
 import com.dujun.springboot.service.RunPlanService;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.dujun.springboot.timing.ScheduledTask;
 import com.dujun.springboot.tools.StringTools;
 import com.dujun.springboot.tools.dateTools;
 import com.dujun.springboot.utils.MailTool;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.testng.collections.Lists;
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -32,6 +39,9 @@ import java.util.concurrent.Future;
 public class RunPlanServiceImpl extends ServiceImpl<RunPlanMapper, RunPlan> implements RunPlanService {
 
     @Resource
+    private PlanRoundMapper planRoundMapper;
+
+    @Resource
     // 计划参数表
     private PlanParamMapper paramMapper;
     @Resource
@@ -40,21 +50,25 @@ public class RunPlanServiceImpl extends ServiceImpl<RunPlanMapper, RunPlan> impl
     @Resource
     // 计划运行结果表
     private PlanResultMapper planResultMapper;
+
     // 计划运行结果详情表
     @Resource
     private PlanResultDetailMapper planResultDetailMapper;
 
     @Resource
     private UiWebCaseMapper webCaseMapper;
-    @Resource
-    private WebCaseStepMapper webCaseStepMapper;
 
     @Resource
     // 接口详情mapper
     private ApiInfoMapper apiInfoMapper;
+
     @Resource
     // 用例关联表
     private ApiCaseMapper apiCaseMapper;
+
+    // 定时任务
+    @Autowired
+    private ScheduledTask scheduledTask;
 
     //计划列表
     @Override
@@ -62,7 +76,7 @@ public class RunPlanServiceImpl extends ServiceImpl<RunPlanMapper, RunPlan> impl
         String name = planFilter.getName();
         String status = planFilter.getStatus();
         Integer planType = planFilter.getPlanType();
-        QueryWrapper<RunPlan> queryWrapper = new QueryWrapper<RunPlan>(null);
+        QueryWrapper<RunPlan> queryWrapper = new QueryWrapper<>(null);
         if (planType !=null){
             queryWrapper.eq("plan_type",planType);
         }
@@ -87,6 +101,7 @@ public class RunPlanServiceImpl extends ServiceImpl<RunPlanMapper, RunPlan> impl
     public Result<?> deletePlan(int planId) {
         paramMapper.delByPlanId(planId);
         planInfoMapper.deleteById(planId);
+        scheduledTask.refresh(scheduledTask.getAllTasks());
         return Result.success();
     }
 
@@ -94,8 +109,6 @@ public class RunPlanServiceImpl extends ServiceImpl<RunPlanMapper, RunPlan> impl
     @Override
     public Result<?> update(RunPlan plan){
         PlanParam planParam = plan.getPlanParam();
-
-
         if(plan.getId() == null){
             planInfoMapper.insert(plan);
 
@@ -111,14 +124,13 @@ public class RunPlanServiceImpl extends ServiceImpl<RunPlanMapper, RunPlan> impl
 
             }
         }
-
+        scheduledTask.refresh(scheduledTask.getAllTasks());
         return Result.success() ;
     }
 
-
     // 运行接口自动化计划(数据库获取数据）
     @Override
-    public Result<?> runPlan(RunPlan planInfo){
+    public Result<?> runApiPlan(RunPlan planInfo){
         // 获取计划中的apiIds 和 caseIds
         PlanParam planParam = paramMapper.selectOne(new QueryWrapper<PlanParam>().eq("plan_id",planInfo.getId()));
         planInfo.setPlanParam(planParam);
@@ -179,7 +191,7 @@ public class RunPlanServiceImpl extends ServiceImpl<RunPlanMapper, RunPlan> impl
             }
 
         }catch (Exception e){
-            throw e;
+            e.printStackTrace();
         }
 
         // 判断计划执行结果
@@ -199,7 +211,7 @@ public class RunPlanServiceImpl extends ServiceImpl<RunPlanMapper, RunPlan> impl
 
         return Result.success();
 
-    };
+    }
 
     // 初始化接口自动化plan_result计划执行结果
     public  PlanResult planResultInit(RunPlan planInfo){
@@ -216,7 +228,7 @@ public class RunPlanServiceImpl extends ServiceImpl<RunPlanMapper, RunPlan> impl
 
     // 判断接口计划执行结果
     public Boolean planEndResult(int apiSuccessCount ,int apiFailedCount, int caseSuccessCount, int caseFailedCount,PlanResult planResult){
-        Boolean runResult = false;
+        boolean runResult = false;
         planResult.setApiSuccessCount(apiSuccessCount);
         planResult.setApiFailedCount(apiFailedCount);
         planResult.setCaseSuccessCount(caseSuccessCount);
@@ -244,6 +256,30 @@ public class RunPlanServiceImpl extends ServiceImpl<RunPlanMapper, RunPlan> impl
     }
 
 
+    @Override
+    // 获取测试计划详情中的setup 和 tearDown
+    public Result<?> setupList(Integer planId){
+        LambdaQueryWrapper<PlanRound> setupQuery = new LambdaQueryWrapper<>();
+        setupQuery.eq(PlanRound::getPlanId,planId).eq(PlanRound::getType,0);
+        List<PlanRound> setup = planRoundMapper.selectList(setupQuery);
+
+        LambdaQueryWrapper<PlanRound> tearDownQuery = new LambdaQueryWrapper<>();
+        tearDownQuery.eq(PlanRound::getPlanId,planId).eq(PlanRound::getType,1);
+        List<PlanRound> tearDown = planRoundMapper.selectList(tearDownQuery);
+
+        HashMap<String,List<PlanRound>> result =new HashMap<String,List<PlanRound>>(){};
+        result.put("setup",setup);
+        result.put("tearDown",tearDown);
+
+        return Result.success(result);
+    }
+
+    @Override
+    public Result<?> delRound(Integer id) {
+        planRoundMapper.deleteById(id);
+        return Result.success();
+    }
+
     /**
      * web自动化计划执行
      * 1: planID获取用例列表
@@ -256,17 +292,85 @@ public class RunPlanServiceImpl extends ServiceImpl<RunPlanMapper, RunPlan> impl
      */
     @Override
     public Result<?> webRun(Integer planId) {
+        runWebPlan.gridStart();
+        boolean gridStart = runWebPlan.portStart("127.0.0.1",4444);
+        if (!gridStart){
+            return Result.error("本机seleniumGrid未成功启动");
+        }
         ExecutorService executor = Executors.newCachedThreadPool();
         Future<String> futures = executor.submit(new runWebPlan(planId));
+        String runResult = "";
         try {
-            futures.get();
+            runResult = futures.get();
+            if (!Objects.equals(runResult, "执行完成")){
+               return Result.error(runResult);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return Result.success(runResult);
+    }
+
+    @Override
+    public Result<?> checkedCase(List<Integer> caseIds) {
+        List<UiWebCase> webCase = new ArrayList<>();
+        for (Integer caseId : caseIds) {
+            webCase.add(webCaseMapper.selectById(caseId));
+        }
+        return Result.success(webCase);
+    }
+
+    // 更新保存前置后置操作
+    public Result<?> updateRound(String payload) {
+
+        JSONObject jsonObject = JSONObject.parseObject(payload);
+
+        // 前置数据
+        JSONArray setUpRounds = jsonObject.getJSONArray("setUp");
+        for (Object planRound : setUpRounds) {
+            PlanRound setup= JSONObject.parseObject(planRound.toString(), PlanRound.class);
+            Result<?> result = updateRoundHelp(setup);
+            if (Objects.equals(result.getCode(), "1")){
+                return result;
+            }
+        }
+
+        // 后置数据
+        JSONArray tearDownRounds = jsonObject.getJSONArray("tearDown");
+        for (Object planRound : tearDownRounds) {
+            PlanRound tearDown = JSONObject.parseObject(planRound.toString(), PlanRound.class);
+            tearDown.setType(1);
+            Result<?> result = updateRoundHelp(tearDown);
+            if (Objects.equals(result.getCode(), "1")){
+                return result;
+            }
+        }
+
         return Result.success();
     }
 
+    public Result<?> updateRoundHelp(PlanRound round){
+        Result<?> result = new Result<>();
+        if (round.getActionId() == null){
+            result.setMsg("操作不能为空");
+            result.setCode(String.valueOf(1));
+            return result;
+        }
+        if (round.getActionKey()==null && round.getActionValue() ==null){
+            result.setMsg("参数不能为空");
+            result.setCode(String.valueOf(1));
+            return result;
+        }
+        if (round.getId()!=null){
+            planRoundMapper.updateById(round);
+        }else {
+            planRoundMapper.insert(round);
+        }
+        result.setMsg("操作成功");
+        result.setCode(String.valueOf(0));
+        return result;
 
+    }
 
 
 }

@@ -27,7 +27,6 @@ public class CommonServiceImpl  implements CommonService {
     //数据库连接测试
     public Result<?> dbDebug(EnvDataBase envDataBase){
         String jdbcUrl = envDataBase.getJdbcUrl();
-        String dbName = envDataBase.getDbName();
         String userName = envDataBase.getDbUserName();
         String password = envDataBase.getDbPwd();
         MysqlTools mysqlTools = new MysqlTools(jdbcUrl,userName,password);

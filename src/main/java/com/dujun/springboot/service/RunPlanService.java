@@ -20,14 +20,19 @@ public interface RunPlanService extends IService<RunPlan> {
     Result<List<RunPlan>> planList(RunPlan planFilter);
 
     //删除计划
-    Result deletePlan(int planId);
+    Result<?> deletePlan(int planId);
 
-    // 运行计划
-    Result runPlan(RunPlan planInfo);
+    // 运行Api计划
+    Result<?> runApiPlan(RunPlan planInfo);
 
     // 新增修改计划
     Result<?> update(RunPlan plan);
 
     Result<?> webRun(Integer planId);
 
+    Result<?> checkedCase(List<Integer> caseId);
+
+    Result<?> setupList(Integer planId);
+
+    Result<?> delRound(Integer id);
 }

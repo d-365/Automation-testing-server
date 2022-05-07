@@ -663,7 +663,11 @@ public  class ApiCommon {
                 case "query":
                     MysqlTools mysqlTools = new MysqlTools(jdbcUrl,userName,password);
                     if(mysqlTools.result){
-                        ResultSet result = mysqlTools.executeQuery(sql);
+                        try {
+                            ResultSet result = mysqlTools.executeQuery(sql);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                         mysqlTools.close();
                         return  new ApiConsole(true,"执行成功",name);
                     }else {
@@ -704,7 +708,11 @@ public  class ApiCommon {
             if ("query".equals(o)) {
                 MysqlTools mysqlTools = new MysqlTools(jdbcUrl, userName, password);
                 if (mysqlTools.result) {
-                    ResultSet result = mysqlTools.executeQuery(sql);
+                    try {
+                        ResultSet result = mysqlTools.executeQuery(sql);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                     mysqlTools.close();
                     return new ApiConsole(true, "执行成功", name);
                 } else {

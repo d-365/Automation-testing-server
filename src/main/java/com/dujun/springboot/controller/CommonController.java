@@ -27,7 +27,7 @@ public class CommonController {
 
     @PostMapping("/ebDebug")
     // 数据库连接测试
-    public Result dbDebug(@RequestBody  EnvDataBase envDataBase){
+    public Result<?> dbDebug(@RequestBody  EnvDataBase envDataBase){
         return commonService.dbDebug(envDataBase);
     }
 

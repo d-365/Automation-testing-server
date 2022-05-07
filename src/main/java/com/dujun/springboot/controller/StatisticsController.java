@@ -23,7 +23,7 @@ public class StatisticsController {
     private StaticServiceImpl staticService;
 
     /*
-      首页数据统计
+      首页数据汇总
      */
     @GetMapping("/home")
     public Result<HomeStatics> homeStatics(){

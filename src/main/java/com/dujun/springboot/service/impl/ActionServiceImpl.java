@@ -1,5 +1,6 @@
 package com.dujun.springboot.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.dujun.springboot.VO.Result;
 import com.dujun.springboot.entity.Action;
@@ -80,6 +81,7 @@ public class ActionServiceImpl extends ServiceImpl<ActionMapper, Action> impleme
         }
         return Result.success(parentAction);
     }
+
     // actionTree 递归查询子节点
     private List<Action> actionTreeDeep(Integer id,List<Action> actions){
         List<Action> childrenActions = Lists.newArrayList();
@@ -94,5 +96,20 @@ public class ActionServiceImpl extends ServiceImpl<ActionMapper, Action> impleme
         }
         return childrenActions;
     }
+
+    @Override
+    public Result<?> teardown(){
+        LambdaQueryWrapper<Action> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Action::getType,3);
+        queryWrapper.eq(Action::getDelFlag,0);
+        List<Action> actions = actionMapper.selectList(queryWrapper);
+
+        List<Action> parentAction = actions.stream().filter(item->item.getParentId() ==0).collect(Collectors.toList());
+        for (Action action_parent : parentAction) {
+            action_parent.setChildren(actionTreeDeep(action_parent.getId(),actions));
+        }
+
+        return Result.success(parentAction);
+    };
 
 }

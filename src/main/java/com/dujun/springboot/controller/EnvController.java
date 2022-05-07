@@ -33,7 +33,7 @@ public class EnvController {
 
     // 更新环境
     @PostMapping("/update")
-    public Result envUpdate(@RequestBody ArrayList<Env> envArrayList){
+    public Result<?> envUpdate(@RequestBody ArrayList<Env> envArrayList){
         return envService.envUpdate(envArrayList);
     }
 
@@ -45,7 +45,7 @@ public class EnvController {
 
     //删除环境信息
     @DeleteMapping("/delEnv/{id}")
-    public Result delEnv(@PathVariable("id") int id){
+    public Result<?> delEnv(@PathVariable("id") int id){
         return envService.delEnv(id);
     }
 

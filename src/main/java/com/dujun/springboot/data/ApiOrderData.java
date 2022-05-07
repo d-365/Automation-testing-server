@@ -1,19 +1,19 @@
-/**
- * author     : dujun
- * date       : 2021/12/21 14:42
- * description: 告诉大家我是干啥的
+/*
+  author     : dujun
+  date       : 2021/12/21 14:42
+  description: 告诉大家我是干啥的
  */
 
 package com.dujun.springboot.data;
-
 import com.alibaba.fastjson.JSON;
+import org.aspectj.weaver.patterns.HasMemberTypePattern;
 
 import java.util.HashMap;
 
 public class ApiOrderData {
     // 电销填单数据
     public static  HashMap<Object,Object> tmk_data(String phone,String city){
-        HashMap<Object,Object> tmkData = new HashMap<Object, Object>(){{
+        return new HashMap<Object, Object>(){{
             put("realname","du");
             put("age",55);
             put("sex","1");
@@ -61,41 +61,42 @@ public class ApiOrderData {
             put("phone",phone);
 
         }};
-        return tmkData;
     }
     //轻易花填单数据
     public static HashMap<String,Object> qyh_applyData(String city){
-        HashMap<String,Object> qyhData = new HashMap<String, Object>(){{
+        return new HashMap<String, Object>(){{
             put("loanMoney","5");
-            put("loanTime",0);
+            put("loanTime",1);
             put("loanGoal",0); // 资金用途
             put("province","浙江省");
             put("city",city);
             put("education",4);
-            put("occupation",0); // 职业身份
+            put("occupation",2); // 职业身份
             put("occupationData", JSON.toJSONString(new HashMap<String,Object>(){{
-                put("work_unit","test");
-                put("month_income",0);
-                put("income_type",0);
-                put("workage",0);
+                put("year_income",299999);
+                put("is_license",0);
+                put("operating_years",11);
             }}));
             put("socialSecurity", 2);
             put("accumulationFund", 1);
             put("isHasHouse", 1);
             put("houseData",JSON.toJSONString(new HashMap<String,Object>(){{
                 put("house_type",0);
-                put("house_price",0);
+                put("house_price",500000);
             }}) );
             put("isHasCar", 1);
             put("carData",JSON.toJSONString(new HashMap<String,Object>(){{
-                put("car_price",1);
+                put("car_price",99999);
             }}) );
-            put("creditLimit", 1);
-            put("wld", 1);
-            put("zmf", 1);
+            put("creditLimit", 3000);
+            put("wld", 4999);
+            put("zmf", 600);
             put("creditRecord", 3);
-            put("insurance", 0);
+            put("insurance", 1);
+            put("insuranceData",JSON.toJSONString(new HashMap<String,Integer>(){{
+                put("insurance_company",1);
+                put("insurance_price",4999);
+            }}));
         }};
-        return qyhData;
     }
 }

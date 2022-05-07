@@ -21,15 +21,14 @@ import org.openqa.selenium.support.Color;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Set;
-import java.util.function.Function;
 
 public class MySelenium {
-
 
     // 获取操作Api
     static Actions actions;
@@ -80,6 +79,7 @@ public class MySelenium {
                 ChromeOptions chromeOptions = new ChromeOptions();
                 chromeOptions.setPageLoadStrategy(PageLoadStrategy.NORMAL);
                 try {
+                    System.out.println(remoteUrl);
                     driver = new RemoteWebDriver(new URL(remoteUrl),chromeOptions);
                     driver.manage().window().maximize();
                 } catch (MalformedURLException e) {
@@ -104,10 +104,14 @@ public class MySelenium {
         return driver.getCurrentUrl();
     }
 
+    public static String getPageSource(WebDriver driver){
+        return  driver.getPageSource();
+    }
+
     /**
      * 打开网址
      */
-    public static void get(WebDriver driver,String url){
+    public static void get(WebDriver driver,String url) throws Exception{
         driver.get(url);
     }
 
@@ -154,31 +158,36 @@ public class MySelenium {
         }
     }
 
+    // 获取当前DOM的Alert弹窗
+     public static  Alert getAlert(WebDriver driver){
+        return driver.switchTo().alert();
+    }
+
     /**
      * Alert获取警告弹窗文本--- Confirm 确认弹窗
      */
-    public static String getText(Alert alert){
+    public static String getAlertText(Alert alert){
         return alert.getText();
     }
 
     /**
      * Alert输入框发送文本
      */
-    public static void sendKeys(Alert alert,String Keys){
+    public static void sendAlertKeys(Alert alert,String Keys){
         alert.sendKeys(Keys);
     }
 
     /**
      * Alert确认
      */
-    public static void accept(Alert alert){
+    public static void acceptAlert(Alert alert){
          alert.accept();
     }
 
     /**
      * 取消(Confirm,Warning)弹窗
      */
-    public static void dismiss(Alert alert){
+    public static void dismissAlert(Alert alert){
         alert.dismiss();
     }
 
@@ -385,15 +394,26 @@ public class MySelenium {
     /**
      * 获取WebElement元素 -- 万能 ExpectedConditions
      */
-    public static<V> WebElement findElement(WebDriver driver,Function<? super WebDriver,V> function){
-        return (WebElement) new WebDriverWait(driver, 1000).until(function);
+    public static WebElement findElement(WebDriver driver,String conditions, By by){
+        WebElement element = null;
+        MyConditions myConditions = MyConditions.valueOf(conditions.trim());
+        switch (myConditions){
+            case elementToBeClickable:
+                element = new WebDriverWait(driver, 3).until(ExpectedConditions.elementToBeClickable(by));
+                break;
+            case visibilityOfElementLocated:
+            default:
+                element = new WebDriverWait(driver, 3).until(ExpectedConditions.visibilityOfElementLocated(by));
+                break;
+        }
+        return element;
     }
-
 
     /*
      * 相对定位器 --
      */
-    public void  test(){
+    public void  test(WebDriver driver){
+        driver.notify();
 
     }
 
@@ -532,15 +552,17 @@ public class MySelenium {
     /**
      * 获取元素颜色
      */
-    public static Color getColor(WebElement element){
-        return Color.fromString(element.getCssValue("color"));
+    public static String getColor(WebElement element){
+        Color color = Color.fromString(element.getCssValue("color"));
+        return String.valueOf(color.getColor());
     }
 
     /**
      * 获取元素背景色
      */
-    public static Color getBackgroundColor(WebElement element){
-        return Color.fromString(element.getCssValue("background-color"));
+    public static String getBackgroundColor(WebElement element){
+        Color color = Color.fromString(element.getCssValue("background-color"));
+        return String.valueOf(color.getColor());
     }
 
 }

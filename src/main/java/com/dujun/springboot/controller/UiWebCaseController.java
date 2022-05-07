@@ -4,6 +4,7 @@ package com.dujun.springboot.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.dujun.springboot.VO.Result;
+import com.dujun.springboot.common.selenium.WebAssertType;
 import com.dujun.springboot.entity.UiWebCase;
 import com.dujun.springboot.service.impl.UiWebCaseServiceImpl;
 import jdk.nashorn.internal.objects.NativeUint8Array;
@@ -13,11 +14,14 @@ import org.springframework.beans.factory.BeanIsAbstractException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.*;
+import org.testng.collections.Lists;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * <p>
@@ -109,6 +113,21 @@ public class UiWebCaseController {
         }
         return "success";
 
+    }
+
+
+
+    @PostMapping("/assertType")
+    public Result<?> assertType(){
+        List<HashMap<String,String>> types = Lists.newArrayList();
+        for (WebAssertType assertType : WebAssertType.values()) {
+            HashMap<String,String> type = new HashMap<>();
+            type.put("name",assertType.getDescribe());
+            type.put("value",assertType.toString());
+            types.add(type);
+        }
+
+        return Result.success(types);
     }
 }
 
