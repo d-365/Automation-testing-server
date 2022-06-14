@@ -6,6 +6,6 @@ spring:
   profiles:
     #激活指定的profile
     active: test
-  # active: online
+#   active: online
 
 

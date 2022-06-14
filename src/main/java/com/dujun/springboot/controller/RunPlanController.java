@@ -25,8 +25,6 @@ import java.util.List;
 @RequestMapping("/plan")
 public class RunPlanController {
 
-
-
     @Autowired
     private RunPlanServiceImpl planService;
 
