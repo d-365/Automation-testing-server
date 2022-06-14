@@ -3,10 +3,7 @@ package com.dujun.springboot.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.dujun.springboot.VO.Result;
 import com.dujun.springboot.entity.User;
-import com.dujun.springboot.entity.UserEnv;
 import com.dujun.springboot.entity.sonEntity.UserInfo;
-import com.dujun.springboot.mapper.EnvMapper;
-import com.dujun.springboot.mapper.UserEnvMapper;
 import com.dujun.springboot.mapper.UserMapper;
 import com.dujun.springboot.service.UserService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -30,10 +27,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Resource
     private UserMapper userMapper;
-    @Resource
-    private UserEnvMapper userEnvMapper;
-    @Resource
-    private EnvMapper envMapper;
 
     // 用户登录
     public Result<?> login(String account, String password) {
@@ -93,8 +86,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         Integer envId = null;
         String EnvName = "";
         try{
-            envId = userEnvMapper.selectOne(new QueryWrapper<UserEnv>().eq("user_id",userId)).getEnvId();
-            EnvName = envMapper.selectById(envId).getEnvName();
+//            envId = userEnvMapper.selectOne(new QueryWrapper<UserEnv>().eq("user_id",userId)).getEnvId();
+//            EnvName = envMapper.selectById(envId).getEnvName();
         }catch (NullPointerException e){
             e.printStackTrace();
         }

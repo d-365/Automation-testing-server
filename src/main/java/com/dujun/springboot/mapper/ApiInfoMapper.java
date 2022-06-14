@@ -16,12 +16,12 @@ import org.apache.ibatis.annotations.Param;
 public interface ApiInfoMapper extends BaseMapper<ApiInfo> {
 
     // 根据分类ID 删除对应接口
-    @Delete("DELETE FROM mall.api_info WHERE api_suite_id = #{apiSuiteId} ")
+    @Delete("DELETE FROM api_info WHERE api_suite_id = #{apiSuiteId} ")
     void  deleteBy_api_suite_id(@Param("apiSuiteId") int apiSuiteId);
 
 
-    // 数据库查询对应的接口详情
-    ApiInfo selectByApiId(@Param("apiId") int apiId);
+//    // 数据库查询对应的接口详情
+//    ApiInfo selectByApiId(@Param("apiId") int apiId);
 
 
 

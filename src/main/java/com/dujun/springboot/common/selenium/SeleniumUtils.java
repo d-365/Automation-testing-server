@@ -6,26 +6,25 @@
 
 package com.dujun.springboot.common.selenium;
 
-import com.auth0.jwt.impl.PublicClaims;
 import com.dujun.springboot.VO.AssertConsole;
 import com.dujun.springboot.VO.UIConsole;
-import com.dujun.springboot.entity.Action;
+import com.dujun.springboot.common.actionEnum;
 import com.dujun.springboot.entity.PageElement;
-import com.dujun.springboot.entity.PlanRound;
 import com.dujun.springboot.entity.WebCaseStep;
 import com.dujun.springboot.mapper.PageElementMapper;
 import com.dujun.springboot.mapper.WebCaseStepMapper;
-import com.dujun.springboot.utils.BeanContext;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.Objects;
 
 @Component
+@Service
 public class SeleniumUtils {
 
     @Resource
@@ -127,7 +126,7 @@ public class SeleniumUtils {
     }
 
     // 执行通用的Action操作
-    public UIConsole runAction(String actionType ,String actionKey, String actionValue){
+    public UIConsole runAction(String actionType ,Object actionKey, String actionValue){
         UIConsole uiConsole;
         actionEnum AcType;
         try {
@@ -140,42 +139,5 @@ public class SeleniumUtils {
     }
 
 
-}
-
-// Action枚举
-enum actionEnum{
-    DEFAULT("默认"),
-    OPENURL("打开网址"),
-    CLICK("点击元素"),
-    SLEEP("强制等待"),
-    INPUT("文本输入"),
-    CLEAR("清除文本"),
-    BACK("driver后退"),
-    FORWARD("driver前进"),
-    REFRESH("网址刷新"),
-    GETCOLOR("获取颜色"),
-    GETBACKGROUNDCOLOR("获取背景色"),
-    GETTEXT("获取元素内显示文本"),
-    CSSVALUE("元素的指定计算样式属性的值"),
-    SENDALERTKEYS("Alert弹窗发送文本"),
-    ACCEPTALERT("接收Alert弹窗"),
-    DISMISSALERT("取消Alert弹窗"),
-    SWITCHFRAMEBYNAME("按照name切换Frame"),
-    SWITCHFRAMEBYELEMENT("按照元素切换Frame"),
-    TODEFAULTCONTENT("切换回默认内容"),
-    EXECPYTHON("执行python文件"),
-    QUERYSQL("执行查询sql"),
-    UPDATESQL("执行sql-无结果");
-
-
-
-
-    public String getDescribe() {
-        return describe;
-    }
-    private final String describe;
-    actionEnum(String describe) {
-        this.describe =describe;
-    }
 }
 

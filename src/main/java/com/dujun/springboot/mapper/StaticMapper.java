@@ -35,7 +35,7 @@ public interface StaticMapper {
     @Select("SELECT COUNT(*) FROM run_plan WHERE status = 1 AND is_clock = 1 and plan_type = #{planType};")
     int clockCount(@Param("planType") Integer planType);
 
-    @Select("SELECT sum(clock_exec_count) FROM run_plan where plan_type = #{planType};")
+    @Select("SELECT IFNULL(sum(clock_exec_count),0) FROM run_plan where plan_type = #{planType};")
     int clockExecCount(@Param("planType") Integer planType);
 
     StaticPlan planRate(Integer planType);

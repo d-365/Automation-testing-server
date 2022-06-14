@@ -27,7 +27,7 @@ public class CaseCategoryController {
 
     // 新增修改接口分类
     @PostMapping("/add")
-    public Result update(@RequestBody CaseCategory caseCategory ){
+    public Result<?> update(@RequestBody CaseCategory caseCategory ){
         return caseCategoryService.update_category(caseCategory);
     }
 
@@ -38,7 +38,7 @@ public class CaseCategoryController {
     }
 
     @DeleteMapping("/delete/{id}")
-    public Result delete(@PathVariable("id") int id){
+    public Result<?> delete(@PathVariable("id") int id){
         return caseCategoryService.delete(id);
     }
 

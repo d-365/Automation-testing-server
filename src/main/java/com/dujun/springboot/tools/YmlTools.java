@@ -35,7 +35,7 @@ public class YmlTools {
 
     public  <T> T getValueByKey(String key, T defaultValue) {
         String separator = ".";
-        String[] separatorKeys = null;
+        String[] separatorKeys;
         if (key.contains(separator)) {
             // 取下面配置项的情况, user.path.keys 这种
             separatorKeys = key.split("\\.");

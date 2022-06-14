@@ -46,7 +46,7 @@ public class AutoConfigServiceImpl extends ServiceImpl<AutoConfigMapper, AutoCon
     }
 
     /**
-     * selenium定位方式
+     * selenium元素类型
      * @return
      */
     @Override

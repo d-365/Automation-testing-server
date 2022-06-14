@@ -11,21 +11,23 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.dujun.springboot.VO.Result;
-import com.dujun.springboot.entity.ApiInfo;
-import com.dujun.springboot.entity.RspAsserts;
-import com.dujun.springboot.entity.RspExtract;
+import com.dujun.springboot.VO.UIConsole;
+import com.dujun.springboot.common.selenium.SeleniumUtils;
+import com.dujun.springboot.entity.*;
 import com.dujun.springboot.entity.sonEntity.ApiConsole;
 import com.dujun.springboot.entity.sonEntity.ApiExec;
+import com.dujun.springboot.mapper.ActionMapper;
+import com.dujun.springboot.mapper.DbConfigMapper;
+import com.dujun.springboot.mapper.PrtDomainMapper;
+import com.dujun.springboot.utils.BeanContext;
 import com.dujun.springboot.utils.MysqlTools;
 import com.dujun.springboot.utils.request;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.util.EntityUtils;
-
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -37,6 +39,13 @@ import java.util.regex.Pattern;
  */
 @Slf4j
 public  class ApiCommon {
+
+    static SeleniumUtils seleniumUtils = BeanContext.getApplicationContext().getBean(SeleniumUtils.class);
+    static ActionMapper actionMapper = BeanContext.getApplicationContext().getBean(ActionMapper.class);
+    static DbConfigMapper dbConfigMapper = BeanContext.getApplicationContext().getBean(DbConfigMapper.class);
+
+
+    static PrtDomainMapper domainMapper = BeanContext.getApplicationContext().getBean(PrtDomainMapper.class);
 
     // 参数提取变量列表
     static HashMap<String,String> apiGlobalParams = new HashMap<>();
@@ -62,7 +71,7 @@ public  class ApiCommon {
                 //期望关系
                 String  expectRelation = rspAsserts.getExpectRelation().trim();
                 //断言结果
-                boolean result = true;
+                boolean result;
                 // 实际值
                 String realValue = "";
                 if(Objects.equals(dataSource, "")|| Objects.equals(expectRelation, "") || Objects.equals(expectValue, "")){
@@ -215,6 +224,7 @@ public  class ApiCommon {
                                 s = s.substring(0, s.length() - 1);
                             }
                             if (s.matches("[0-9]+")) {
+                                assert parseJsonArray != null;
                                 finalValue = (String) parseJsonArray.get(Integer.parseInt(s));
                             } else {
                                 try {
@@ -240,6 +250,7 @@ public  class ApiCommon {
                         s = s.substring(0, s.length() - 1);
                     }
                     if (s.matches("[0-9]+")) {
+                        assert parseJsonArray != null;
                         finalValue =  (String) parseJsonArray.get(Integer.parseInt(s));
                     } else {
                         try {
@@ -322,16 +333,20 @@ public  class ApiCommon {
     }
 
     // 单接口请求封装
-    public static Result<ApiInfo> apiDebug(ApiInfo apiInfo) {
-
+    public static Result<?> apiDebug(Integer envId,ApiInfo apiInfo) {
         // 控制台输出
         ArrayList<ApiConsole> console = new ArrayList<>();
-
         CloseableHttpResponse response = null;
         // 请求方法
         String method = apiInfo.getMethod();
+        // 获取接口中项目信息
+        Integer projectId = apiInfo.getProjectId();
+
+        // 获取域名信息
+        String domain = domainMapper.getDomainByEnvId(envId,projectId);
+
         // 请求url
-        String url = apiInfo.getDomain()+apiInfo.getPath();
+        String url = domain+apiInfo.getPath();
         if(Objects.equals(method, "") || Objects.equals(url, "")){
             return Result.error("请求方式或url不能为空");
         }
@@ -351,10 +366,12 @@ public  class ApiCommon {
         long endTime = 0;
         JSONObject rspJson = null;
 
-        // 前置动作
-        ArrayList<ApiExec> beforeExec = apiInfo.getBeforeExec();
-        ArrayList<ApiConsole> beforeExecResult  = ApiCommon.exec(beforeExec);
-        console.addAll(beforeExecResult);
+        // 执行前置动作
+        List<PlanRound> beforeExec = apiInfo.getBeforeExec();
+        if (beforeExec.size()>0){
+            ArrayList<ApiConsole> beforeExecResult  = ApiCommon.exec(beforeExec);
+            console.addAll(beforeExecResult);
+        }
 
         //执行接口请求
         switch (method.toUpperCase()){
@@ -382,7 +399,6 @@ public  class ApiCommon {
                 } catch (URISyntaxException e) {
                     e.printStackTrace();
                 } catch (IllegalArgumentException illegalArgumentException){
-                    System.out.println(illegalArgumentException);
                     return Result.error("Name may not be null");
                 }
                 break;
@@ -402,17 +418,18 @@ public  class ApiCommon {
                 break;
         }
 
-        // 后置动作
-        ArrayList<ApiExec> afterExec = apiInfo.getAfterExec();
-        ArrayList<ApiConsole> afterExecResult  = ApiCommon.exec(afterExec);
-        console.addAll(afterExecResult);
-
+        // 执行后置动作
+        List<PlanRound> tearDown = apiInfo.getAfterExec();
+        if (tearDown.size()>0){
+            ArrayList<ApiConsole> tearDownResult  = ApiCommon.exec(tearDown);
+            console.addAll(tearDownResult);
+        }
 
         // 将接口数据返回至前端
         try {
             //响应体
+            assert response != null;
             rspJson = request.getResponseJson(response);
-            System.out.println("响应值是"+rspJson);
             apiInfo.setRspBodyJson(rspJson);
             apiInfo.setRspBodySize(rspJson.size());
         } catch (JSONException jsonException){
@@ -624,12 +641,25 @@ public  class ApiCommon {
     }
 
     // 执行前置-后置动作
-    public static ArrayList<ApiConsole> exec(ArrayList<ApiExec> beforeExec){
+    public static ArrayList<ApiConsole> exec(List<PlanRound> exec){
         ArrayList<ApiConsole> consoleMsg = new ArrayList<>();
-        //执行动作
-        for (ApiExec apiExec : beforeExec) {
-            ApiConsole msg = ApiCommon.parse_exec(apiExec);
-            consoleMsg.add(msg);
+        for (PlanRound planRound : exec) {
+            ApiConsole apiConsole = new ApiConsole();
+            Integer actionId = planRound.getActionId();
+            String actionValue = planRound.getParams();
+            String operationData = planRound.getOperateData();
+            // 获取Action类型
+            Action action = actionMapper.selectById(actionId);
+            actionEnum AcType = actionEnum.valueOf(action.getActionKey());
+            if (AcType==actionEnum.QUERYSQL||AcType==actionEnum.UPDATESQL){
+                DbConfig dbConfig = dbConfigMapper.selectById(operationData);
+                UIConsole  uiConsole =  seleniumUtils.runAction(action.getActionKey(), dbConfig,actionValue);
+                String msg = uiConsole.getMsg();
+                Integer code = uiConsole.getCode();
+                apiConsole.setMsg(msg);
+                apiConsole.setSuccess(code == 0);
+            }
+            consoleMsg.add(apiConsole);
         }
         return  consoleMsg;
     }
@@ -642,7 +672,6 @@ public  class ApiCommon {
             JSONObject apiExec = (JSONObject) beforeExec.get(i);
             ApiConsole msg = ApiCommon.parse_execDb(apiExec);
             consoleMsg.add(msg);
-
         }
         return  consoleMsg;
     }
@@ -694,7 +723,6 @@ public  class ApiCommon {
 
     // 解析动作
     public static ApiConsole parse_execDb(JSONObject apiExec){
-
         if(apiExec.getString("params") != null && !Objects.equals(apiExec.getString("params"), "")){
             //解析database信息
             JSONObject dbConfig = JSON.parseObject(apiExec.getString("dbConfig"));
@@ -757,7 +785,6 @@ public  class ApiCommon {
         for (int i = 0; i < rspAsserts.size(); i++) {
             JSONObject rspAssertRaw = (JSONObject) rspAsserts.get(i);
             RspAsserts rspAssert = JSON.parseObject(String.valueOf(rspAssertRaw), RspAsserts.class);
-            System.out.println("打印下rspAssert"+rspAssert);
             if(rspAssert.getAssertResult()==null){
                 return true;
             }else{
@@ -802,7 +829,7 @@ public  class ApiCommon {
 
 
     // 单接口请求封装(数据库获取数据)
-    public static ApiInfo apiDebugDb(ApiInfo apiInfo) {
+    public static ApiInfo apiDebugDb(Integer envId,ApiInfo apiInfo) {
 
         // 控制台输出
         ArrayList<ApiConsole> console = new ArrayList<>();
@@ -810,8 +837,13 @@ public  class ApiCommon {
         CloseableHttpResponse response = null;
         // 请求方法
         String method = apiInfo.getMethod();
+        // 获取接口中项目信息
+        Integer projectId = apiInfo.getProjectId();
+
+        // 获取域名信息
+        String domain = domainMapper.getDomainByEnvId(envId,projectId);
         // 请求url
-        String url = apiInfo.getDomain()+apiInfo.getPath();
+        String url = domain+apiInfo.getPath();
 
         //解析请求体类型
         String reqBodyType = apiInfo.getReqBodyType();
@@ -828,10 +860,10 @@ public  class ApiCommon {
         long endTime = 0;
         JSONObject rspJson = null;
 
-        // 前置动作
-        ArrayList<ApiExec> beforeExec = apiInfo.getBeforeExec();
-        ArrayList<ApiConsole> beforeExecResult  = ApiCommon.execDb(beforeExec);
-        console.addAll(beforeExecResult);
+//        // 前置动作
+//        ArrayList<ApiExec> beforeExec = apiInfo.getBeforeExec();
+//        ArrayList<ApiConsole> beforeExecResult  = ApiCommon.execDb(beforeExec);
+//        console.addAll(beforeExecResult);
 
         //执行接口请求
         switch (method.toUpperCase()){
@@ -869,17 +901,16 @@ public  class ApiCommon {
                 break;
         }
 
-        // 后置动作
-        ArrayList<ApiExec> afterExec = apiInfo.getAfterExec();
-        ArrayList<ApiConsole> afterExecResult  = ApiCommon.execDb(afterExec);
-        console.addAll(afterExecResult);
+//        // 后置动作
+//        ArrayList<ApiExec> afterExec = apiInfo.getAfterExec();
+//        ArrayList<ApiConsole> afterExecResult  = ApiCommon.execDb(afterExec);
+//        console.addAll(afterExecResult);
 
 
         // 将接口数据返回至前端
         try {
             //响应体
             rspJson = request.getResponseJson(response);
-            System.out.println("响应值是"+rspJson);
             apiInfo.setRspBodyJson(rspJson);
             apiInfo.setRspBodySize(rspJson.size());
         } catch (JSONException jsonException){
@@ -950,7 +981,7 @@ public  class ApiCommon {
                 //期望关系
                 String  expectRelation = rspAsserts.getExpectRelation().trim();
                 //断言结果
-                boolean result = true;
+                boolean result;
                 // 实际值
                 String realValue = "";
                 if(Objects.equals(dataSource, "")|| Objects.equals(extractExpress, "") || Objects.equals(expectRelation, "") || Objects.equals(expectValue, "")){
@@ -1027,7 +1058,6 @@ public  class ApiCommon {
                 // 变量值
                 String realValue = "";
                 // 变量数据类型
-                String realType = "";
                 switch (dataSource){
                     case "code":
                         realValue = rspCode;

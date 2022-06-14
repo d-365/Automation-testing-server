@@ -6,7 +6,6 @@
 
 package com.dujun.springboot.Api.qyh;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.dujun.springboot.tools.JsonTools;
 import com.dujun.springboot.tools.YmlTools;
@@ -14,16 +13,16 @@ import com.dujun.springboot.tools.dateTools;
 import com.dujun.springboot.utils.MyRedis;
 import com.dujun.springboot.utils.MysqlTools;
 import com.dujun.springboot.utils.request;
-import com.mysql.cj.jdbc.MysqlSavepoint;
 import org.apache.http.client.methods.CloseableHttpResponse;
 
+import java.io.PrintWriter;
 import java.util.HashMap;
 
 public class Qyh {
 
     YmlTools ymlTools = new YmlTools("globalConfig.yml");
     MyRedis myRedis = new MyRedis(ymlTools.getValueByKey("test.redis.qyh.ip",""),ymlTools.getValueByKey("test.redis.qyh.password",""));
-    String domain = ymlTools.getValueByKey("test.domain.qyh","");
+    String domain = ymlTools.getValueByKey("test.domain.qyh","http://testmapi.qyihua.com");
 
     private String token = "";
 
@@ -42,7 +41,6 @@ public class Qyh {
 
     // 登录
     public void login(String phone){
-
         myRedis.set(String.format("customer_%s",phone),"1234");
         String url = domain+"/api/customer/v1/user/code/login";
         HashMap<String,String> header = new HashMap<String, String>(){{

@@ -21,7 +21,7 @@ import java.util.Map;
 public class JwtUtil {
 
     // 过期时间
-    private static final long EXPIRE_TIME = 48 * 60 *60 * 1000;
+    private static final long EXPIRE_TIME = 72 * 60 *60 * 1000;
 
     // token私钥
     private static final String TOKEN_SECRET = "f26e587c28064d0e855e72c0a6a0e631";
@@ -64,14 +64,12 @@ public class JwtUtil {
     public static boolean verify(String token) {
         try {
             Algorithm algorithm = Algorithm.HMAC256(TOKEN_SECRET);
-            JWTVerifier verifier = JWT.require(algorithm)
-                    .build();
-            DecodedJWT jwt = verifier.verify(token);
+            JWTVerifier verifier = JWT.require(algorithm).build();
+            verifier.verify(token);
             return true;
         } catch (Exception exception) {
             return false;
         }
     }
-
 
 }

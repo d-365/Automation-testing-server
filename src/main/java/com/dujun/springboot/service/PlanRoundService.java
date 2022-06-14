@@ -1,6 +1,6 @@
 package com.dujun.springboot.service;
 
-import com.dujun.springboot.entity.UserEnv;
+import com.dujun.springboot.entity.PlanRound;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
@@ -9,8 +9,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * </p>
  *
  * @author dujun
- * @since 2022-01-07
+ * @since 2022-05-09
  */
-public interface UserEnvService extends IService<UserEnv> {
+public interface PlanRoundService extends IService<PlanRound> {
 
 }

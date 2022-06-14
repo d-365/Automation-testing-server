@@ -1,7 +1,9 @@
 # 测试环境
 test:
   domain:
-    qyh: "http://testadmin.qyhnet.com"
+    qyh: http://testmapi.qyihua.com
+    qs: http://testadmin.qyhnet.com
+
   redis:
     qyh:
       ip : "120.55.125.94"

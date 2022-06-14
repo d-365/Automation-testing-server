@@ -1,39 +1,36 @@
 package com.dujun.springboot.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import java.util.Date;
+
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.FastjsonTypeHandler;
-import com.dujun.springboot.entity.sonEntity.ApiDomain;
-import com.dujun.springboot.entity.sonEntity.EnvDataBase;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
-import org.apache.ibatis.type.BlobTypeHandler;
 
 /**
  * <p>
- * 环境配置
+ * 环境配置表
  * </p>
  *
  * @author dujun
- * @since 2021-12-10
+ * @since 2022-05-09
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @TableName(autoResultMap = true)
-public class Env implements Serializable {
+public class EnvConfig implements Serializable {
 
     private static final long serialVersionUID=1L;
 
-    /**
-     * 环境ID
-     */
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
@@ -43,18 +40,30 @@ public class Env implements Serializable {
     private String envName;
 
     /**
-     * 接口域名
+     * 数据库ID
      */
     @TableField(typeHandler= FastjsonTypeHandler.class)
-//    @TableField(typeHandler = BlobTypeHandler.class)
-    private ArrayList<ApiDomain> apiDomain;
+    private Set<Integer> dbId;
 
     /**
-     * 数据库配置
+     * 备注
      */
-    @TableField(typeHandler= FastjsonTypeHandler.class)
-//    @TableField(typeHandler = BlobTypeHandler.class)
-    private ArrayList<EnvDataBase> envDataBase;
+    private String remark;
+
+    /**
+     * 创建时间
+     */
+    private Date createTime;
+
+    /**
+     * 更新时间
+     */
+    private Date updateTime;
+
+    /**
+     * 0 启用 1 已删除
+     */
+    private Integer delFlag;
 
 
 }

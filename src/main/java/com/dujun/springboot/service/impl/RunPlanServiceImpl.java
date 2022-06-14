@@ -144,11 +144,13 @@ public class RunPlanServiceImpl extends ServiceImpl<RunPlanMapper, RunPlan> impl
         int case_failedCount = 0;
         boolean caseResult = false;
         // 执行接口请求
+        // 环境信息
+        Integer envId = planInfo.getEnvId();
         try {
             // 执行单个接口请求
             for (Integer apiId : apiIds) {
                 ApiInfo apiInfo = apiInfoMapper.selectOne(new QueryWrapper<ApiInfo>().eq("api_suite_id",apiId));
-                ApiInfo apiResult = ApiCommon.apiDebugDb(apiInfo);
+                ApiInfo apiResult = ApiCommon.apiDebugDb(envId,apiInfo);
                 PlanResultDetail planResultDetail = new PlanResultDetail();
                 planResultDetail.setApiId(apiInfo.getId());
                 planResultDetail.setApiInfo(apiResult);
@@ -162,6 +164,7 @@ public class RunPlanServiceImpl extends ServiceImpl<RunPlanMapper, RunPlan> impl
 
             // 解析caseId
             ArrayList<Integer> caseCategoryIds = planInfo.getPlanParam().getCaseIds();
+
             if (caseCategoryIds.size()!=0){
                 for (Integer categoryId : caseCategoryIds) {
                     // 根据用例分类ID 查询 对应apiId
@@ -170,7 +173,7 @@ public class RunPlanServiceImpl extends ServiceImpl<RunPlanMapper, RunPlan> impl
                         int i = 0;
                         while ( i < caseApiIds.size()) {
                             ApiInfo apiInfo = apiInfoMapper.selectById(caseApiIds.get(i));
-                            ApiInfo apiResult = ApiCommon.apiDebugDb(apiInfo);
+                            ApiInfo apiResult = ApiCommon.apiDebugDb(envId,apiInfo);
                             PlanResultDetail planResultDetail = new PlanResultDetail();
                             planResultDetail.setApiId(apiInfo.getId());
                             planResultDetail.setApiInfo(apiResult);

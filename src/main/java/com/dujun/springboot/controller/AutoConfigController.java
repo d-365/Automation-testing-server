@@ -33,7 +33,7 @@ public class AutoConfigController {
     }
 
     /**
-     * 定位方式列表
+     * 元素类型
      */
     @PostMapping("/elementType")
     public Result<?> elementType(){

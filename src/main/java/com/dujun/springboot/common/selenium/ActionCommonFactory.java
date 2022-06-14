@@ -8,9 +8,12 @@ package com.dujun.springboot.common.selenium;
 
 import com.alibaba.fastjson.JSONObject;
 import com.dujun.springboot.VO.UIConsole;
+import com.dujun.springboot.common.actionEnum;
 import com.dujun.springboot.entity.Action;
+import com.dujun.springboot.entity.DbConfig;
 import com.dujun.springboot.entity.WebCaseStep;
 import com.dujun.springboot.utils.MysqlTools;
+import org.omg.CORBA.OBJ_ADAPTER;
 import org.openqa.selenium.WebDriver;
 import org.springframework.stereotype.Component;
 
@@ -24,7 +27,7 @@ public class ActionCommonFactory {
     static String execMsg;
     static UIConsole uiConsole;
 
-    public  UIConsole execPython(String actionKey ,String actionValue) {
+    public  UIConsole execPython(Object actionKey ,String actionValue) {
         uiConsole = new UIConsole();
         try {
 
@@ -36,20 +39,20 @@ public class ActionCommonFactory {
         return uiConsole;
     }
 
-    public  UIConsole querySql(String actionKey ,String actionValue) {
+    public  UIConsole querySql(Object actionKey ,String actionValue) {
         uiConsole = new UIConsole();
         if (actionValue == null || actionKey == null){
             execMsg = "actionValue 或 actionKey不完整,请检查后重试";
             uiConsole.setCode(1);
         }else {
             MysqlTools mysqlTools = null;
+            DbConfig db = (DbConfig) actionKey;
             try {
                 // 解析数据库对象
-                JSONObject dbJson = JSONObject.parseObject(actionKey);
-                String jdbcUrl = dbJson.getString("jdbcUrl");
-                String dbUserName = dbJson.getString("dbUserName");
-                String dbPwd = dbJson.getString("dbPwd");
-                mysqlTools = new MysqlTools(jdbcUrl,dbUserName,dbPwd);
+                String jdbcUrl = db.getJdbcUrl();
+                String account = db.getAccount();
+                String pwd = db.getPwd();
+                mysqlTools = new MysqlTools(jdbcUrl,account,pwd);
                 // 执行SQL
                 ResultSet resultSet = mysqlTools.executeQuery(actionValue);
                 if (resultSet!=null){
@@ -73,7 +76,7 @@ public class ActionCommonFactory {
         return uiConsole;
     }
 
-    public  UIConsole updateSql(String actionKey ,String actionValue) {
+    public  UIConsole updateSql(Object actionKey ,String actionValue) {
         uiConsole = new UIConsole();
         try {
 
@@ -101,7 +104,7 @@ public class ActionCommonFactory {
      * @param actionValue action参数
      * @return 控制台信息
      */
-    public UIConsole execAction(actionEnum actionType,String actionKey ,String actionValue){
+    public UIConsole execAction(actionEnum actionType, Object actionKey , String actionValue){
         HashMap<actionEnum, actionCommonInterface> myActionMap = new HashMap<>();
         myActionMap.put(actionEnum.EXECPYTHON, this::execPython);
         myActionMap.put(actionEnum.QUERYSQL, this::querySql);
@@ -116,5 +119,5 @@ public class ActionCommonFactory {
 @FunctionalInterface
 interface actionCommonInterface{
 
-    UIConsole apply(String actionKey ,String actionValue);
+    UIConsole apply(Object actionKey , String actionValue);
 }

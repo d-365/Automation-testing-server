@@ -8,9 +8,11 @@ package com.dujun.springboot.entity.sonEntity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class ApiConsole {
 
     //控制台消息结果

@@ -21,7 +21,7 @@ public interface PlanParamMapper extends BaseMapper<PlanParam> {
     PlanParam byPlanId(int planId);
 
     // 按照计划ID进行删除
-    @Delete("DELETE FROM mall.plan_param WHERE  plan_id = #{planId};")
+    @Delete("DELETE FROM plan_param WHERE  plan_id = #{planId};")
     void delByPlanId(int planId);
 
 }

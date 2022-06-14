@@ -25,17 +25,13 @@ public class MyFilter implements Filter {
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) {
         HttpServletRequest request = (HttpServletRequest)servletRequest;
         String requestUri = request.getRequestURI();
-        if (requestUri.contains("favicon.ico")){
-            System.out.println("过滤掉图标请求");
-        }else {
-            log.info("请求地址是："+requestUri);
+        if (!requestUri.contains("favicon.ico")){
             try {
                 filterChain.doFilter(servletRequest, servletResponse);
-            } catch (IOException | ServletException ioException) {
-                ioException.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
-
     }
 
     @Override

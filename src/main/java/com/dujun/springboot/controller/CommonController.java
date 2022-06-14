@@ -7,6 +7,7 @@
 package com.dujun.springboot.controller;
 
 import com.dujun.springboot.VO.Result;
+import com.dujun.springboot.entity.DbConfig;
 import com.dujun.springboot.entity.sonEntity.EnvDataBase;
 import com.dujun.springboot.service.impl.CommonServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,8 +28,8 @@ public class CommonController {
 
     @PostMapping("/ebDebug")
     // 数据库连接测试
-    public Result<?> dbDebug(@RequestBody  EnvDataBase envDataBase){
-        return commonService.dbDebug(envDataBase);
+    public Result<?> dbDebug(@RequestBody DbConfig dbConfig){
+        return commonService.dbDebug(dbConfig);
     }
 
 }

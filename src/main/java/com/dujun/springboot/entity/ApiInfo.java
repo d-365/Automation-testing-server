@@ -1,27 +1,21 @@
 package com.dujun.springboot.entity;
 
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.annotation.IdType;
-
-import java.lang.reflect.Array;
-import java.util.*;
-
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
-import java.io.Serializable;
-
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.FastjsonTypeHandler;
 import com.dujun.springboot.entity.sonEntity.ApiConsole;
 import com.dujun.springboot.entity.sonEntity.ApiExec;
-import com.mysql.cj.xdevapi.JsonArray;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Value;
 import lombok.experimental.Accessors;
-import org.springframework.boot.context.properties.bind.DefaultValue;
-import sun.nio.cs.FastCharsetProvider;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * <p>
@@ -58,7 +52,7 @@ public class ApiInfo implements Serializable {
     /**
      * 项目id
      */
-    private Long projectId;
+    private Integer projectId;
 
     /**
      * 接口分类id
@@ -71,13 +65,9 @@ public class ApiInfo implements Serializable {
     private String method;
 
     /**
-     * 环境id
-     */
-    private Long envId;
-
-    /**
      * 请求的协议+域名
      */
+    @TableField(exist = false)
     private String domain;
 
     /**
@@ -103,14 +93,14 @@ public class ApiInfo implements Serializable {
     /**
      * 前置处理器
      */
-    @TableField(typeHandler= FastjsonTypeHandler.class)
-    private ArrayList<ApiExec> beforeExec;
+    @TableField(exist = false)
+    private List<PlanRound> beforeExec;
 
     /**
      * 后置处理器
      */
-    @TableField(typeHandler= FastjsonTypeHandler.class)
-    private ArrayList<ApiExec> afterExec;
+    @TableField(exist = false)
+    private List<PlanRound> afterExec;
 
     /**
      * 请求头
@@ -187,7 +177,7 @@ public class ApiInfo implements Serializable {
     //虚拟返回对象类型
     private  String virtualBodyType;
 
-    //请求cookies信息
+    //请求cookies信息·
     @TableField(typeHandler= FastjsonTypeHandler.class)
     private ArrayList<HashMap> reqCookies;
 
@@ -233,5 +223,11 @@ public class ApiInfo implements Serializable {
     //控制台消息
     @TableField(exist = false)
     private  ArrayList<ApiConsole> log;
+
+    @TableField(typeHandler= FastjsonTypeHandler.class)
+    private List<Integer> setUpIds;
+
+    @TableField(typeHandler= FastjsonTypeHandler.class)
+    private List<Integer> tearDownIds;
 
 }

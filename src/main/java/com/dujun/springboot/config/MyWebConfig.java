@@ -17,20 +17,19 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-
 import java.util.ArrayList;
 import java.util.List;
 
-//@Configuration
+@Configuration
 public class MyWebConfig implements WebMvcConfigurer {
 
     @Autowired
-    MyInterceptor myInterceptor;
+    private MyInterceptor myInterceptor;
 
-    @Bean
-    public MyInterceptor getMyInterceptor(){
-        return new MyInterceptor();
-    }
+//    @Bean
+//    public MyInterceptor getMyInterceptor(){
+//        return new MyInterceptor();
+//    }
 
     /*注册监听器*/
     @Bean
@@ -50,7 +49,6 @@ public class MyWebConfig implements WebMvcConfigurer {
         return filterRegistration;
     }
 
-
     /*注册拦截器*/
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
@@ -58,8 +56,10 @@ public class MyWebConfig implements WebMvcConfigurer {
             add("/user/login");
             add("/user/save");
             add("/loginPlus");
+            add("/test/*");
+            add("/error");
         }};
-        registry.addInterceptor(myInterceptor).excludePathPatterns(excludePath).addPathPatterns("/**");
+        registry.addInterceptor(myInterceptor).addPathPatterns("/**").excludePathPatterns(excludePath);
     }
 
     /*跨域处理*/

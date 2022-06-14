@@ -23,7 +23,7 @@ import lombok.experimental.Accessors;
  * @since 2022-04-06
  */
 @Data
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode()
 @Accessors(chain = true)
 public class Action implements Serializable {
 

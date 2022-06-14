@@ -68,6 +68,7 @@ public class executeCases implements Callable<List<UIConsole>> {
                 }
             }
             // 1: 执行机 开启seleniumGrid服务
+
             // 2: 连接远程seleniumServer
             String remoteUrl = "http://"+userAddress+":"+port;
             driver = MySelenium.getRemoteDriver(remoteUrl,browserName);

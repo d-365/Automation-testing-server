@@ -1,17 +1,12 @@
 package com.dujun.springboot.controller;
 
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.dujun.springboot.VO.Result;
 import com.dujun.springboot.common.selenium.WebAssertType;
 import com.dujun.springboot.entity.UiWebCase;
 import com.dujun.springboot.service.impl.UiWebCaseServiceImpl;
-import jdk.nashorn.internal.objects.NativeUint8Array;
-import org.apache.commons.io.IOUtils;
-import org.hibernate.bytecode.internal.bytebuddy.PassThroughInterceptor;
-import org.springframework.beans.factory.BeanIsAbstractException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.*;
 import org.testng.collections.Lists;
@@ -19,7 +14,9 @@ import org.testng.collections.Lists;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.HashMap;
 import java.util.List;
 
@@ -80,12 +77,11 @@ public class UiWebCaseController {
 
     // selenium-server文件下载
     @PostMapping("/seleniumServer")
-    public String downloadServer(HttpServletResponse response) {
+    public void downloadServer(HttpServletResponse response) {
         // 定义输出文件流--字节码输出到httpResponse
-        ServletOutputStream os = null;
+        ServletOutputStream os;
         // 定义输入文件流--目标文件读取到内存中
-        BufferedInputStream bufferedInputStream = null;
-
+        BufferedInputStream bufferedInputStream;
         try {
             //1 : 获取文件位置,new文件对象
             String filePath = ResourceUtils.getURL("classpath:").getPath();
@@ -101,7 +97,7 @@ public class UiWebCaseController {
             bufferedInputStream = new BufferedInputStream(new FileInputStream(file));
             // 4: ServletOutputStream遍历写入字节数据
             byte[] bytes = new byte[1024];
-            int len = 0;
+            int len;
             while ((len = bufferedInputStream.read(bytes)) != -1) {
                 os.write(bytes, 0, len);
             }
@@ -111,11 +107,8 @@ public class UiWebCaseController {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return "success";
 
     }
-
-
 
     @PostMapping("/assertType")
     public Result<?> assertType(){
@@ -129,5 +122,10 @@ public class UiWebCaseController {
 
         return Result.success(types);
     }
+
+    public static void main(String[] args) {
+
+    }
+
 }
 

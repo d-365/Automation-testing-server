@@ -9,12 +9,16 @@ package com.dujun.springboot.utils;
 import com.dujun.springboot.tools.YmlTools;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import org.springframework.transaction.annotation.Transactional;
+
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+
+@Transactional
 public class MysqlTools {
 
     YmlTools ymlTools = new YmlTools("globalConfig.yml");
@@ -100,9 +104,6 @@ public class MysqlTools {
     public static void main(String[] args) {
         try {
             ResultSet resultSet =  new MysqlTools().executeQuery("SELECT * FROM qyh.qyh_manager_user;");
-            while (resultSet.first()){
-                System.out.println(resultSet.getString(1));
-            }
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -24,7 +24,7 @@ public interface ApiCaseMapper extends BaseMapper<ApiCase> {
     List<ApiInfo> apiInfoByCaseCategory(Integer categoryId);
 
     // 根据用例分类ID 查询用例ID
-    @Select("SELECT id from mall.api_case WHERE category_id= #{categoryId}")
+    @Select("SELECT id from api_case WHERE category_id= #{categoryId}")
     Integer caseIdByCategory(Integer categoryId);
 
 

@@ -15,7 +15,7 @@ import org.apache.ibatis.annotations.Select;
 public interface CategoryApiMapper extends BaseMapper<CategoryApi> {
 
     // 根据接口ID 找到对应的分类ID
-    @Select("SELECT api_suite_id FROM mall.api_info WHERE id = #{id}")
+    @Select("SELECT api_suite_id FROM api_info WHERE id = #{id}")
     Long categoryIdById(Long id);
 
 }

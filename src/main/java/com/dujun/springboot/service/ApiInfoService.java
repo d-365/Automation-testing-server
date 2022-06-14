@@ -15,6 +15,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
 public interface ApiInfoService extends IService<ApiInfo> {
 
     // 运行单个测试用例（debug）
-    Result debug(ApiInfo apiInfo);
+    Result<?> debug(Integer envId,ApiInfo apiInfo);
 
 }

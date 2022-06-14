@@ -15,13 +15,13 @@
         SELECT
             api_id
         FROM
-            mall.case_api_relation
+            case_api_relation
         WHERE
             case_id = (
                 SELECT
                     id
                 FROM
-                    mall.api_case
+                    api_case
                 WHERE
                     category_id = #{categoryId}
             )
@@ -34,19 +34,19 @@
         SELECT
             *
         FROM
-            mall.api_info
+            api_info
         WHERE
             id IN (
                 SELECT
                     api_id
                 FROM
-                    mall.case_api_relation
+                    case_api_relation
                 WHERE
                     case_id = (
                         SELECT
                             id
                         FROM
-                            mall.api_case
+                            api_case
                         WHERE
                             category_id = #{categoryId}
                     )

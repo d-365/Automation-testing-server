@@ -13,7 +13,7 @@
 		SELECT
 			id,plan_id,api_ids,case_ids
 		FROM
-			mall.plan_param
+			plan_param
 		WHERE
 			plan_id = #{planId};
 	</select>

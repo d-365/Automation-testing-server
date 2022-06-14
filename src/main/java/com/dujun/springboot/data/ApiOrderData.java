@@ -78,7 +78,7 @@ public class ApiOrderData {
                 put("operating_years",11);
             }}));
             put("socialSecurity", 2);
-            put("accumulationFund", 1);
+            put("accumulationFund", 2);
             put("isHasHouse", 1);
             put("houseData",JSON.toJSONString(new HashMap<String,Object>(){{
                 put("house_type",0);
@@ -90,12 +90,12 @@ public class ApiOrderData {
             }}) );
             put("creditLimit", 3000);
             put("wld", 4999);
-            put("zmf", 600);
+            put("zmf", 700);
             put("creditRecord", 3);
             put("insurance", 1);
             put("insuranceData",JSON.toJSONString(new HashMap<String,Integer>(){{
                 put("insurance_company",1);
-                put("insurance_price",4999);
+                put("insurance_price",49999);
             }}));
         }};
     }

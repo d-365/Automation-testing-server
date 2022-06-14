@@ -118,7 +118,7 @@ public class ScheduledTask implements SchedulingConfigurer {
 }
 
 
-@Component
+//@Component
 class StartInitTask implements CommandLineRunner {
 
     @Autowired

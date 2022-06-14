@@ -74,13 +74,11 @@ public class ApiCaseController {
     }
 
 
-    @PostMapping("/debugCase")
+    @PostMapping("/debugCase/{envId}")
     // 用例deBUG调试
-    public Result debugCase(@RequestBody ApiCase apiCase){
-        return apiCaseService.debugCase(apiCase);
+    public Result<?> debugCase(@PathVariable("envId")Integer envId,@RequestBody ApiCase apiCase){
+        return apiCaseService.debugCase(envId,apiCase);
     }
-
-
 
 }
 

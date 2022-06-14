@@ -7,6 +7,7 @@
 package com.dujun.springboot.common.selenium;
 
 import com.dujun.springboot.VO.UIConsole;
+import com.dujun.springboot.common.actionEnum;
 import com.dujun.springboot.entity.WebCaseStep;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.WebDriver;
@@ -400,7 +401,7 @@ public class ActionFactory {
         return uiConsole;
     }
 
-    public UIConsole execAction(actionEnum actionType,WebDriver driver, WebCaseStep caseStep) {
+    public UIConsole execAction(actionEnum actionType, WebDriver driver, WebCaseStep caseStep) {
         HashMap<actionEnum, MyFunctionalInterface> myActionMap = new HashMap<>();
         myActionMap.put(actionEnum.OPENURL, this::openUrl);
         myActionMap.put(actionEnum.CLICK, this::click);

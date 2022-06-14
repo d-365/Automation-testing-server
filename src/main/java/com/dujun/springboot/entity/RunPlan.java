@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableField;
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -92,5 +93,8 @@ public class RunPlan implements Serializable {
     // UI自动化执行 浏览器类型
     private String browserType;
 
+    private Date createTime;
+
+    private Date updateTime;
 
 }

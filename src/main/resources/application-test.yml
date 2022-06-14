@@ -7,11 +7,16 @@ spring:
     dynamic:
       primary: master
       datasource:
+#        master:
+#          driver-class-name: com.mysql.cj.jdbc.Driver
+#          url: jdbc:mysql://121.40.229.114:3306/tester_plat?useUnicode=true&useSSL=false&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+#          username: dujun
+#          password: test1997
         master:
-          driver-class-name: com.mysql.cj.jdbc.Driver
-          url: jdbc:mysql://121.40.229.114:3306/mall?useUnicode=true&useSSL=false&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
-          username: dujun
-          password: test1997
+            driver-class-name: com.mysql.cj.jdbc.Driver
+            url: jdbc:mysql://118.31.184.240:3306/tester_plat?useUnicode=true&useSSL=false&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+            username: root
+            password: 3wHNY2Bq
         qsTest:
             driver-class-name: com.mysql.cj.jdbc.Driver
             url: jdbc:mysql://118.31.184.240:3306?useUnicode=true&useSSL=false&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
@@ -28,6 +33,10 @@ spring:
       additional-exclude: WEB-INF/**
   freemarker:
     cache: false
+  jackson:
+    time-zone: GMT+8
+    date-format: yyyy-MM-dd HH:mm:ss
+
 
 # mybatis-plus
 mybatis-plus:

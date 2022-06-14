@@ -62,7 +62,7 @@ public class encryptionUtils {
     }
 
     public static void main(String[] args) {
-        System.out.println(md5Encryption("dujun"));
+        System.out.println(md5Encryption("123456"));
     }
 
 }

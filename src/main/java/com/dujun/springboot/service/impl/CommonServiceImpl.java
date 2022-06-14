@@ -7,6 +7,7 @@
 package com.dujun.springboot.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.dujun.springboot.VO.Result;
+import com.dujun.springboot.entity.DbConfig;
 import com.dujun.springboot.entity.RunPlan;
 import com.dujun.springboot.entity.sonEntity.EnvDataBase;
 import com.dujun.springboot.mapper.RunPlanMapper;
@@ -25,17 +26,17 @@ public class CommonServiceImpl  implements CommonService {
     private RunPlanMapper runPlanMapper;
 
     //数据库连接测试
-    public Result<?> dbDebug(EnvDataBase envDataBase){
-        String jdbcUrl = envDataBase.getJdbcUrl();
-        String userName = envDataBase.getDbUserName();
-        String password = envDataBase.getDbPwd();
+    public Result<?> dbDebug(DbConfig dbConfig){
+        String jdbcUrl = dbConfig.getJdbcUrl();
+        String userName = dbConfig.getAccount();
+        String password = dbConfig.getPwd();
         MysqlTools mysqlTools = new MysqlTools(jdbcUrl,userName,password);
         if(mysqlTools.result){
+            mysqlTools.close();
             return Result.success("连接成功");
         }else {
             return Result.error(mysqlTools.msg);
         }
-
     }
 
     // 获取需要执行的定时任务
@@ -43,8 +44,7 @@ public class CommonServiceImpl  implements CommonService {
         QueryWrapper<RunPlan> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("status","1");
         queryWrapper.eq("is_clock","1");
-        List<RunPlan> planList = runPlanMapper.selectList(queryWrapper);
-        return planList;
+        return runPlanMapper.selectList(queryWrapper);
     }
 
 }
