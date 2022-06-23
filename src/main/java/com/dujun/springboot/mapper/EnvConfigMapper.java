@@ -22,7 +22,7 @@ public interface EnvConfigMapper extends BaseMapper<EnvConfig> {
 
     // user 和 EnvID 进行绑定
     @Update("UPDATE  user SET env_id = #{envId} WHERE id = #{userId};")
-    void userEnvBind(@Param("userId") Long userId , @Param("envId") Integer envId);
+    void userEnvBind(@Param("userId") Integer userId , @Param("envId") Integer envId);
 
     // 通过环境ID查询对应下的数据库信息
     String dbConfigByEnvId(@Param("envId") Integer envId);

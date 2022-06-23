@@ -120,8 +120,8 @@ public class EnvConfigServiceImpl extends ServiceImpl<EnvConfigMapper, EnvConfig
         return Result.success();
     }
 
-    @Override
-    public Result<?> userBind(Long userId, Integer envId) {
+
+    public Result<?> userBind(Integer userId, Integer envId) {
         envConfigMapper.userEnvBind(userId,envId);
         return Result.success();
     }

@@ -6,7 +6,7 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>2.5.6</version>
-        <relativePath/> <!-- lookup parent from repository -->
+        <relativePath/>
     </parent>
     <groupId>com.dujun</groupId>
     <artifactId>web</artifactId>
@@ -226,11 +226,19 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
         </dependency>
-        <!--springSecurity-->
+<!--        &lt;!&ndash;springSecurity&ndash;&gt;-->
 <!--        <dependency>-->
 <!--            <groupId>org.springframework.boot</groupId>-->
 <!--            <artifactId>spring-boot-starter-security</artifactId>-->
+<!--            <version>2.6.8</version>-->
 <!--        </dependency>-->
+        <!--Appium-java-->
+        <dependency>
+            <groupId>io.appium</groupId>
+            <artifactId>java-client</artifactId>
+            <version>8.0.0</version>
+        </dependency>
+
     </dependencies>
 
     <build>

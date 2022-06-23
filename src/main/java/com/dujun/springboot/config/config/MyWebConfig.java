@@ -4,10 +4,12 @@
  * description: 告诉大家我是干啥的
  */
 
-package com.dujun.springboot.config;
+package com.dujun.springboot.config.config;
 
 import com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor;
 import com.dujun.springboot.config.inteceptor.MyInterceptor;
+import com.dujun.springboot.config.myFilter.MyFilter;
+import com.dujun.springboot.config.myListener.MyListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
@@ -25,11 +27,6 @@ public class MyWebConfig implements WebMvcConfigurer {
 
     @Autowired
     private MyInterceptor myInterceptor;
-
-//    @Bean
-//    public MyInterceptor getMyInterceptor(){
-//        return new MyInterceptor();
-//    }
 
     /*注册监听器*/
     @Bean

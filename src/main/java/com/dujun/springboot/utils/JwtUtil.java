@@ -41,8 +41,8 @@ public class JwtUtil {
             return JWT.create()
                     .withHeader(header)
                     //要往token中存储的东西
-                    .withClaim("phone", user.getId())
-                    .withClaim("uId",user.getAccount())
+                    .withClaim("uId", user.getId().toString())
+                    .withClaim("account",user.getAccount())
                     .withExpiresAt(date)
                     .sign(algorithm);
         } catch (UnsupportedEncodingException e) {

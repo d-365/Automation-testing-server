@@ -1,13 +1,10 @@
 package com.dujun.springboot.temp;
 
-import antlr.StringUtils;
-import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Component;
-
 import java.util.Arrays;
 
 // 定义切面类
@@ -37,7 +34,6 @@ public class AopServiceAspect {
         }finally {
             System.out.println("result:===="+result);
             System.out.println("环绕最终通知");
-            System.out.println();
         }
         return result;
     }

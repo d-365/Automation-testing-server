@@ -18,6 +18,7 @@ import com.dujun.springboot.entity.sonEntity.ApiConsole;
 import com.dujun.springboot.entity.sonEntity.ApiExec;
 import com.dujun.springboot.mapper.ActionMapper;
 import com.dujun.springboot.mapper.DbConfigMapper;
+import com.dujun.springboot.mapper.PlanRoundMapper;
 import com.dujun.springboot.mapper.PrtDomainMapper;
 import com.dujun.springboot.utils.BeanContext;
 import com.dujun.springboot.utils.MysqlTools;
@@ -43,293 +44,149 @@ public  class ApiCommon {
     static SeleniumUtils seleniumUtils = BeanContext.getApplicationContext().getBean(SeleniumUtils.class);
     static ActionMapper actionMapper = BeanContext.getApplicationContext().getBean(ActionMapper.class);
     static DbConfigMapper dbConfigMapper = BeanContext.getApplicationContext().getBean(DbConfigMapper.class);
-
-
     static PrtDomainMapper domainMapper = BeanContext.getApplicationContext().getBean(PrtDomainMapper.class);
+    static PlanRoundMapper planRoundMapper = BeanContext.getApplicationContext().getBean(PlanRoundMapper.class);
 
     // 参数提取变量列表
     static HashMap<String,String> apiGlobalParams = new HashMap<>();
 
-    /**
-     * @param reqAsserts 需要断言list
-     * @param rspJson json格式响应体
-     * @param rspCode 状态码
-     * @param rspHeader 响应头
-     * @return String
-     */
-    // 接口断言
-    public static ArrayList<ApiConsole> apiAssert(ArrayList<RspAsserts> reqAsserts, JSONObject rspJson, String rspCode,ArrayList<HashMap<String,String>> rspHeader){
-        ArrayList<ApiConsole> consoleMsg = new ArrayList<>();
-        for(RspAsserts rspAsserts : reqAsserts){
-            if(rspAsserts.getDataSource() !=null && rspAsserts.getExpectRelation()!=null && rspAsserts.getExtractExpress()!=null){
-                //数据源
-                String  dataSource = rspAsserts.getDataSource().trim();
-                // 未解析表达式内容
-                String  extractExpress = rspAsserts.getExtractExpress().trim();
-                //期望值
-                String  expectValue = rspAsserts.getExpectValue().trim();
-                //期望关系
-                String  expectRelation = rspAsserts.getExpectRelation().trim();
-                //断言结果
-                boolean result;
-                // 实际值
-                String realValue = "";
-                if(Objects.equals(dataSource, "")|| Objects.equals(expectRelation, "") || Objects.equals(expectValue, "")){
-                    rspAsserts.setAssertResult(true);
-                    consoleMsg.add(new ApiConsole(true,"接口断言数据不完整",extractExpress));
-                    break;
+    // 单接口请求封装(数据库获取数据)
+    public static ApiInfo apiDebugDb(Integer envId,ApiInfo apiInfo) {
+
+        // 控制台输出
+        ArrayList<ApiConsole> console = new ArrayList<>();
+
+        CloseableHttpResponse response = null;
+        // 请求方法
+        String method = apiInfo.getMethod();
+        // 获取接口中项目信息
+        Integer projectId = apiInfo.getProjectId();
+
+        // 获取域名信息
+        String domain = domainMapper.getDomainByEnvId(envId,projectId);
+        // 请求url
+        String url = domain+apiInfo.getPath();
+
+        //解析请求体类型
+        String reqBodyType = apiInfo.getReqBodyType();
+
+        //解析后的请求体
+        HashMap<Object, Object> entity = parseEntityDb(apiInfo.getReqBodyData());
+
+        //解析后的Headers
+        HashMap<String,String> headers = parseHeadersDb(apiInfo.getReqHeader());
+
+        //text格式请求体
+        String textBody = "";
+        long startTime = new Date().getTime();
+        long endTime = 0;
+        JSONObject rspJson = null;
+
+        // 执行前置动作
+        List<PlanRound> beforeExec = apiInfo.getBeforeExec();
+        beforeExec = beforeExec==null?new ArrayList<>():beforeExec;
+        if (beforeExec.size()>0){
+            ArrayList<ApiConsole> beforeExecResult  = ApiCommon.exec(beforeExec);
+            console.addAll(beforeExecResult);
+        }
+
+        //执行接口请求
+        switch (method.toUpperCase()){
+            case "DELETE":
+                response = request.delete(url,headers);
+                break;
+            case "PUT":
+                break;
+            case "GET":
+                //params
+                ArrayList<HashMap> paramsRaw = apiInfo.getReqParams();
+                //解析后的param
+                HashMap<String,String> params = parseParamDb(paramsRaw);
+
+                try {
+                    response = request.get(url,headers,params);
+                    endTime = new Date().getTime();
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-
-                switch (dataSource){
-                    case "code":
-                        result = ApiCommon.assert_final(expectValue,rspCode,expectRelation);
-                        rspAsserts.setRealValue(rspCode);
-                        if(!result){
-                            consoleMsg .add(new ApiConsole(false,"断言失败",extractExpress));
-                        }else {
-                            consoleMsg .add(new ApiConsole(true,"断言成功",extractExpress));
-                        }
-                        rspAsserts.setAssertResult(result);
-                        break;
-                    case "header":
-                        realValue = ApiCommon.parseHeader(rspHeader,extractExpress);
-                        result = ApiCommon.assert_final(expectValue,realValue,expectRelation);
-                        rspAsserts.setRealValue(realValue);
-                        rspAsserts.setAssertResult(result);
-                        if(!result){
-                            consoleMsg .add(new ApiConsole(false,"断言失败",extractExpress));
-                        }else {
-                            consoleMsg .add(new ApiConsole(true,"断言成功",extractExpress));
-                        }
-                        break;
-                    case "bodyJson":
-                        // 解析 提取表达式
-                        try{
-                            realValue = ApiCommon.parseJson(rspJson,extractExpress);
-                            System.out.println("解析出的值是: "+realValue);
-                        }catch (NullPointerException nullPointerException){
-                            consoleMsg .add(new ApiConsole(false,"表达式有误",extractExpress));
-                        }
-                        //进行断言
-                        result = ApiCommon.assert_final(expectValue,realValue,expectRelation);
-                        rspAsserts.setRealValue(realValue);
-                        rspAsserts.setAssertResult(result);
-                        if(!result){
-                            consoleMsg .add(new ApiConsole(false,"断言失败",extractExpress));
-                        }else {
-                            consoleMsg .add(new ApiConsole(true,"断言成功",extractExpress));
-                        }
-                        break;
-                    default:
-                        consoleMsg.add(new ApiConsole(true,"断言数据源不合法",extractExpress));
-                        break;
-                }
-            }
-        }
-        return consoleMsg;
-
-    }
-    // 期望关系
-    /**
-     * @param expectValue  期望值
-     * @param realityValue   实际值
-     * @param expectRelation 期望关系
-     * @return boolean
-     */
-    public static boolean assert_final(String expectValue,String realityValue,String expectRelation){
-        if(Objects.equals(expectValue, "")|| Objects.equals(realityValue, "")|| Objects.equals(expectRelation, "")){
-            return false;
-        }
-        if(expectValue == null||realityValue == null || expectRelation==null){
-            return false;
-        }
-        switch (expectRelation){
-            case "等于":
-                return expectValue.equals(realityValue);
-            case "大于":
-                return expectValue.hashCode() > realityValue.hashCode();
-            case "大于等于":
-                return expectValue.hashCode() >= realityValue.hashCode();
-            case "小于":
-                return expectValue.hashCode() < realityValue.hashCode();
-            case "小于等于":
-                return expectValue.hashCode() <= realityValue.hashCode();
-            case "包含":
-                return expectValue.contains(realityValue);
-            case "不包含":
-                boolean results = expectValue.contains(realityValue);
-                return !results;
-            case "长度等于":
-                return expectValue.length() == realityValue.length();
-            case "长度大于":
-                return expectValue.length() > realityValue.length();
-            case "长度大于等于":
-                return expectValue.length() >= realityValue.length();
-            case "长度小于":
-                return expectValue.length() < realityValue.length();
-            case "长度小于等于":
-                return expectValue.length() <= realityValue.length();
-            default:
-                System.out.println("输入的期望关系不合法");
-                return false;
-        }
-    }
-
-    //参数表达式解析( 响应体(json) )
-    /**
-     * @param jsonObject 源json串
-     * @param extractExpress  解析表达式
-     */
-    public static String  parseJson(JSONObject jsonObject,String extractExpress ){
-        String finalValue = "";
-        if(Objects.equals(extractExpress, "")){
-            return "解析表达式不能为空"; }
-        JSONObject ParseJsonObject = jsonObject;
-        JSONArray parseJsonArray = null;
-        if (extractExpress.contains(".")){
-            String[] strings = extractExpress.split("\\.");
-            for (int i = 0; i < strings.length; i++) {
-                if (i<strings.length-1){
-                    if(strings[i].contains("[")){
-                        String[] parseArrayList =  strings[i].split("\\[");
-                        for (String s : parseArrayList) {
-                            if (s.endsWith("]")) {
-                                s = s.substring(0, s.length() - 1);
-                            }
-                            if (s.matches("[0-9]+")) {
-                                assert parseJsonArray != null;
-                                ParseJsonObject = (JSONObject) parseJsonArray.get(Integer.parseInt(s));
-                            } else {
-                                try {
-                                    parseJsonArray = ParseJsonObject.getJSONArray(s);
-                                } catch (ClassCastException castException) {
-                                    return "无法解析表达式值" + s;
-                                }
-
-                            }
-                        }
-                    }else {
-                        try{
-                            ParseJsonObject = JSONObject.parseObject((ParseJsonObject.getString(strings[i])));
-                        }catch (JSONException jsonException){
-                            return "无法解析表达式值:"+ strings[i];
-                        }
-                    }
-                }
+                break;
+            case "POST":
+                //发送post请求: form-data
+                if(Objects.equals(reqBodyType, "1")){
+                    response  = request.post(url,headers,entity);
+                }//发送post请求: json
+                else if(Objects.equals(reqBodyType, "2")){
+                    String reqBodyJson = apiInfo.getReqBodyJson();
+                    response = request.post(url,headers,reqBodyJson);
+                }//发送post请求: 无请求体
                 else {
-                    if(strings[i].contains("[")){
-                        String[] parseArrayList =  strings[i].split("\\[");
-                        for (String s : parseArrayList) {
-                            if (s.endsWith("]")) {
-                                s = s.substring(0, s.length() - 1);
-                            }
-                            if (s.matches("[0-9]+")) {
-                                assert parseJsonArray != null;
-                                finalValue = (String) parseJsonArray.get(Integer.parseInt(s));
-                            } else {
-                                try {
-                                    parseJsonArray = ParseJsonObject.getJSONArray(s);
-                                } catch (ClassCastException castException) {
-                                    castException.printStackTrace();
-                                    return "无法解析表达式值" + s;
-                                }
-
-                            }
-                        }
-                    }else {
-                        finalValue=ParseJsonObject.getString(strings[i]);
-                    }
+                    response = request.post(url,headers,entity);
                 }
+                endTime = new Date().getTime();
+                break;
+        }
+
+        // 执行后置动作
+        List<PlanRound> tearDown = apiInfo.getAfterExec();
+        System.out.println(tearDown);
+        tearDown = tearDown==null?new ArrayList<>():tearDown;
+        if (tearDown.size()>0){
+            ArrayList<ApiConsole> tearDownResult  = ApiCommon.exec(tearDown);
+            console.addAll(tearDownResult);
+        }
+
+        // 将接口数据返回至前端
+        try {
+            //响应体
+            rspJson = request.getResponseJson(response);
+            apiInfo.setRspBodyJson(rspJson);
+            apiInfo.setRspBodySize(rspJson.size());
+        } catch (JSONException jsonException){
+            // text格式响应体
+            try {
+                apiInfo.setTextBody(EntityUtils.toString(response.getEntity()));
+            } catch (IOException ioException) {
+                ioException.printStackTrace();
             }
+            apiInfo.setRspBodySize(textBody.length());
+        }
+        //控制台
+        apiInfo.setLog(console);
+        //响应时间
+        apiInfo.setRspTime(endTime-startTime);
+        //状态码
+        String statusCode = String.valueOf(request.getStatusCode(response));
+        apiInfo.setRspStatusCode(statusCode);
+
+        ArrayList<HashMap<String, String>> rspHeader = request.getResHeaders(response);
+        apiInfo.setRspHeaders(rspHeader);
+        String rspCode = String.valueOf(request.getStatusCode(response));   //响应头
+
+        //断言
+        ArrayList<ApiConsole> AssertConsole = ApiCommon.apiAssertDb(apiInfo.getReqAssert(),rspJson,rspCode,rspHeader);
+        ArrayList rspAsserts = apiInfo.getReqAssert();
+
+        apiInfo.setRspAsserts(rspAsserts);
+        console.addAll(AssertConsole);
+
+        //接口请求结果
+        if(apiInfo.getReqAssert()!=null){
+            apiInfo.setResult(code_resultDb(statusCode,apiInfo.getReqAssert()));
         }else {
-            if(extractExpress.contains("[")){
-                String[] parseArrayList =  extractExpress.split("\\[");
-                for (String s : parseArrayList) {
-                    //
-                    if (s.endsWith("]")) {
-                        s = s.substring(0, s.length() - 1);
-                    }
-                    if (s.matches("[0-9]+")) {
-                        assert parseJsonArray != null;
-                        finalValue =  (String) parseJsonArray.get(Integer.parseInt(s));
-                    } else {
-                        try {
-                            parseJsonArray = ParseJsonObject.getJSONArray(s);
-                        } catch (ClassCastException castException) {
-                            castException.printStackTrace();
-                            return "无法解析表达式值" + s;
-                        }
-
-                    }
-                }
-            }else {
-                finalValue = jsonObject.getString(extractExpress);
-            }
-        }
-        if (finalValue == null){
-            return "无法解析表达式值";
-        }
-        return finalValue;
-    }
-    //参数表达式解析(响应头)
-    public static  String parseHeader(ArrayList<HashMap<String,String>> rspHeader ,String express){
-        String finalValue = "";
-        for (HashMap<String, String> hashMap : rspHeader) {
-            finalValue = hashMap.get(express);
-        }
-        return finalValue;
-    }
-
-    /**
-     * @param reqExtract 参数提取原始值
-     * @param rspJson 响应体（Json）
-     * @param rspCode 响应码
-     * @param rspHeader 响应体
-     */
-    //参数提取
-    public static void apiExtract(ArrayList<RspExtract> reqExtract, JSONObject rspJson, String rspCode, ArrayList<HashMap<String,String>> rspHeader){
-
-        for(RspExtract extract : reqExtract){
-            if(extract.getDataSource()!=null&& extract.getExtractExpress()!=null){
-                // 数据源
-                String  dataSource = extract.getDataSource().trim();
-                // 未解析表达式内容
-                String  extractExpress = extract.getExtractExpress().trim();
-                // 变量名称
-                String varName = extract.getVarName();
-                // 变量值
-                String realValue = "";
-                // 变量数据类型
-                String realType = "";
-                switch (dataSource){
-                    case "code":
-                        realValue = rspCode;
-                        extract.setRealValue(rspCode);
-                        break;
-                    case "header":
-                        // 解析 提取表达式
-                        realValue = ApiCommon.parseHeader(rspHeader,extractExpress);
-                        extract.setRealValue(realValue);
-                        break;
-                    case "bodyJson":
-                        // 解析 提取表达式
-                        realValue = ApiCommon.parseJson(rspJson,extractExpress);
-                        extract.setRealValue(realValue);
-                        break;
-                    default:
-                        System.out.println("数据源不合法");
-                        break;
-                }
-                apiGlobalParams.put(varName,realValue);
-            }
-
+            apiInfo.setResult(code_resultDb(statusCode));
         }
 
-    }
+        //提取参数
+        ArrayList reqExtract =  apiInfo.getReqExtract();
+        JSONObject reqExtractOne  = (JSONObject) reqExtract.get(0);
+        if (reqExtract.size() == 1 && Objects.equals(reqExtractOne.getString("dataSource"), "")){
+            log.info("不需要提取参数");
+        }else {
+            ApiCommon.apiExtractDb(reqExtract,rspJson,rspCode,rspHeader);
+            apiInfo.setRspExtract(apiInfo.getReqExtract());
+        }
 
-    // 获取用例执行后的接口参数
-    public static Map<String, String> getGlobalParams(){
-        return apiGlobalParams;
+        return apiInfo;
     }
 
     // 单接口请求封装
@@ -480,6 +337,310 @@ public  class ApiCommon {
 
         return Result.success(apiInfo);
     }
+
+    /**
+     * 处理用户前置后置信息
+     * @param apiInfo 接口详情
+     * @return apiInfo
+     */
+    public static ApiInfo setUpTearDownDispose(ApiInfo apiInfo){
+        // 处理前置后置信息
+        List<Integer> setUpIds = apiInfo.getSetUpIds();
+        List<Integer> tearDownIds = apiInfo.getTearDownIds();
+        List<PlanRound> setUp = new ArrayList<>();
+        List<PlanRound> tearDown = new ArrayList<>();
+        if (setUpIds.size()>0){
+            for (Integer setUpId : setUpIds) {
+                setUp.add(planRoundMapper.selectById(setUpId));
+            }
+        }
+        if (tearDownIds.size()>0){
+            for (Integer tearDownId : tearDownIds) {
+                tearDown.add(planRoundMapper.selectById(tearDownId));
+            }
+        }
+        apiInfo.setBeforeExec(setUp);
+        apiInfo.setAfterExec(tearDown);
+        return apiInfo;
+    }
+
+    /**
+     * @param reqAsserts 需要断言list
+     * @param rspJson json格式响应体
+     * @param rspCode 状态码
+     * @param rspHeader 响应头
+     * @return String
+     */
+    public static ArrayList<ApiConsole> apiAssert(ArrayList<RspAsserts> reqAsserts, JSONObject rspJson, String rspCode,ArrayList<HashMap<String,String>> rspHeader){
+        ArrayList<ApiConsole> consoleMsg = new ArrayList<>();
+        for(RspAsserts rspAsserts : reqAsserts){
+            if(rspAsserts.getDataSource() !=null && rspAsserts.getExpectRelation()!=null && rspAsserts.getExtractExpress()!=null){
+                //数据源
+                String  dataSource = rspAsserts.getDataSource().trim();
+                // 未解析表达式内容
+                String  extractExpress = rspAsserts.getExtractExpress().trim();
+                //期望值
+                String  expectValue = rspAsserts.getExpectValue().trim();
+                //期望关系
+                String  expectRelation = rspAsserts.getExpectRelation().trim();
+                //断言结果
+                boolean result;
+                // 实际值
+                String realValue = "";
+                if(Objects.equals(dataSource, "")|| Objects.equals(expectRelation, "") || Objects.equals(expectValue, "")){
+                    rspAsserts.setAssertResult(true);
+                    consoleMsg.add(new ApiConsole(true,"接口断言数据不完整",extractExpress));
+                    break;
+                }
+
+                switch (dataSource){
+                    case "code":
+                        result = ApiCommon.assert_final(expectValue,rspCode,expectRelation);
+                        rspAsserts.setRealValue(rspCode);
+                        if(!result){
+                            consoleMsg .add(new ApiConsole(false,"断言失败",extractExpress));
+                        }else {
+                            consoleMsg .add(new ApiConsole(true,"断言成功",extractExpress));
+                        }
+                        rspAsserts.setAssertResult(result);
+                        break;
+                    case "header":
+                        realValue = ApiCommon.parseHeader(rspHeader,extractExpress);
+                        result = ApiCommon.assert_final(expectValue,realValue,expectRelation);
+                        rspAsserts.setRealValue(realValue);
+                        rspAsserts.setAssertResult(result);
+                        if(!result){
+                            consoleMsg .add(new ApiConsole(false,"断言失败",extractExpress));
+                        }else {
+                            consoleMsg .add(new ApiConsole(true,"断言成功",extractExpress));
+                        }
+                        break;
+                    case "bodyJson":
+                        // 解析 提取表达式
+                        try{
+                            realValue = ApiCommon.parseJson(rspJson,extractExpress);
+                            System.out.println("解析出的值是: "+realValue);
+                        }catch (NullPointerException nullPointerException){
+                            consoleMsg .add(new ApiConsole(false,"表达式有误",extractExpress));
+                        }
+                        //进行断言
+                        result = ApiCommon.assert_final(expectValue,realValue,expectRelation);
+                        rspAsserts.setRealValue(realValue);
+                        rspAsserts.setAssertResult(result);
+                        if(!result){
+                            consoleMsg .add(new ApiConsole(false,"断言失败",extractExpress));
+                        }else {
+                            consoleMsg .add(new ApiConsole(true,"断言成功",extractExpress));
+                        }
+                        break;
+                    default:
+                        consoleMsg.add(new ApiConsole(true,"断言数据源不合法",extractExpress));
+                        break;
+                }
+            }
+        }
+        return consoleMsg;
+
+    }
+    /**
+     * @param expectValue  期望值
+     * @param realityValue   实际值
+     * @param expectRelation 期望关系
+     * @return boolean
+     */
+    public static boolean assert_final(String expectValue,String realityValue,String expectRelation){
+        if(Objects.equals(expectValue, "")|| Objects.equals(realityValue, "")|| Objects.equals(expectRelation, "")){
+            return false;
+        }
+        if(expectValue == null||realityValue == null || expectRelation==null){
+            return false;
+        }
+        switch (expectRelation){
+            case "等于":
+                return expectValue.equals(realityValue);
+            case "大于":
+                return expectValue.hashCode() > realityValue.hashCode();
+            case "大于等于":
+                return expectValue.hashCode() >= realityValue.hashCode();
+            case "小于":
+                return expectValue.hashCode() < realityValue.hashCode();
+            case "小于等于":
+                return expectValue.hashCode() <= realityValue.hashCode();
+            case "包含":
+                return expectValue.contains(realityValue);
+            case "不包含":
+                boolean results = expectValue.contains(realityValue);
+                return !results;
+            case "长度等于":
+                return expectValue.length() == realityValue.length();
+            case "长度大于":
+                return expectValue.length() > realityValue.length();
+            case "长度大于等于":
+                return expectValue.length() >= realityValue.length();
+            case "长度小于":
+                return expectValue.length() < realityValue.length();
+            case "长度小于等于":
+                return expectValue.length() <= realityValue.length();
+            default:
+                System.out.println("输入的期望关系不合法");
+                return false;
+        }
+    }
+
+    /**
+     * @param jsonObject 源json串
+     * @param extractExpress  解析表达式
+     */
+    public static String  parseJson(JSONObject jsonObject,String extractExpress ){
+        String finalValue = "";
+        if(Objects.equals(extractExpress, "")){
+            return "解析表达式不能为空"; }
+        JSONObject ParseJsonObject = jsonObject;
+        JSONArray parseJsonArray = null;
+        if (extractExpress.contains(".")){
+            String[] strings = extractExpress.split("\\.");
+            for (int i = 0; i < strings.length; i++) {
+                if (i<strings.length-1){
+                    if(strings[i].contains("[")){
+                        String[] parseArrayList =  strings[i].split("\\[");
+                        for (String s : parseArrayList) {
+                            if (s.endsWith("]")) {
+                                s = s.substring(0, s.length() - 1);
+                            }
+                            if (s.matches("[0-9]+")) {
+                                assert parseJsonArray != null;
+                                ParseJsonObject = (JSONObject) parseJsonArray.get(Integer.parseInt(s));
+                            } else {
+                                try {
+                                    parseJsonArray = ParseJsonObject.getJSONArray(s);
+                                } catch (ClassCastException castException) {
+                                    return "无法解析表达式值" + s;
+                                }
+
+                            }
+                        }
+                    }else {
+                        try{
+                            ParseJsonObject = JSONObject.parseObject((ParseJsonObject.getString(strings[i])));
+                        }catch (JSONException jsonException){
+                            return "无法解析表达式值:"+ strings[i];
+                        }
+                    }
+                }
+                else {
+                    if(strings[i].contains("[")){
+                        String[] parseArrayList =  strings[i].split("\\[");
+                        for (String s : parseArrayList) {
+                            if (s.endsWith("]")) {
+                                s = s.substring(0, s.length() - 1);
+                            }
+                            if (s.matches("[0-9]+")) {
+                                assert parseJsonArray != null;
+                                finalValue = (String) parseJsonArray.get(Integer.parseInt(s));
+                            } else {
+                                try {
+                                    parseJsonArray = ParseJsonObject.getJSONArray(s);
+                                } catch (ClassCastException castException) {
+                                    castException.printStackTrace();
+                                    return "无法解析表达式值" + s;
+                                }
+
+                            }
+                        }
+                    }else {
+                        finalValue=ParseJsonObject.getString(strings[i]);
+                    }
+                }
+            }
+        }else {
+            if(extractExpress.contains("[")){
+                String[] parseArrayList =  extractExpress.split("\\[");
+                for (String s : parseArrayList) {
+                    //
+                    if (s.endsWith("]")) {
+                        s = s.substring(0, s.length() - 1);
+                    }
+                    if (s.matches("[0-9]+")) {
+                        assert parseJsonArray != null;
+                        finalValue =  (String) parseJsonArray.get(Integer.parseInt(s));
+                    } else {
+                        try {
+                            parseJsonArray = ParseJsonObject.getJSONArray(s);
+                        } catch (ClassCastException castException) {
+                            castException.printStackTrace();
+                            return "无法解析表达式值" + s;
+                        }
+
+                    }
+                }
+            }else {
+                finalValue = jsonObject.getString(extractExpress);
+            }
+        }
+        if (finalValue == null){
+            return "无法解析表达式值";
+        }
+        return finalValue;
+    }
+    //参数表达式解析(响应头)
+    public static  String parseHeader(ArrayList<HashMap<String,String>> rspHeader ,String express){
+        String finalValue = "";
+        for (HashMap<String, String> hashMap : rspHeader) {
+            finalValue = hashMap.get(express);
+        }
+        return finalValue;
+    }
+
+    /**
+     * @param reqExtract 参数提取原始值
+     * @param rspJson 响应体（Json）
+     * @param rspCode 响应码
+     * @param rspHeader 响应体
+     */
+    public static void apiExtract(ArrayList<RspExtract> reqExtract, JSONObject rspJson, String rspCode, ArrayList<HashMap<String,String>> rspHeader){
+
+        for(RspExtract extract : reqExtract){
+            if(extract.getDataSource()!=null&& extract.getExtractExpress()!=null){
+                // 数据源
+                String  dataSource = extract.getDataSource().trim();
+                // 未解析表达式内容
+                String  extractExpress = extract.getExtractExpress().trim();
+                // 变量名称
+                String varName = extract.getVarName();
+                // 变量值
+                String realValue = "";
+                // 变量数据类型
+                switch (dataSource){
+                    case "code":
+                        realValue = rspCode;
+                        extract.setRealValue(rspCode);
+                        break;
+                    case "header":
+                        // 解析 提取表达式
+                        realValue = ApiCommon.parseHeader(rspHeader,extractExpress);
+                        extract.setRealValue(realValue);
+                        break;
+                    case "bodyJson":
+                        // 解析 提取表达式
+                        realValue = ApiCommon.parseJson(rspJson,extractExpress);
+                        extract.setRealValue(realValue);
+                        break;
+                    default:
+                        System.out.println("数据源不合法");
+                        break;
+                }
+                apiGlobalParams.put(varName,realValue);
+            }
+
+        }
+
+    }
+
+    // 获取用例执行后的接口参数
+    public static Map<String, String> getGlobalParams(){
+        return apiGlobalParams;
+    }
+
 
     // 解析请求头
     public static HashMap<String,String> parseHeaders(ArrayList<HashMap> headerList){
@@ -664,105 +825,6 @@ public  class ApiCommon {
         return  consoleMsg;
     }
 
-    // 执行前置-后置动作(数据库获取数据)
-    public static ArrayList<ApiConsole> execDb(ArrayList beforeExec){
-        ArrayList<ApiConsole> consoleMsg = new ArrayList<>();
-        //执行动作
-        for (int i = 0; i < beforeExec.size(); i++) {
-            JSONObject apiExec = (JSONObject) beforeExec.get(i);
-            ApiConsole msg = ApiCommon.parse_execDb(apiExec);
-            consoleMsg.add(msg);
-        }
-        return  consoleMsg;
-    }
-
-    // 解析动作
-    public static ApiConsole parse_exec(ApiExec apiExec){
-        System.out.println("打印"+apiExec);
-        if(apiExec.getParams() != null && !Objects.equals(apiExec.getParams(), "")){
-            //解析database信息
-            JSONObject dbConfig = JSON.parseObject(apiExec.getDbConfig());
-            String jdbcUrl = dbConfig.getString("jdbcUrl");
-            String userName = dbConfig.getString("dbUserName");
-            String password = dbConfig.getString("dbPwd");
-            String dbType = dbConfig.getString("dbType");
-            String name = apiExec.getName();
-            String sql = apiExec.getParams();
-            switch (apiExec.getAction().get(apiExec.getAction().size() - 1)){
-                case "query":
-                    MysqlTools mysqlTools = new MysqlTools(jdbcUrl,userName,password);
-                    if(mysqlTools.result){
-                        try {
-                            ResultSet result = mysqlTools.executeQuery(sql);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                        mysqlTools.close();
-                        return  new ApiConsole(true,"执行成功",name);
-                    }else {
-                        return  new ApiConsole(false,"数据库链接失败",name);
-                    }
-                case "update":
-                    MysqlTools mysqlTool = new MysqlTools(jdbcUrl,userName,password);
-                    if(mysqlTool.result){
-                        mysqlTool.execute(sql);
-                        mysqlTool.close();
-                        return  new ApiConsole(true,"执行成功",name);
-                    }else {
-                        return  new ApiConsole(false,"数据库链接失败",name);
-                    }
-                default:
-                    return  new ApiConsole(false,"不合法的前置动作",name);
-
-            }
-        }
-        else {
-            return  new ApiConsole(false,"前置或后置-配置不完整",apiExec.getName());
-        }
-    }
-
-    // 解析动作
-    public static ApiConsole parse_execDb(JSONObject apiExec){
-        if(apiExec.getString("params") != null && !Objects.equals(apiExec.getString("params"), "")){
-            //解析database信息
-            JSONObject dbConfig = JSON.parseObject(apiExec.getString("dbConfig"));
-            String jdbcUrl = dbConfig.getString("jdbcUrl");
-            String userName = dbConfig.getString("dbUserName");
-            String password = dbConfig.getString("dbPwd");
-            String dbType = dbConfig.getString("dbType");
-            String name = apiExec.getString("name");
-            String sql = apiExec.getString("params");
-            Object o = apiExec.getJSONArray("action").get(apiExec.getJSONArray("action").size() - 1);
-            if ("query".equals(o)) {
-                MysqlTools mysqlTools = new MysqlTools(jdbcUrl, userName, password);
-                if (mysqlTools.result) {
-                    try {
-                        ResultSet result = mysqlTools.executeQuery(sql);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    mysqlTools.close();
-                    return new ApiConsole(true, "执行成功", name);
-                } else {
-                    return new ApiConsole(false, "数据库链接失败", name);
-                }
-            } else if ("update".equals(o)) {
-                MysqlTools mysqlTool = new MysqlTools(jdbcUrl, userName, password);
-                if (mysqlTool.result) {
-                    mysqlTool.execute(sql);
-                    mysqlTool.close();
-                    return new ApiConsole(true, "执行成功", name);
-                } else {
-                    return new ApiConsole(false, "数据库链接失败", name);
-                }
-            }
-            return new ApiConsole(false, "不合法的前置动作", name);
-        }
-        else {
-            return  new ApiConsole(false,"前置或后置-配置不完整",apiExec.getString("name"));
-        }
-    }
-
     //根据接口返回状态码 写入接口运行结果
     public static Boolean code_result(String statusCode,ArrayList<RspAsserts> rspAsserts){
         if(statusCode.startsWith("4") || statusCode.startsWith("5")){
@@ -825,144 +887,6 @@ public  class ApiCommon {
             return apiGlobalParams.get(apiParam);
         }
         return apiParam;
-    }
-
-
-    // 单接口请求封装(数据库获取数据)
-    public static ApiInfo apiDebugDb(Integer envId,ApiInfo apiInfo) {
-
-        // 控制台输出
-        ArrayList<ApiConsole> console = new ArrayList<>();
-
-        CloseableHttpResponse response = null;
-        // 请求方法
-        String method = apiInfo.getMethod();
-        // 获取接口中项目信息
-        Integer projectId = apiInfo.getProjectId();
-
-        // 获取域名信息
-        String domain = domainMapper.getDomainByEnvId(envId,projectId);
-        // 请求url
-        String url = domain+apiInfo.getPath();
-
-        //解析请求体类型
-        String reqBodyType = apiInfo.getReqBodyType();
-
-        //解析后的请求体
-        HashMap<Object, Object> entity = parseEntityDb(apiInfo.getReqBodyData());
-
-        //解析后的Headers
-        HashMap<String,String> headers = parseHeadersDb(apiInfo.getReqHeader());
-
-        //text格式请求体
-        String textBody = "";
-        long startTime = new Date().getTime();
-        long endTime = 0;
-        JSONObject rspJson = null;
-
-//        // 前置动作
-//        ArrayList<ApiExec> beforeExec = apiInfo.getBeforeExec();
-//        ArrayList<ApiConsole> beforeExecResult  = ApiCommon.execDb(beforeExec);
-//        console.addAll(beforeExecResult);
-
-        //执行接口请求
-        switch (method.toUpperCase()){
-            case "DELETE":
-                response = request.delete(url,headers);
-                break;
-            case "PUT":
-                break;
-            case "GET":
-                //params
-                ArrayList<HashMap> paramsRaw = apiInfo.getReqParams();
-                //解析后的param
-                HashMap<String,String> params = parseParamDb(paramsRaw);
-
-                try {
-                    response = request.get(url,headers,params);
-                    endTime = new Date().getTime();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                break;
-            case "POST":
-                //发送post请求: form-data
-                if(Objects.equals(reqBodyType, "1")){
-                    response  = request.post(url,headers,entity);
-                }//发送post请求: json
-                else if(Objects.equals(reqBodyType, "2")){
-                    String reqBodyJson = apiInfo.getReqBodyJson();
-                    response = request.post(url,headers,reqBodyJson);
-                }//发送post请求: 无请求体
-                else {
-                    response = request.post(url,headers,entity);
-                }
-                endTime = new Date().getTime();
-                break;
-        }
-
-//        // 后置动作
-//        ArrayList<ApiExec> afterExec = apiInfo.getAfterExec();
-//        ArrayList<ApiConsole> afterExecResult  = ApiCommon.execDb(afterExec);
-//        console.addAll(afterExecResult);
-
-
-        // 将接口数据返回至前端
-        try {
-            //响应体
-            rspJson = request.getResponseJson(response);
-            apiInfo.setRspBodyJson(rspJson);
-            apiInfo.setRspBodySize(rspJson.size());
-        } catch (JSONException jsonException){
-            // text格式响应体
-            try {
-                apiInfo.setTextBody(EntityUtils.toString(response.getEntity()));
-            } catch (IOException ioException) {
-                ioException.printStackTrace();
-            }
-            apiInfo.setRspBodySize(textBody.length());
-        }
-        //控制台
-        apiInfo.setLog(console);
-        //响应时间
-        apiInfo.setRspTime(endTime-startTime);
-        //状态码
-        String statusCode = String.valueOf(request.getStatusCode(response));
-        apiInfo.setRspStatusCode(statusCode);
-
-        //响应头
-        ArrayList<HashMap<String, String>> rspHeader = request.getResHeaders(response);
-        apiInfo.setRspHeaders(rspHeader);
-        String rspCode = String.valueOf(request.getStatusCode(response));
-
-        //断言
-        ArrayList<ApiConsole> AssertConsole = ApiCommon.apiAssertDb(apiInfo.getReqAssert(),rspJson,rspCode,rspHeader);
-        ArrayList rspAsserts = apiInfo.getReqAssert();
-
-
-        apiInfo.setRspAsserts(rspAsserts);
-        console.addAll(AssertConsole);
-
-
-        //接口请求结果
-        if(apiInfo.getReqAssert()!=null){
-            apiInfo.setResult(code_resultDb(statusCode,apiInfo.getReqAssert()));
-        }else {
-            apiInfo.setResult(code_resultDb(statusCode));
-        }
-
-
-        //提取参数
-        ArrayList reqExtract =  apiInfo.getReqExtract();
-        JSONObject reqExtractOne  = (JSONObject) reqExtract.get(0);
-        if (reqExtract.size() == 1 && Objects.equals(reqExtractOne.getString("dataSource"), "")){
-            log.info("不需要提取参数");
-        }else {
-            ApiCommon.apiExtractDb(reqExtract,rspJson,rspCode,rspHeader);
-            apiInfo.setRspExtract(apiInfo.getReqExtract());
-        }
-
-        return apiInfo;
     }
 
     // 接口断言

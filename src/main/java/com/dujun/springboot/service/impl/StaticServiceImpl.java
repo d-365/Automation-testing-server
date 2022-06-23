@@ -51,16 +51,21 @@ public class StaticServiceImpl implements StaticService {
         StaticPlan rate = staticMapper.planRate(0);
         if (rate.getPlanCount() != 0){
             DecimalFormat df = new DecimalFormat("0.00");
-            double success = rate.getSuccess() / rate.getPlanCount();
-            success = Double.parseDouble(df.format(success));
-            double failed = rate.getFailed() / rate.getPlanCount();
-            failed = Double.parseDouble(df.format(failed));
-            BigDecimal f = new BigDecimal(String.valueOf(failed));
-            BigDecimal slat = new BigDecimal(String.valueOf(100));
-            apiAutoStatics.setSuccessRatio(success*100);
-            apiAutoStatics.setFailedRatio(f.multiply(slat).doubleValue());
-        }
 
+            double failed = rate.getFailed() / rate.getPlanCount();
+            failed = Double.parseDouble(df.format(failed*100));
+
+            double success = 1 - failed;
+            success = Double.parseDouble(df.format(success*100));
+
+//            BigDecimal f = new BigDecimal(String.valueOf(failed));
+//            BigDecimal slat = new BigDecimal(String.valueOf(100));
+
+            apiAutoStatics.setSuccessRatio(success);
+//            apiAutoStatics.setFailedRatio(f.multiply(slat).doubleValue());
+            apiAutoStatics.setFailedRatio(failed);
+
+        }
 
         // 获取Web自动化执行数据
         ApiAutoStatics webStatics = new ApiAutoStatics();
@@ -78,19 +83,22 @@ public class StaticServiceImpl implements StaticService {
         webStatics.setClockExecCount(staticMapper.clockExecCount(1));
 
         // 计算Web计划执行成功率数据
-        StaticPlan webRate = staticMapper.planRate(0);
+        StaticPlan webRate = staticMapper.planRate(1);
         if (webRate.getPlanCount() != 0){
             DecimalFormat df = new DecimalFormat("0.00");
-            double success = webRate.getSuccess() / webRate.getPlanCount();
-            success = Double.parseDouble(df.format(success));
-            double failed = webRate.getFailed() / webRate.getPlanCount();
-            failed = Double.parseDouble(df.format(failed));
-            BigDecimal f = new BigDecimal(String.valueOf(failed));
-            BigDecimal slat = new BigDecimal(String.valueOf(100));
-            apiAutoStatics.setSuccessRatio(success*100);
-            apiAutoStatics.setFailedRatio(f.multiply(slat).doubleValue());
-        }
 
+            double failed = webRate.getFailed() / webRate.getPlanCount();
+            failed = Double.parseDouble(df.format(failed*100));
+//            BigDecimal f = new BigDecimal(String.valueOf(failed));
+//            BigDecimal slat = new BigDecimal(String.valueOf(100));
+
+            double success = 1 - failed;
+            success = Double.parseDouble(df.format(success*100));
+
+            webStatics.setSuccessRatio(success);
+//            webStatics.setFailedRatio(f.multiply(slat).doubleValue());
+            webStatics.setFailedRatio(failed);
+        }
 
         // 数据封装返回
         HomeStatics homeStatics = new HomeStatics();
@@ -135,7 +143,6 @@ public class StaticServiceImpl implements StaticService {
             DayRunDetail dayRunDetail = new DayRunDetail(count,success,failed);
             WEBData.put(today,dayRunDetail);
         }
-
 
         lineChat.setApiLine(ApiData);
         lineChat.setWebLine(WEBData);

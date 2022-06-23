@@ -1,19 +1,20 @@
 package com.dujun.springboot.entity;
 
-import com.alibaba.fastjson.annotation.JSONField;
-import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
-import java.io.Serializable;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+//import org.springframework.security.core.GrantedAuthority;
+//import org.springframework.security.core.userdetails.UserDetails;
+
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.Set;
 
 /**
  * <p>
@@ -26,18 +27,19 @@ import lombok.experimental.Accessors;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode()
 @Accessors(chain = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class User implements Serializable {
 
     private static final long serialVersionUID=1L;
 
-    /**
-     * 管理员id
-     */
+
     @TableId(value = "id", type = IdType.AUTO)
-    private Long id;
+    private Integer id;
+
+//    @TableField(exist = false)
+//    private Set<GrantedAuthority> authorities;
 
     /**
      * 管理员登陆名称
@@ -52,7 +54,6 @@ public class User implements Serializable {
     /**
      * 管理员显示昵称
      */
-    @TableField()
     private String nickName;
 
     /**
@@ -60,12 +61,49 @@ public class User implements Serializable {
      */
     private Integer locked;
 
-    //登录token
+    /**
+     * 登录token
+     */
     @TableField(exist = false)
     private String token;
 
+    /**
+     * 角色ID
+     */
     private Integer roleId;
 
+    /**
+     * 环境ID
+     */
     private Integer envId;
 
+//    @Override
+//    public Collection<? extends GrantedAuthority> getAuthorities() {
+//        return this.authorities;
+//    }
+//
+//    @Override
+//    public String getUsername() {
+//        return account;
+//    }
+//
+//    @Override
+//    public boolean isAccountNonExpired() {
+//        return true;
+//    }
+//
+//    @Override
+//    public boolean isAccountNonLocked() {
+//        return true;
+//    }
+//
+//    @Override
+//    public boolean isCredentialsNonExpired() {
+//        return true;
+//    }
+//
+//    @Override
+//    public boolean isEnabled() {
+//        return true;
+//    }
 }

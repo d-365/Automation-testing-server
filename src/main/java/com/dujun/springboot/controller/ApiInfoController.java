@@ -46,6 +46,12 @@ public class ApiInfoController {
         return apiInfoService.delete(id);
     }
 
+    /**
+     * 接口调试
+     * @param envId
+     * @param apiInfo
+     * @return
+     */
     @PostMapping("/debug/{envId}")
     public Result<?> debug(@PathVariable("envId")Integer envId,@RequestBody ApiInfo apiInfo){
         return apiInfoService.debug(envId,apiInfo);

@@ -14,6 +14,7 @@ import com.baomidou.mybatisplus.extension.handlers.FastjsonTypeHandler;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+//import org.springframework.security.core.GrantedAuthority;
 
 /**
  * <p>
@@ -24,10 +25,10 @@ import lombok.experimental.Accessors;
  * @since 2022-03-14
  */
 @Data
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode()
 @Accessors(chain = true)
 @TableName(autoResultMap = true)
-public class Role implements Serializable {
+public class Role implements Serializable  {
 
     private static final long serialVersionUID=1L;
 
@@ -60,4 +61,8 @@ public class Role implements Serializable {
     private Integer delFlag;
 
 
+//    @Override
+//    public String getAuthority() {
+//        return roleName;
+//    }
 }

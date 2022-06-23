@@ -21,7 +21,7 @@ public interface EnvConfigService extends IService<EnvConfig> {
 
     Result<?> delEnv(Integer id);
 
-    Result<?> userBind(Long userId, Integer envId);
+    Result<?> userBind(Integer userId, Integer envId);
 
     Result<?> userProDomain( Integer envId,  Integer proId);
 

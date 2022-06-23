@@ -4,13 +4,12 @@
  * description: 告诉大家我是干啥的
  */
 
-package com.dujun.springboot.config;
+package com.dujun.springboot.config.myFilter;
 
 
 import lombok.extern.log4j.Log4j2;
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
 
 
 @Log4j2

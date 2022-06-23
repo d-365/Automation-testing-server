@@ -101,9 +101,7 @@ public class MyGenerator {
         gc.setIdType(IdType.ID_WORKER_STR); //主键策略
         gc.setDateType(DateType.ONLY_DATE);//定义生成的实体类中日期类型
         gc.setSwagger2(false);//开启Swagger2模式
-
         mpg.setGlobalConfig(gc);
-
         // 3、数据源配置
         DataSourceConfig dsc = new DataSourceConfig();
         dsc.setUrl(dbUrl);
@@ -125,7 +123,7 @@ public class MyGenerator {
 
         // 5、策略配置
         StrategyConfig strategy = new StrategyConfig();
-        strategy.setInclude(getTables(dbName));//对那一张表生成代码
+        strategy.setInclude(getTables(dbName));//对哪个库进行生成
         strategy.setNaming(NamingStrategy.underline_to_camel);//数据库表映射到实体的命名策略
         strategy.setTablePrefix(pc.getModuleName() + "_"); //生成实体时去掉表前缀
 

@@ -13,4 +13,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface UserMapper extends BaseMapper<User> {
 
+    // 根据角色ID查询对应角色权限
+
+
 }

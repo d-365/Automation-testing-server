@@ -17,7 +17,6 @@ import com.dujun.springboot.tools.dateTools;
 import com.dujun.springboot.utils.MailTool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.testng.collections.Lists;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -137,19 +136,19 @@ public class RunPlanServiceImpl extends ServiceImpl<RunPlanMapper, RunPlan> impl
         PlanResult planResult = planResultInit(planInfo);
         // 解析apiId
         ArrayList<Integer> apiIds =  planInfo.getPlanParam().getApiIds();
-
         int api_successCount = 0;
         int api_failedCount = 0;
         int case_successCount = 0;
         int case_failedCount = 0;
         boolean caseResult = false;
         // 执行接口请求
-        // 环境信息
         Integer envId = planInfo.getEnvId();
         try {
             // 执行单个接口请求
             for (Integer apiId : apiIds) {
                 ApiInfo apiInfo = apiInfoMapper.selectOne(new QueryWrapper<ApiInfo>().eq("api_suite_id",apiId));
+                // 查询封装对应的前置后置动作
+                ApiCommon.setUpTearDownDispose(apiInfo);
                 ApiInfo apiResult = ApiCommon.apiDebugDb(envId,apiInfo);
                 PlanResultDetail planResultDetail = new PlanResultDetail();
                 planResultDetail.setApiId(apiInfo.getId());
@@ -211,7 +210,6 @@ public class RunPlanServiceImpl extends ServiceImpl<RunPlanMapper, RunPlan> impl
                 planSendMail(planInfo,planResult.getId(),success,failed);
             }
         }
-
         return Result.success();
 
     }

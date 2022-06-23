@@ -21,7 +21,6 @@ import org.openqa.selenium.support.Color;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -79,7 +78,6 @@ public class MySelenium {
                 ChromeOptions chromeOptions = new ChromeOptions();
                 chromeOptions.setPageLoadStrategy(PageLoadStrategy.NORMAL);
                 try {
-                    System.out.println(remoteUrl);
                     driver = new RemoteWebDriver(new URL(remoteUrl),chromeOptions);
                     driver.manage().window().maximize();
                 } catch (MalformedURLException e) {
@@ -388,7 +386,7 @@ public class MySelenium {
      * 传统定位器 --xpath
      */
     public static WebElement ByXpath(WebDriver driver,String xpath){
-        return new WebDriverWait(driver, 1000).until(ExpectedConditions.visibilityOfElementLocated(By.xpath(xpath)));
+        return new WebDriverWait(driver, 6000).until(ExpectedConditions.visibilityOfElementLocated(By.xpath(xpath)));
     }
 
     /**
@@ -399,11 +397,11 @@ public class MySelenium {
         MyConditions myConditions = MyConditions.valueOf(conditions.trim());
         switch (myConditions){
             case elementToBeClickable:
-                element = new WebDriverWait(driver, 3).until(ExpectedConditions.elementToBeClickable(by));
+                element = new WebDriverWait(driver, 6000).until(ExpectedConditions.elementToBeClickable(by));
                 break;
             case visibilityOfElementLocated:
             default:
-                element = new WebDriverWait(driver, 3).until(ExpectedConditions.visibilityOfElementLocated(by));
+                element = new WebDriverWait(driver, 6000).until(ExpectedConditions.visibilityOfElementLocated(by));
                 break;
         }
         return element;

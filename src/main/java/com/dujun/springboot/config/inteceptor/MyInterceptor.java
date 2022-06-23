@@ -28,19 +28,19 @@ public class MyInterceptor implements HandlerInterceptor {
     //请求处理前调用
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        String token = request.getHeader("token");
-        response.setCharacterEncoding("UTF-8");
-        response.setContentType("application/json; charset=utf-8");
-        PrintWriter out = null;
-        if (token == null || !JwtUtil.verify(token) ) {
-            JSONObject jsonObject = new JSONObject(){{
-                put("msg","用户token已失效");
-                put("code","201004");
-            }};
-            out = response.getWriter();
-            out.append(jsonObject.toJSONString());
-            return false;
-        }
+//        String token = request.getHeader("token");
+//        response.setCharacterEncoding("UTF-8");
+//        response.setContentType("application/json; charset=utf-8");
+//        PrintWriter out;
+//        if (token == null || !JwtUtil.verify(token) ) {
+//            JSONObject jsonObject = new JSONObject(){{
+//                put("msg","用户token已失效");
+//                put("code","201004");
+//            }};
+//            out = response.getWriter();
+//            out.append(jsonObject.toJSONString());
+//            return false;
+//        }
         return true;
     }
 

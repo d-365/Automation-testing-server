@@ -46,6 +46,7 @@ public class UserController {
         if(user == null || Objects.equals(user.getAccount(), "") || Objects.equals(user.getPassword(),"")){
             return Result.error("用户名或密码不能为空");
         }
+        System.out.println(user.getAccount());
          return userService.login(user.getAccount(),user.getPassword());
     }
 

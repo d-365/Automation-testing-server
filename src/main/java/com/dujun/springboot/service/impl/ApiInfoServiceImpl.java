@@ -1,28 +1,21 @@
 package com.dujun.springboot.service.impl;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONException;
-import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.dujun.springboot.VO.DebugApi;
 import com.dujun.springboot.VO.Result;
 import com.dujun.springboot.common.ApiCommon;
-import com.dujun.springboot.entity.*;
-import com.dujun.springboot.entity.sonEntity.ApiExec;
+import com.dujun.springboot.entity.ApiInfo;
+import com.dujun.springboot.entity.CategoryApi;
+import com.dujun.springboot.entity.PlanRound;
 import com.dujun.springboot.mapper.ApiInfoMapper;
 import com.dujun.springboot.mapper.CategoryApiMapper;
 import com.dujun.springboot.mapper.PlanRoundMapper;
 import com.dujun.springboot.service.ApiInfoService;
-import com.dujun.springboot.utils.request;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.util.EntityUtils;
 import org.springframework.stereotype.Service;
-
 import javax.annotation.Resource;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * <p>
@@ -56,30 +49,14 @@ public class ApiInfoServiceImpl extends ServiceImpl<ApiInfoMapper, ApiInfo> impl
         }else if (apiInfo.getReqExtract() ==null){
             apiInfo.setReqExtract(arrayList);
         }
-
-        // 处理前置后置信息
-        List<Integer> setUpIds = apiInfo.getSetUpIds();
-        List<Integer> tearDownIds = apiInfo.getTearDownIds();
-        List<PlanRound> setUp = new ArrayList<>();
-        List<PlanRound> tearDown = new ArrayList<>();
-        if (setUpIds.size()>0){
-            for (Integer setUpId : setUpIds) {
-                setUp.add(planRoundMapper.selectById(setUpId));
-            }
-        }
-        if (tearDownIds.size()>0){
-            for (Integer tearDownId : tearDownIds) {
-                tearDown.add(planRoundMapper.selectById(tearDownId));
-            }
-        }
-        apiInfo.setBeforeExec(setUp);
-        apiInfo.setAfterExec(tearDown);
+        ApiCommon.setUpTearDownDispose(apiInfo);
         return Result.success(apiInfo);
     }
 
     //接口详情（接口ID）
     public Result<ApiInfo> info(int id){
         ApiInfo apiInfo = apiInfoMapper.selectOne(new QueryWrapper<ApiInfo>().eq("id",id));
+        ApiCommon.setUpTearDownDispose(apiInfo);
         return Result.success(apiInfo);
     }
 

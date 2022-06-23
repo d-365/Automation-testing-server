@@ -6,7 +6,11 @@
 
 package com.dujun.springboot.temp;
 
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.annotation.ApplicationScope;
 
 @Service
 public class AopService {
@@ -17,4 +21,16 @@ public class AopService {
         return url;
     }
 
+
+}
+
+@SpringBootTest
+class myTest{
+    @Autowired
+    AopService aopService;
+
+    @Test
+    public void fun1(){
+        aopService.share("dujun");
+    }
 }

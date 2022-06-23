@@ -4,7 +4,7 @@
  * description: 告诉大家我是干啥的
  */
 
-package com.dujun.springboot.config;
+package com.dujun.springboot.config.myListener;
 import lombok.extern.log4j.Log4j2;
 import javax.servlet.*;
 import javax.servlet.annotation.WebListener;

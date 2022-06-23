@@ -43,7 +43,7 @@ public class EnvConfigController {
 
     @PostMapping("/user/bind")
     public Result<?> userBind(@RequestBody User user){
-        Long userId = user.getId();
+        Integer userId = user.getId();
         Integer envId = user.getEnvId();
         return envConfigService.userBind(userId,envId);
     }
