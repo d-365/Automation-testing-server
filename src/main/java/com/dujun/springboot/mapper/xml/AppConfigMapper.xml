@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dujun.springboot.mapper.AppConfigMapper">
+
+    <resultMap id="appConfResult" type="com.dujun.springboot.entity.AppConfig">
+        <result column="others"  property="others" typeHandler="com.baomidou.mybatisplus.extension.handlers.FastjsonTypeHandler" />
+    </resultMap>
+
+    <select id="appConfigs" resultType="com.dujun.springboot.entity.AppConfig" resultMap="appConfResult">
+        SELECT id,name,app_package,app_activity,no_reset,automation_name,others,del_flag,create_time,update_time
+            FROM app_config
+        <where>
+            del_flag = 0
+            <if test="name!=null and name.length>0 ">
+                and name like concat('%',#{name},'%')
+            </if>
+        </where>
+    </select>
+
+</mapper>

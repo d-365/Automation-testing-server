@@ -46,18 +46,18 @@ public class MyWebConfig implements WebMvcConfigurer {
         return filterRegistration;
     }
 
-    /*注册拦截器*/
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        List<String> excludePath = new ArrayList<String>(){{
-            add("/user/login");
-            add("/user/save");
-            add("/loginPlus");
-            add("/test/*");
-            add("/error");
-        }};
-        registry.addInterceptor(myInterceptor).addPathPatterns("/**").excludePathPatterns(excludePath);
-    }
+//    /*注册拦截器*/
+//    @Override
+//    public void addInterceptors(InterceptorRegistry registry) {
+//        List<String> excludePath = new ArrayList<String>(){{
+//            add("/user/login");
+//            add("/user/save");
+//            add("/loginPlus");
+//            add("/test/*");
+//            add("/error");
+//        }};
+//        registry.addInterceptor(myInterceptor).addPathPatterns("/**").excludePathPatterns(excludePath);
+//    }
 
     /*跨域处理*/
     @Override
