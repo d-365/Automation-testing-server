@@ -3,12 +3,13 @@ package com.dujun.springboot.service.impl;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dujun.springboot.VO.Result;
+import com.dujun.springboot.VO.option.AppConfigOp;
 import com.dujun.springboot.entity.AppConfig;
 import com.dujun.springboot.mapper.AppConfigMapper;
 import com.dujun.springboot.service.AppConfigService;
 import org.springframework.stereotype.Service;
-
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * <p>
@@ -44,6 +45,12 @@ public class AppConfigServiceImpl extends ServiceImpl<AppConfigMapper, AppConfig
             appConfigMapper.insert(appConfig);
         }
         return Result.success();
+    }
+
+    @Override
+    public Result<?> appConfigOption() {
+        List<AppConfigOp> appConfigOps = appConfigMapper.APP_CONFIG_OPS();
+        return Result.success(appConfigOps);
     }
 
 }

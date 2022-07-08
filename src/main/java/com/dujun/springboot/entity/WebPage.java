@@ -36,5 +36,10 @@ public class WebPage implements Serializable {
     @TableField(exist = false)
     private List<WebPage>  children = new ArrayList<>();
 
+    /**
+     * 1 WEB  2 App
+     */
+    private Integer type;
+
 
 }

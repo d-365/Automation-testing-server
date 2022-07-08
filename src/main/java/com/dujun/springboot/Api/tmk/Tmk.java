@@ -6,11 +6,7 @@
 
 package com.dujun.springboot.Api.tmk;
 
-import ch.qos.logback.classic.pattern.RelativeTimeConverter;
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.dujun.springboot.data.ApiOrderData;
-import com.dujun.springboot.utils.MysqlTools;
 import com.dujun.springboot.utils.request;
 import org.apache.http.client.methods.CloseableHttpResponse;
 
@@ -19,12 +15,17 @@ import java.util.HashMap;
 public class Tmk {
 
     public String token="";
+    private final request request;
 
     public Tmk(){
+        request= new request();
         login("fen_interface","16d7a4fca7442dda3ad93c9a726597e4");
+
     }
     public Tmk(String username,String password){
+        request= new request();
         login(username,password);
+
     }
 
     // 通用的headers
@@ -68,16 +69,3 @@ public class Tmk {
 
 }
 
-class hh{
-    public static void main(String[] args) {
-        String delOrder = String.format("DELETE FROM jgq.think_loan WHERE phone = %s","17637898300");
-        String delUser = String.format("DELETE FROM jgq.think_user WHERE phone = %s","17637898300");
-        MysqlTools mysqlTools = new MysqlTools("jdbc:mysql://118.31.184.240:3306","root","3wHNY2Bq");
-        mysqlTools.execute(delOrder);
-        mysqlTools.execute(delUser);
-        mysqlTools.close();
-
-        HashMap<Object,Object> data = ApiOrderData.tmk_data("15622222222","杭州市");
-        JSONObject jsonObject = new Tmk().apply(data);
-    }
-}

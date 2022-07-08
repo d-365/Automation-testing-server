@@ -6,14 +6,14 @@ import com.dujun.springboot.common.selenium.MyConditions;
 import com.dujun.springboot.entity.WebCaseStep;
 import com.dujun.springboot.entity.WebPage;
 import com.dujun.springboot.service.impl.WebPageServiceImpl;
-import org.hibernate.boot.jaxb.hbm.spi.PluralAttributeInfoIdBagAdapter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.CacheManager;
+import org.springframework.boot.context.properties.bind.DefaultValue;
 import org.springframework.web.bind.annotation.*;
 import org.testng.collections.Lists;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -33,8 +33,8 @@ public class WebPageController {
      * web自动化 模块页面列表
      */
     @GetMapping("/pageList")
-    public Result<List<WebPage>> pageList(){
-        return webPageService.PAGE_LIST();
+    public Result<List<WebPage>> pageList(@RequestParam(required = false,defaultValue = "1") Integer type){
+        return webPageService.PAGE_LIST(type);
     }
 
     @PostMapping("/update")
@@ -49,8 +49,12 @@ public class WebPageController {
 
     // 页面元素级联选择
     @PostMapping("/webPageElement")
-    public Result<?> webPageElement(){
-        return webPageService.webPageElement();
+    public Result<?> webPageElement(@RequestBody Map<String,Integer> map){
+        Integer type = 1;
+        if (map!=null){
+            type = map.get("type");
+        }
+        return webPageService.webPageElement(type);
     }
 
     // 更新用例步骤

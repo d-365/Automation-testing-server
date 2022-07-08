@@ -1,13 +1,9 @@
 package com.dujun.springboot.controller;
 
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.dujun.springboot.VO.Result;
-import com.dujun.springboot.entity.PlanRound;
 import com.dujun.springboot.entity.RunPlan;
 import com.dujun.springboot.service.impl.RunPlanServiceImpl;
-import com.dujun.springboot.timing.ScheduledTask;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -56,6 +52,12 @@ public class RunPlanController {
     @PostMapping("/webRun/{planId}")
     public Result<?> webRun(@PathVariable("planId")Integer planId){
         return planService.webRun(planId);
+    }
+
+    // 执行App端测试计划
+    @PostMapping("/execute/appPlan/{planId}")
+    public Result<?> appPlan(@PathVariable("planId")Integer planId){
+        return planService.appPlanExec(planId);
     }
 
     @PostMapping("/checked/case")

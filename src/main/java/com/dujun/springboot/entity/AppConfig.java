@@ -1,5 +1,6 @@
 package com.dujun.springboot.entity;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -9,6 +10,8 @@ import com.dujun.springboot.VO.AppConOther;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.omg.CORBA.OBJ_ADAPTER;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
@@ -63,7 +66,7 @@ public class AppConfig implements Serializable {
      * 其他启动配置信息
      */
     @TableField(typeHandler= FastjsonTypeHandler.class)
-    private List<AppConOther> others = new ArrayList<>();
+    private List<JSONObject> others = new ArrayList<>();
 
     /**
      * 删除标志 0 未删除 1 已删除

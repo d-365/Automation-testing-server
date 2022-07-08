@@ -9,7 +9,6 @@ import com.dujun.springboot.entity.PageElement;
 import com.dujun.springboot.mapper.PageElementMapper;
 import com.dujun.springboot.service.PageElementService;
 import org.springframework.stereotype.Service;
-
 import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.List;
@@ -44,6 +43,7 @@ public class PageElementServiceImpl extends ServiceImpl<PageElementMapper, PageE
     }
 
     public void update_help(PageElement pageElement){
+        pageElement.setLocationValue(pageElement.getLocationValue().trim());
         if (pageElement.getId() == null){
             pageElementMapper.insert(pageElement);
         }else {

@@ -60,19 +60,16 @@ public class PlanTiming implements SchedulingConfigurer {
 
     // 执行定时任务
     private Runnable getRunnable(RunPlan runPlan) {
-        return new Runnable() {
-            @Override
-            public void run() {
-                // 接口自动化定时任务
-                if (runPlan.getPlanType() == 0) {
-                    System.out.println("接口自动化定时任务");
-                }// Web 自动化定时
-                else if (runPlan.getPlanType() == 1) {
-                    System.out.println("Web 自动化定时");
-                }//App计划定时
-                else if (runPlan.getPlanType() == 2) {
-                    System.out.println("App计划定时");
-                }
+        return () -> {
+            // 接口自动化定时任务
+            if (runPlan.getPlanType() == 0) {
+                System.out.println("接口自动化定时任务");
+            }// Web 自动化定时
+            else if (runPlan.getPlanType() == 1) {
+                System.out.println("Web 自动化定时");
+            }//App计划定时
+            else if (runPlan.getPlanType() == 2) {
+                System.out.println("App计划定时");
             }
         };
     }

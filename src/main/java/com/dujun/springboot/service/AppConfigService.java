@@ -20,4 +20,6 @@ public interface AppConfigService extends IService<AppConfig> {
     Result<?> delAppConfig(Integer id);
 
     Result<?> updateAppConf(AppConfig appConfig);
+
+    Result<?> appConfigOption();
 }

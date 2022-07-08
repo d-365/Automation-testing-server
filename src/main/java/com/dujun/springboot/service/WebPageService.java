@@ -24,14 +24,14 @@ public interface WebPageService extends IService<WebPage> {
      *
      * @return WebPage
      */
-    Result<List<WebPage>> PAGE_LIST();
+    Result<List<WebPage>> PAGE_LIST(Integer type);
 
     Result<?> pageUpdate(WebPage Page);
 
     Result<?> pageDel(Integer pageId);
 
     // 页面元素级联选择器
-    Result<?> webPageElement();
+    Result<?> webPageElement(Integer type);
 
     // 更新用例步骤
     Result<?> upCaseStep(List<WebCaseStep> caseSteps);

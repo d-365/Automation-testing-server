@@ -31,6 +31,11 @@ public class AppConfigController {
         return appConfigService.appConfigList(size,current,name);
     }
 
+    @GetMapping("/option/list")
+    public Result<?> appConfigOption(){
+        return appConfigService.appConfigOption();
+    }
+
     @DeleteMapping("del/{id}")
     public Result<?> delAppConfig(@PathVariable("id") Integer id){
         return appConfigService.delAppConfig(id);

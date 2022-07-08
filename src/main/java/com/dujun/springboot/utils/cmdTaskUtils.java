@@ -6,9 +6,9 @@
 
 package com.dujun.springboot.utils;
 
-import org.springframework.util.ResourceUtils;
-
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 public class cmdTaskUtils {
 
@@ -37,5 +37,20 @@ public class cmdTaskUtils {
         execCommand(String.format("taskkill /F /pid %s",pid));
     }
 
+    /**
+     * 执行命令--获取结果
+     * @param command 命令
+     * @return 命令执行结果
+     */
+    public static String getCmdResult(String command) throws IOException {
+        Process process = execCommand(command);
+        BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream()));
+        String line;
+        StringBuilder stringBuilder = new StringBuilder();
+        while ((line = br.readLine())!=null && ! line.equals("")){
+            stringBuilder.append(line).append(",");
+        }
+        return String.valueOf(stringBuilder);
+    }
 
 }

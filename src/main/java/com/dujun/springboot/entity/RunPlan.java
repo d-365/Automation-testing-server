@@ -93,6 +93,9 @@ public class RunPlan implements Serializable {
     // UI自动化执行 浏览器类型
     private String browserType;
 
+    // 运行App(APP自动化)
+    private Integer appId;
+
     private Date createTime;
 
     private Date updateTime;

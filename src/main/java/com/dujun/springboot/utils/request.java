@@ -31,19 +31,18 @@ import java.util.*;
 
 public class request {
 
-
     //创建HttpClient对象
-    static  CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-    static CloseableHttpResponse response = null;
+     CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+     CloseableHttpResponse response = null;
 
 
-    static RequestConfig requestConfig = RequestConfig.custom()
-            .setConnectTimeout(5000)
-            .setConnectionRequestTimeout(1000)
-            .setSocketTimeout(5000).build();
+     RequestConfig requestConfig = RequestConfig.custom()
+            .setConnectTimeout(10000)
+            .setConnectionRequestTimeout(10000)
+            .setSocketTimeout(10000).build();
 
     //get不带参数传递
-    public static CloseableHttpResponse get(String url){
+    public  CloseableHttpResponse get(String url){
         //创建get请求
         HttpGet request = new HttpGet(url);
         //执行get请求
@@ -56,7 +55,7 @@ public class request {
     }
 
     // get 传递参数 带请求头信息
-    public  static CloseableHttpResponse get(String url , HashMap<String,String> headers, HashMap<String,String> params) throws URISyntaxException {
+    public   CloseableHttpResponse get(String url , HashMap<String,String> headers, HashMap<String,String> params) throws URISyntaxException {
 
         try {
             // 添加get请求参数
@@ -85,11 +84,9 @@ public class request {
     }
 
     // post（传递json类型数据)
-    public static CloseableHttpResponse post(String url, HashMap<String, String> headers, String payload){
-
+    public  CloseableHttpResponse post(String url, HashMap<String, String> headers, String payload){
         HttpPost request = new HttpPost(url);
         request.setConfig(requestConfig);
-
         // 加载请求头
         for(String key : headers.keySet()){
             if(key!=null){
@@ -99,19 +96,16 @@ public class request {
         try {
             // 加载payload
             request.setEntity(new StringEntity(payload, StandardCharsets.UTF_8));
-
             response = httpClient.execute(request);
-
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         return response;
 
     }
 
     // post（自动将map转换成json)
-    public static <T> CloseableHttpResponse post(String url, HashMap<String, String> headers, HashMap<T,T> payload){
+    public  <T> CloseableHttpResponse post(String url, HashMap<String, String> headers, HashMap<T,T> payload){
 
         HttpPost request = new HttpPost(url);
         // 加载请求头
@@ -136,7 +130,7 @@ public class request {
     }
 
     // post(url传参)
-    public  static CloseableHttpResponse post_url(String url , HashMap<String,String> headers, HashMap<String,String> payload){
+    public   CloseableHttpResponse post_url(String url , HashMap<String,String> headers, HashMap<String,String> payload){
 
         try {
             // 添加get请求参数
@@ -165,7 +159,7 @@ public class request {
     }
 
     //delete请求
-    public static CloseableHttpResponse delete(String url,HashMap<String, String> headers){
+    public  CloseableHttpResponse delete(String url,HashMap<String, String> headers){
         HttpDelete request = new HttpDelete(url);
         // 加载请求头
         for(String key : headers.keySet()){
@@ -183,7 +177,7 @@ public class request {
 
     }
 
-    public static void close(){
+    public  void close(){
         try {
             if(response!=null){
                 response.close();
@@ -198,7 +192,7 @@ public class request {
      * @param response HttpResponse 对象
      * @return http状态码
      */
-    public static int getStatusCode(CloseableHttpResponse response){
+    public  int getStatusCode(CloseableHttpResponse response){
         return response.getStatusLine().getStatusCode();
     }
 
@@ -207,7 +201,7 @@ public class request {
      * @return 返回Json格式的HTTP响应体
      * @throws IOException
      */
-    public static JSONObject getResponseJson(CloseableHttpResponse response){
+    public  JSONObject getResponseJson(CloseableHttpResponse response){
         String responseStr = null;
         try {
             responseStr = EntityUtils.toString(response.getEntity());
@@ -218,7 +212,7 @@ public class request {
     }
 
     // 获取响应头信息
-    public static ArrayList<HashMap<String,String>> getResHeaders(CloseableHttpResponse response){
+    public  ArrayList<HashMap<String,String>> getResHeaders(CloseableHttpResponse response){
         ArrayList<HashMap<String,String>> headerList = new ArrayList<>();
         Header[] headers =response.getAllHeaders();
         HashMap<String,String> hashMap = new HashMap<>();

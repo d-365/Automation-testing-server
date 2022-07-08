@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dujun.springboot.VO.Result;
+import com.dujun.springboot.VO.option.AppConfigOp;
 import com.dujun.springboot.entity.MobilePhone;
 import com.dujun.springboot.mapper.MobilePhoneMapper;
 import com.dujun.springboot.service.MobilePhoneService;
@@ -11,6 +12,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * <p>
@@ -36,6 +38,12 @@ public class MobilePhoneServiceImpl extends ServiceImpl<MobilePhoneMapper, Mobil
         phoneLambdaQueryWrapper.eq(MobilePhone::getDelFlag,0);
         IPage<MobilePhone> pageElements = mobilePhoneMapper.selectPage(page,phoneLambdaQueryWrapper);
         return Result.success(pageElements);
+    }
+
+    @Override
+    public Result<?> mobilePhoneListOp() {
+        List<AppConfigOp> phoneOp = mobilePhoneMapper.PHONE_OP();
+        return Result.success(phoneOp);
     }
 
 }

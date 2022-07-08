@@ -32,5 +32,10 @@ public class MobilePhoneController {
         return  mobilePhoneService.mobilePhoneList(current,size,status);
     }
 
+    @GetMapping("/option/list")
+    public Result<?> mobilePhoneListOp(){
+        return mobilePhoneService.mobilePhoneListOp();
+    }
+
 }
 

@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 public interface UiWebCaseService extends IService<UiWebCase> {
 
-    Result<?> caseList();
+    Result<?> caseList(Integer caseType);
 
     // 更新用例
     Result<?> update(UiWebCase uiWebCase);

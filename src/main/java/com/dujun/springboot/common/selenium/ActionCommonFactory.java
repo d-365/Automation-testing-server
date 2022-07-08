@@ -6,19 +6,12 @@
 
 package com.dujun.springboot.common.selenium;
 
-import com.alibaba.fastjson.JSONObject;
 import com.dujun.springboot.VO.UIConsole;
 import com.dujun.springboot.common.actionEnum;
-import com.dujun.springboot.entity.Action;
 import com.dujun.springboot.entity.DbConfig;
-import com.dujun.springboot.entity.WebCaseStep;
 import com.dujun.springboot.utils.MysqlTools;
-import org.omg.CORBA.OBJ_ADAPTER;
-import org.openqa.selenium.WebDriver;
 import org.springframework.stereotype.Component;
-
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.HashMap;
 
 @Component

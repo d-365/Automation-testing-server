@@ -15,20 +15,18 @@ import com.dujun.springboot.VO.UIConsole;
 import com.dujun.springboot.common.selenium.SeleniumUtils;
 import com.dujun.springboot.entity.*;
 import com.dujun.springboot.entity.sonEntity.ApiConsole;
-import com.dujun.springboot.entity.sonEntity.ApiExec;
 import com.dujun.springboot.mapper.ActionMapper;
 import com.dujun.springboot.mapper.DbConfigMapper;
 import com.dujun.springboot.mapper.PlanRoundMapper;
 import com.dujun.springboot.mapper.PrtDomainMapper;
 import com.dujun.springboot.utils.BeanContext;
-import com.dujun.springboot.utils.MysqlTools;
 import com.dujun.springboot.utils.request;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.util.EntityUtils;
+
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.sql.ResultSet;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -49,6 +47,8 @@ public  class ApiCommon {
 
     // 参数提取变量列表
     static HashMap<String,String> apiGlobalParams = new HashMap<>();
+
+    static request request = new request();
 
     // 单接口请求封装(数据库获取数据)
     public static ApiInfo apiDebugDb(Integer envId,ApiInfo apiInfo) {

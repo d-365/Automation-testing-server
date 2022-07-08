@@ -7,21 +7,24 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dujun.springboot.VO.Result;
 import com.dujun.springboot.common.ApiCommon;
+import com.dujun.springboot.common.appium.AppUtils;
+import com.dujun.springboot.common.appium.ExecAppPlan;
 import com.dujun.springboot.common.selenium.runWebPlan;
 import com.dujun.springboot.entity.*;
 import com.dujun.springboot.mapper.*;
 import com.dujun.springboot.service.RunPlanService;
-import com.dujun.springboot.timing.ScheduledTask;
+import com.dujun.springboot.tools.RandomValue;
 import com.dujun.springboot.tools.StringTools;
 import com.dujun.springboot.tools.dateTools;
 import com.dujun.springboot.utils.MailTool;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -39,6 +42,12 @@ public class RunPlanServiceImpl extends ServiceImpl<RunPlanMapper, RunPlan> impl
 
     @Resource
     private PlanRoundMapper planRoundMapper;
+
+    @Resource
+    private AppUtils appUtils;
+
+    @Resource
+    private MobilePhoneMapper phoneMapper;
 
     @Resource
     // 计划参数表
@@ -65,10 +74,6 @@ public class RunPlanServiceImpl extends ServiceImpl<RunPlanMapper, RunPlan> impl
     // 用例关联表
     private ApiCaseMapper apiCaseMapper;
 
-    // 定时任务
-    @Autowired
-    private ScheduledTask scheduledTask;
-
     //计划列表
     @Override
     public Result<List<RunPlan>> planList(RunPlan planFilter) {
@@ -80,7 +85,7 @@ public class RunPlanServiceImpl extends ServiceImpl<RunPlanMapper, RunPlan> impl
             queryWrapper.eq("plan_type",planType);
         }
         if(name != null){
-            queryWrapper.eq("name",name);
+            queryWrapper.like("name",name);
         }
         if(status != null){
             queryWrapper.eq("status",status);
@@ -100,7 +105,6 @@ public class RunPlanServiceImpl extends ServiceImpl<RunPlanMapper, RunPlan> impl
     public Result<?> deletePlan(int planId) {
         paramMapper.delByPlanId(planId);
         planInfoMapper.deleteById(planId);
-        scheduledTask.refresh(scheduledTask.getAllTasks());
         return Result.success();
     }
 
@@ -123,7 +127,6 @@ public class RunPlanServiceImpl extends ServiceImpl<RunPlanMapper, RunPlan> impl
 
             }
         }
-        scheduledTask.refresh(scheduledTask.getAllTasks());
         return Result.success() ;
     }
 
@@ -228,7 +231,7 @@ public class RunPlanServiceImpl extends ServiceImpl<RunPlanMapper, RunPlan> impl
     }
 
     // 判断接口计划执行结果
-    public Boolean planEndResult(int apiSuccessCount ,int apiFailedCount, int caseSuccessCount, int caseFailedCount,PlanResult planResult){
+    public Boolean planEndResult(Integer apiSuccessCount ,Integer apiFailedCount, Integer caseSuccessCount, Integer caseFailedCount,PlanResult planResult){
         boolean runResult = false;
         planResult.setApiSuccessCount(apiSuccessCount);
         planResult.setApiFailedCount(apiFailedCount);
@@ -256,7 +259,6 @@ public class RunPlanServiceImpl extends ServiceImpl<RunPlanMapper, RunPlan> impl
         MailTool.sendEmail(to,object,text);
     }
 
-
     @Override
     // 获取测试计划详情中的setup 和 tearDown
     public Result<?> setupList(Integer planId){
@@ -282,6 +284,41 @@ public class RunPlanServiceImpl extends ServiceImpl<RunPlanMapper, RunPlan> impl
     }
 
     /**
+     * 执行APP测试计划
+     **/
+    @Override
+    public Result<?> appPlanExec(Integer planId) {
+        RunPlan plan = planInfoMapper.selectById(planId);
+        // 判断APP是否为空
+        if (plan.getAppId()==null){
+            return Result.error("计划未执行,App为空");
+        }
+        // 判断appiumServer是否可正常开启
+        boolean appServerStatus = appUtils.AppiumStart();
+        if (!appServerStatus){
+            return Result.error("计划未执行,AppiumServer无法启动");
+        }
+        // 判断是否有空闲的手机
+        List<MobilePhone> phone = phoneMapper.onlinePhone();
+        if (phone.size()>0){
+            Integer randomInteger = RandomValue.getInteger(0,phone.size());
+            MobilePhone execPhone = phone.get(randomInteger);
+            // 执行APP测试计划
+            ExecutorService executor = Executors.newCachedThreadPool();
+            Future<String> appFutures = executor.submit(new ExecAppPlan(plan,execPhone));
+            String runResult = "";
+            try {
+                runResult = appFutures.get();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return Result.success(runResult);
+        }else {
+            return Result.error("计划未执行,没有空闲的测试机");
+        }
+    }
+
+    /**
      * web自动化计划执行
      * 1: planID获取用例列表
      * 2: 遍历用例列表
@@ -293,10 +330,13 @@ public class RunPlanServiceImpl extends ServiceImpl<RunPlanMapper, RunPlan> impl
      */
     @Override
     public Result<?> webRun(Integer planId) {
-        runWebPlan.gridStart();
         boolean gridStart = runWebPlan.portStart("127.0.0.1",4444);
         if (!gridStart){
-            return Result.error("本机seleniumGrid未成功启动");
+            runWebPlan.gridStart();
+            boolean gridStart2 = runWebPlan.portStart("127.0.0.1",4444);
+            if (!gridStart2){
+                return Result.error("本机seleniumGrid未成功启动");
+            }
         }
         ExecutorService executor = Executors.newCachedThreadPool();
         Future<String> futures = executor.submit(new runWebPlan(planId));
@@ -372,6 +412,5 @@ public class RunPlanServiceImpl extends ServiceImpl<RunPlanMapper, RunPlan> impl
         return result;
 
     }
-
 
 }

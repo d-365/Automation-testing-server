@@ -24,14 +24,6 @@ public class MyRedis {
      * @param password 密码
      */
     public MyRedis(String ip, String password,Integer... port) {
-
-//        if (port.length == 0){
-//            port[0] = 6379;
-//        }
-//        for (Integer integer : port) {
-//            System.out.println(integer);
-//        }
-
         JedisPoolConfig jedisPoolConfig = new JedisPoolConfig();
         //最大连接数，默认8
         jedisPoolConfig.setMaxTotal(20);
@@ -180,6 +172,14 @@ public class MyRedis {
      */
     public void select(int index) {
         jRedis.select(index);
+    }
+
+    /**
+     * 根据key名进行删除
+     * @param key String
+     */
+    public void del(String... key){
+        jRedis.del(key);
     }
 
     /**

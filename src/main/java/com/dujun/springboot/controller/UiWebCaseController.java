@@ -6,7 +6,6 @@ import com.dujun.springboot.common.selenium.WebAssertType;
 import com.dujun.springboot.entity.UiWebCase;
 import com.dujun.springboot.service.impl.UiWebCaseServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.*;
 import org.testng.collections.Lists;
@@ -19,6 +18,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -36,8 +36,9 @@ public class UiWebCaseController {
     private UiWebCaseServiceImpl webCaseService;
 
     @PostMapping("/caseList")
-    public Result<?> caseList() {
-        return webCaseService.caseList();
+    public Result<?> caseList(@RequestBody Map<String,Integer> map) {
+        Integer caseType = map.get("caseType");
+        return webCaseService.caseList(caseType);
     }
 
     // 更新用例
@@ -121,10 +122,6 @@ public class UiWebCaseController {
         }
 
         return Result.success(types);
-    }
-
-    public static void main(String[] args) {
-
     }
 
 }

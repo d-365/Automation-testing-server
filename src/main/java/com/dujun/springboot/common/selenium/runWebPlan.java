@@ -15,6 +15,7 @@ import com.dujun.springboot.service.impl.RunPlanServiceImpl;
 import com.dujun.springboot.tools.dateTools;
 import com.dujun.springboot.utils.BeanContext;
 import com.dujun.springboot.utils.cmdTaskUtils;
+import lombok.extern.log4j.Log4j2;
 import org.openqa.selenium.WebDriver;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ResourceUtils;
@@ -27,6 +28,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Callable;
 
+@Log4j2
 public class  runWebPlan implements Callable<String> {
 
     SeleniumUtils seleniumUtils = BeanContext.getApplicationContext().getBean(SeleniumUtils.class);
@@ -48,14 +50,13 @@ public class  runWebPlan implements Callable<String> {
 
     @Override
     public String call() {
-
         // 执行结果信息
         String runMessage = "执行完成";
         WebDriver driver = null;
         int case_successCount = 0;
         int case_failedCount = 0;
-        PlanResult planResult = null;
-        RunPlan plan = null;
+        PlanResult planResult;
+        RunPlan plan;
         // 计划执行结果
         boolean finalPlanResult;
         plan = RunPlanMapper.selectById(planId);
@@ -77,9 +78,9 @@ public class  runWebPlan implements Callable<String> {
         }catch (Exception e){
             e.printStackTrace();
         }
+
         // 执行计划用例信息
         try {
-
             // 2: planID获取用例列表
             PlanParam planParam = PlanParamMapper.byPlanId(planId);
             if (planParam.getCaseIds().size() == 0){
@@ -93,8 +94,13 @@ public class  runWebPlan implements Callable<String> {
             }
 
             // 2.1: 启动WebDriver
-            String remoteAddress = "http://127.0.0.1:4444";
-            driver = MySelenium.getRemoteDriver(remoteAddress,browser);
+            try {
+                String remoteAddress = "http://127.0.0.1:4444";
+                driver = MySelenium.getRemoteDriver(remoteAddress,browser);
+            }catch (Exception e){
+                e.printStackTrace();
+                return "执行失败：无法创建driver实例";
+            }
 
             //3: 遍历用例列表--获取对应用例步骤列表
             List<UIConsole> consoleMsg;
@@ -146,6 +152,7 @@ public class  runWebPlan implements Callable<String> {
 
         }catch (Exception e){
             e.printStackTrace();
+            case_failedCount++;
             runMessage = "执行失败"+e.toString();
         }finally {
             // 关闭driver
@@ -240,7 +247,8 @@ public class  runWebPlan implements Callable<String> {
             Socket socket = new Socket(address,port);
             result = true;
         }catch (Exception e){
-            System.out.println("本机4444端口未占用");
+            e.printStackTrace();
+            log.debug(String.format("端口%1$s未开启成功",port));
         }
         return result;
     }
@@ -255,6 +263,7 @@ public class  runWebPlan implements Callable<String> {
                 String path = ResourceUtils.getURL("classpath:").getPath();
                 String gridPath = path +"static"+File.separator+"data"+File.separator+"selenium-server-4.1.3.jar";
                 File file = new File(gridPath);
+                System.out.println(file.getAbsolutePath());
                 cmdTaskUtils.execCommand(String.format("java -jar %s standalone",file.getAbsolutePath()));
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
@@ -274,7 +283,6 @@ public class  runWebPlan implements Callable<String> {
         List<PlanRound> planRounds =  planRoundMapper.selectList(queryWrapper);
         if (planRounds.size() ==0){
             return null;
-            // 不需要执行
         }else {
             List<UIConsole> uiConsoles = Lists.newArrayList();
             for (PlanRound planRound : planRounds) {
@@ -288,8 +296,6 @@ public class  runWebPlan implements Callable<String> {
             }
             return uiConsoles;
         }
-
     }
-
 
 }

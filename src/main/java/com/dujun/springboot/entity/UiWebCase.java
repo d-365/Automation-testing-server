@@ -56,5 +56,11 @@ public class UiWebCase implements Serializable {
     @TableField(exist = false)
     private List<UiWebCase> children = new ArrayList<>();
 
+    /**
+     * 1 WEB  2 App
+     */
+    private Integer caseType;
+
+    private Integer delFlag;
 
 }

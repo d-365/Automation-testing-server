@@ -17,4 +17,5 @@ public interface MobilePhoneService extends IService<MobilePhone> {
 
     Result<IPage<MobilePhone>> mobilePhoneList(Integer current, Integer size,Integer status);
 
+    Result<?> mobilePhoneListOp();
 }

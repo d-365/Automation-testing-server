@@ -24,8 +24,13 @@ public class Temp {
         AndroidDriver driver = AppiumApi.getAndroidDriver("http://127.0.0.1:4723/wd/hub",capabilities);
         WebElement element1 = AppiumApi.ByXpath(driver,"//*[@resource-id=\"com.wanqiandaikuan.xddd:id/tvConfirm\"]");
         element1.click();
+        AppiumApi.ByXpath(driver,"//*[@resource-id=\"com.wanqiandaikuan.xddd:id/tv_pass_login\"]").click();
+        AppiumApi.ById(driver,"com.wanqiandaikuan.xddd:id/cetInput").sendKeys("dujun");
+        AppiumApi.ById(driver,"com.wanqiandaikuan.xddd:id/etPassword").sendKeys("dujun");
         String context = driver.getContext();
         System.out.println("打印context"+ context);
+        driver.quit();
     }
+
 
 }

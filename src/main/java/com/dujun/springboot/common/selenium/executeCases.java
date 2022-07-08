@@ -27,7 +27,6 @@ import java.util.concurrent.Callable;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-
 public class executeCases implements Callable<List<UIConsole>> {
 
     // 用例Id
@@ -71,7 +70,12 @@ public class executeCases implements Callable<List<UIConsole>> {
 
             // 2: 连接远程seleniumServer
             String remoteUrl = "http://"+userAddress+":"+port;
-            driver = MySelenium.getRemoteDriver(remoteUrl,browserName);
+            try {
+                driver = MySelenium.getRemoteDriver(remoteUrl,browserName);
+            }catch (Exception e){
+                consoleMsg.add(new UIConsole(1,"RemoteDriver连接客户端seleniumGrid失败"));
+                return consoleMsg;
+            }
 
             // 3: 根据订单ID 获取用例信息
             LambdaQueryWrapper<WebCaseStep> lambdaQueryWrapper = new LambdaQueryWrapper<>();

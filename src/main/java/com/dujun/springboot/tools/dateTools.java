@@ -12,7 +12,7 @@ import java.util.Date;
 
 public class dateTools {
 
-    public  static String currentTime(){
+    public static String currentTime(){
         Calendar date  = Calendar.getInstance();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return sdf.format(date.getTime());

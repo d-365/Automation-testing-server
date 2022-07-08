@@ -35,4 +35,6 @@ public interface RunPlanService extends IService<RunPlan> {
     Result<?> setupList(Integer planId);
 
     Result<?> delRound(Integer id);
+
+    Result<?> appPlanExec(Integer planId);
 }

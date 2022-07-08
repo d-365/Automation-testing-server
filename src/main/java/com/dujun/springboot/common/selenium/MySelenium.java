@@ -386,7 +386,7 @@ public class MySelenium {
      * 传统定位器 --xpath
      */
     public static WebElement ByXpath(WebDriver driver,String xpath){
-        return new WebDriverWait(driver, 6000).until(ExpectedConditions.visibilityOfElementLocated(By.xpath(xpath)));
+        return new WebDriverWait(driver, 3).until(ExpectedConditions.visibilityOfElementLocated(By.xpath(xpath)));
     }
 
     /**
@@ -397,11 +397,11 @@ public class MySelenium {
         MyConditions myConditions = MyConditions.valueOf(conditions.trim());
         switch (myConditions){
             case elementToBeClickable:
-                element = new WebDriverWait(driver, 6000).until(ExpectedConditions.elementToBeClickable(by));
+                element = new WebDriverWait(driver, 3).until(ExpectedConditions.elementToBeClickable(by));
                 break;
             case visibilityOfElementLocated:
             default:
-                element = new WebDriverWait(driver, 6000).until(ExpectedConditions.visibilityOfElementLocated(by));
+                element = new WebDriverWait(driver, 3).until(ExpectedConditions.visibilityOfElementLocated(by));
                 break;
         }
         return element;

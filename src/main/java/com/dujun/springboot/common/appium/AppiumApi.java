@@ -6,12 +6,14 @@
 
 package com.dujun.springboot.common.appium;
 
+import com.dujun.springboot.common.selenium.MyConditions;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.nativekey.AndroidKey;
 import io.appium.java_client.android.nativekey.KeyEvent;
 import io.appium.java_client.ios.IOSDriver;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.touch.TouchActions;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -21,7 +23,6 @@ import java.net.URL;
 import java.util.Set;
 
 public class AppiumApi {
-
 
     /**
      * 获取AndroidDriver
@@ -61,7 +62,7 @@ public class AppiumApi {
     public static WebElement ById(AppiumDriver driver, String id,MyExpected expected){
         WebElement element = null;
         try {
-            element = new WebDriverWait(driver,3000).until(MyExpectedConditions.run(By.id(id),expected));
+            element = new WebDriverWait(driver,5).until(MyExpectedConditions.run(By.id(id),expected));
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -77,7 +78,7 @@ public class AppiumApi {
     public static WebElement ById (AppiumDriver driver,String id){
         WebElement element = null;
         try {
-            element = new WebDriverWait(driver,3000).until(ExpectedConditions.visibilityOfElementLocated(By.id(id)));
+            element = new WebDriverWait(driver,5).until(ExpectedConditions.visibilityOfElementLocated(By.id(id)));
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -94,7 +95,7 @@ public class AppiumApi {
     public static WebElement ByXpath(AppiumDriver driver, String xpath,MyExpected expected){
         WebElement element = null;
         try {
-            element = new WebDriverWait(driver,3000).until(MyExpectedConditions.run(By.xpath(xpath),expected));
+            element = new WebDriverWait(driver,3).until(MyExpectedConditions.run(By.xpath(xpath),expected));
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -110,7 +111,7 @@ public class AppiumApi {
     public static WebElement ByXpath (AppiumDriver driver,String xpath){
         WebElement element = null;
         try {
-            element = new WebDriverWait(driver,3000).until(ExpectedConditions.visibilityOfElementLocated(By.xpath(xpath)));
+            element = new WebDriverWait(driver,5).until(ExpectedConditions.visibilityOfElementLocated(By.xpath(xpath)));
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -127,9 +128,27 @@ public class AppiumApi {
     public static WebElement ElementLocation(AppiumDriver driver,By by ,MyExpected expected){
         WebElement element = null;
         try {
-            element = new WebDriverWait(driver,3000).until(MyExpectedConditions.run(by,expected));
+            element = new WebDriverWait(driver,3).until(MyExpectedConditions.run(by,expected));
         }catch (Exception e){
             e.printStackTrace();
+        }
+        return element;
+    }
+
+    /**
+     * 获取WebElement元素 -- 万能 ExpectedConditions
+     */
+    public static WebElement findElement(AppiumDriver driver, String conditions, By by){
+        WebElement element = null;
+        MyConditions myConditions = MyConditions.valueOf(conditions.trim());
+        switch (myConditions){
+            case elementToBeClickable:
+                element = new WebDriverWait(driver, 3).until(ExpectedConditions.elementToBeClickable(by));
+                break;
+            case visibilityOfElementLocated:
+            default:
+                element = new WebDriverWait(driver, 3).until(ExpectedConditions.visibilityOfElementLocated(by));
+                break;
         }
         return element;
     }
@@ -151,6 +170,22 @@ public class AppiumApi {
     }
 
     /**
+     * 元素点击操作
+     * @param element WebElement
+     */
+    public static void click(WebElement element) {
+        element.click();
+    }
+
+    /**
+     * 元素输入
+     * @param element WebElement
+     */
+    public static void send_keys(WebElement element,String... code) {
+        element.sendKeys(code);
+    }
+
+    /**
      * 向左滑动
      * @param driver AppiumDriver
      */
@@ -167,8 +202,17 @@ public class AppiumApi {
      */
     public static String catch_toast(AppiumDriver driver){
         String message = "//*[@class='android.widget.Toast']";
-        //String message = "//*[contains(@text,"xxxx")]";
         return ByXpath(driver,message).getText();
+    }
+
+    /**
+     * 捕捉toast提示
+     * @param driver  AppiumDriver
+     * @return String
+     */
+    public static String catch_toast(AppiumDriver driver,String text){
+        String messages = String.format("//*[contains(@text,'%1$s')]",text);
+        return ByXpath(driver,messages).getText();
     }
 
     /**

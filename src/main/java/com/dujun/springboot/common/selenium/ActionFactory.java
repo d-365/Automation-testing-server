@@ -116,7 +116,6 @@ public class ActionFactory {
             uiConsole.setCode(1);
         }
         uiConsole.setMsg(execMsg);
-
         return uiConsole;
     }
 
@@ -422,7 +421,6 @@ public class ActionFactory {
         myActionMap.put(actionEnum.SWITCHFRAMEBYELEMENT, this::switchFrameByElement);
         myActionMap.put(actionEnum.TODEFAULTCONTENT, this::toDefaultContent);
         myActionMap.put(actionEnum.DEFAULT, this::defaultAction);
-
         MyFunctionalInterface functionalInterface = myActionMap.get(actionType);
         return functionalInterface.apply(driver,caseStep);
     }

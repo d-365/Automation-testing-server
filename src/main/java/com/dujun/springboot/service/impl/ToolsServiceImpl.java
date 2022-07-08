@@ -86,7 +86,6 @@ public class ToolsServiceImpl implements ToolsService {
             tmkApply.setLoanId(loanId);
             tmkApply.setPayload(applyData);
             mysqlTools.close();
-            request.close();
             return Result.success(tmkApply);
         }
         return Result.error("订单新增失败");
@@ -180,14 +179,13 @@ public class ToolsServiceImpl implements ToolsService {
         //填单数据
         HashMap payload = ApiOrderData.qyh_applyData(city);
         //用户填单
-        JSONObject result = new Qyh(phone).fillForm(phone,JSON.toJSONString(payload));
+        JSONObject result = new Qyh(phone).fillForm(JSON.toJSONString(payload));
         log.info(String.valueOf(result));
         String msg = result.getString("message");
         if(!msg.contains("系统异常")){
             //  获取填单ID
             String loanId = toolsMapper.qyh_idByPhone(phone);
             tmkApply tmkApply = new tmkApply(loanId,payload);
-            request.close();
             return Result.success(tmkApply);
         }
         return Result.error("订单新增失败");

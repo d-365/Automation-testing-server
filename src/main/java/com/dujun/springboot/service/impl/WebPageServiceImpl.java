@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.testng.collections.Lists;
 
 import javax.annotation.Resource;
+import javax.swing.text.View;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -44,19 +45,26 @@ public class WebPageServiceImpl extends ServiceImpl<WebPageMapper, WebPage> impl
 
 
     @Override
-    public Result<List<WebPage>> PAGE_LIST() {
-        List<WebPage> pageList = webPageMapper.selectList(new QueryWrapper<WebPage>().eq("del_flag",0));
+    public Result<List<WebPage>> PAGE_LIST(Integer type) {
+        List<WebPage> pageList = webPageMapper.selectList(new QueryWrapper<WebPage>().eq("del_flag",0).eq("type",type));
         List<WebPage> parentPage = pageList.stream().filter(item->item.getParentId() == 0).collect(Collectors.toList());
-        for (WebPage page : pageList) {
-            if (page.getParentId() != 0){
-                for (WebPage parent : parentPage) {
-                    if (Objects.equals(parent.getId(), page.getParentId())){
-                        parent.getChildren().add(page);
-                    }
-                }
-            }
+        for (WebPage webPage : parentPage) {
+            PAGE_LIST_HELP(pageList,webPage);
         }
         return Result.success(parentPage);
+    }
+
+    public void PAGE_LIST_HELP(List<WebPage> allPage,WebPage page){
+        for (WebPage webPage : allPage) {
+            if (Objects.equals(page.getId(), webPage.getParentId())){
+                page.getChildren().add(webPage);
+            }
+        }
+        if (page.getChildren().size()>0){
+            for (WebPage child : page.getChildren()) {
+                PAGE_LIST_HELP(allPage,child);
+            }
+        }
     }
 
     @Override
@@ -67,7 +75,7 @@ public class WebPageServiceImpl extends ServiceImpl<WebPageMapper, WebPage> impl
         }else if (Objects.equals(page.getName(), "") || page.getName() == null){
             return Result.error("名称不能为空");
         }
-        // 更新删除操作
+        // 更新添加操作
         if (page.getId()==null){
             webPageMapper.insert(page);
             for (WebPage child : page.getChildren()) {
@@ -92,24 +100,37 @@ public class WebPageServiceImpl extends ServiceImpl<WebPageMapper, WebPage> impl
     }
 
     @Override
-    public Result<?> webPageElement() {
-        // 1 递归获取所有的web-page数据--层级结构
-        List<WebPage> webPageRaw = webPageMapper.selectList(new QueryWrapper<WebPage>().eq("del_flag", 0));
-        List<WebPageElement> webPages = new ArrayList<>();
-        // 数据转换
-        for (WebPage webPage : webPageRaw) {
-            WebPageElement webPageElement = new WebPageElement();
-            webPageElement.setId(webPage.getId());
-            webPageElement.setParentId(webPage.getParentId());
-            webPageElement.setName(webPage.getName());
-            webPages.add(webPageElement);
+    public Result<?> webPageElement(Integer type) {
+        List<WebPage> pageList = PAGE_LIST(type).getData();
+        for (WebPage webPage : pageList) {
+            pageEleDeep(webPage);
         }
-        // 数据封装
-        List<WebPageElement> topWebPages =  webPages.stream().filter(item->item.getParentId() ==0).collect(Collectors.toList());
-        for (WebPageElement topWebPage : topWebPages) {
-            topWebPage.setChildren(webPageElementDeep(topWebPage.getId(),webPages));
+        return Result.success(pageList);
+    }
+
+    /**
+     * 递归获取Page对应元素
+     * @param webPage WebPage
+     */
+    public void pageEleDeep(WebPage webPage){
+        if (webPage.getType()!=null){
+            List<PageElement> pageElements = pageElementMapper.selectList(new QueryWrapper<PageElement>().eq("page_id",webPage.getId()));
+            if (pageElements.size()>0){
+                List<WebPage> pageList = new ArrayList<>();
+                pageElements.forEach(pageElement -> {
+                    WebPage page = new WebPage();
+                    page.setId(pageElement.getId());
+                    page.setParentId(webPage.getId());
+                    page.setName(pageElement.getElementName());
+                    pageList.add(page);
+                });
+                webPage.getChildren().addAll(pageList);
+            }
         }
-        return Result.success(topWebPages);
+        if (webPage.getChildren().size()>0&&webPage.getType()!=null){
+            webPage.getChildren().forEach(this::pageEleDeep);
+        }
+
     }
 
     // 更新用例步骤
@@ -132,14 +153,12 @@ public class WebPageServiceImpl extends ServiceImpl<WebPageMapper, WebPage> impl
         return Result.success();
     }
 
-
     private  List<WebPageElement> webPageElementDeep(Integer Id, List<WebPageElement> allWebPages){
         List<WebPageElement> childrenPage = Lists.newArrayList();
         for (WebPageElement WebPage : allWebPages) {
             if (Objects.equals(WebPage.getParentId(), Id)){
                 // 查找对应对应childrenID 对应的元素数据
                 List<PageElement> pageElements = pageElementMapper.selectList(new QueryWrapper<PageElement>().eq("page_id",WebPage.getId()));
-
                 if (pageElements.size()!=0){
                     List <WebPageElement> elements = Lists.newArrayList();
                     for (PageElement pageElement : pageElements) {
@@ -153,7 +172,6 @@ public class WebPageServiceImpl extends ServiceImpl<WebPageMapper, WebPage> impl
                 childrenPage.add(WebPage);
             }
         }
-
         return childrenPage;
     }
 
