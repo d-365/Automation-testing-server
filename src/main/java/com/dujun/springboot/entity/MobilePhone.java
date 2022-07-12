@@ -47,6 +47,11 @@ public class MobilePhone implements Serializable {
     private String ip;
 
     /**
+     * 电量信息
+     */
+    private String level;
+
+    /**
      * 删除标志
      */
     private Integer delFlag;

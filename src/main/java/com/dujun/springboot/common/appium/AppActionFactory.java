@@ -12,6 +12,7 @@ import com.dujun.springboot.utils.BeanContext;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.android.AndroidDriver;
 import lombok.extern.log4j.Log4j2;
+import org.hibernate.mapping.TableOwner;
 import org.openqa.selenium.WebElement;
 
 import java.io.PrintWriter;
@@ -99,23 +100,21 @@ public class AppActionFactory {
      */
     private UIConsole catch_toast(AppiumDriver driver, WebCaseStep caseStep){
         UIConsole uiConsole = new UIConsole();
-        String execMsg = null;
-        try {
-            String toast;
-            if (caseStep.getActionValue()!=null){
-                toast = AppiumApi.catch_toast(driver,caseStep.getActionValue().trim());
-            }else {
-                toast = AppiumApi.catch_toast(driver);
-            }
+        String execMsg;
+        String toast;
+        if (caseStep.getActionValue()!=null){
+            toast = AppiumApi.catch_toast(driver,caseStep.getActionValue().trim());
+        }else {
+            toast = AppiumApi.catch_toast(driver);
+        }
+        if (!Objects.equals(toast, "")){
             uiConsole.setCode(0);
             execMsg = String.format("步骤ID%1$S 捕捉toast成功 toast: %2$s",caseStep.getId(),toast);
-        }catch (Exception e){
+        }else {
             uiConsole.setCode(1);
             execMsg = String.format("步骤ID%1$s 捕捉toast失败",caseStep.getId());
-            e.printStackTrace();
-        }finally {
-            uiConsole.setMsg(execMsg);
         }
+        uiConsole.setMsg(execMsg);
         return uiConsole;
     }
 

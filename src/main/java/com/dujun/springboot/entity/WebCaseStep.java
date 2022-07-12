@@ -24,7 +24,7 @@ import lombok.experimental.Accessors;
  * @since 2022-04-14
  */
 @Data
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode()
 @Accessors(chain = true)
 public class WebCaseStep implements Serializable {
 

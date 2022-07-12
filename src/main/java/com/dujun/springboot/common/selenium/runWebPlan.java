@@ -241,10 +241,10 @@ public class  runWebPlan implements Callable<String> {
     /**
      * 端口是否占用
      */
-    public static boolean portStart(String address,Integer port){
+    public static Boolean portStart(String address,Integer port){
         boolean result = false;
         try {
-            Socket socket = new Socket(address,port);
+            new Socket(address,port);
             result = true;
         }catch (Exception e){
             e.printStackTrace();
@@ -256,7 +256,7 @@ public class  runWebPlan implements Callable<String> {
     /**
      * 开启seleniumGrid服务
      */
-    public static void gridStart(){
+    public  static void gridStart(){
         boolean result = portStart("127.0.0.1",4444);
         if (!result){
             try {

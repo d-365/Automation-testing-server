@@ -47,7 +47,7 @@ public class cmdTaskUtils {
         BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream()));
         String line;
         StringBuilder stringBuilder = new StringBuilder();
-        while ((line = br.readLine())!=null && ! line.equals("")){
+        while ((line = br.readLine())!=null){
             stringBuilder.append(line).append(",");
         }
         return String.valueOf(stringBuilder);

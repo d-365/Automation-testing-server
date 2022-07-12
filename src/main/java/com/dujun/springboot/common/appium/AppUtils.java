@@ -18,10 +18,14 @@ import com.dujun.springboot.mapper.PageElementMapper;
 import com.dujun.springboot.mapper.WebCaseStepMapper;
 import com.dujun.springboot.utils.cmdTaskUtils;
 import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.remote.AutomationName;
+import io.appium.java_client.remote.MobileCapabilityType;
+import lombok.extern.log4j.Log4j2;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.springframework.stereotype.Component;
+
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.Objects;
@@ -29,6 +33,7 @@ import java.util.Objects;
 import static com.dujun.springboot.common.selenium.runWebPlan.portStart;
 
 @Component
+@Log4j2
 public class AppUtils {
 
     @Resource
@@ -43,7 +48,7 @@ public class AppUtils {
     @Resource
     private MobilePhoneMapper mobilePhoneMapper;
 
-
+    boolean AppiumServerStatus;
     Integer appiumStartCount = 0;
 
     /**
@@ -97,18 +102,20 @@ public class AppUtils {
      * 开启Appium服务
      * @return boolean
      */
-    public boolean AppiumStart(){
-        boolean result;
+    public Boolean AppiumStart(){
         // 开启Appium服务
-        result = portStart("127.0.0.1",4723);
+        AppiumServerStatus = portStart("0.0.0.0",4723);
+        log.debug(AppiumServerStatus);
         if (appiumStartCount<=2){
-            if (!result){
-                cmdTaskUtils.execCommand("cmd /c start  appium");
+            if (!AppiumServerStatus){
+                cmdTaskUtils.execCommand("cmd /k start appium");
                 appiumStartCount++;
                 AppiumStart();
             }
+        }else {
+            appiumStartCount = 0;
         }
-        return result;
+        return AppiumServerStatus;
     }
 
     /**
@@ -127,6 +134,7 @@ public class AppUtils {
         capabilities.setCapability("noReset", appConfigs.getNoReset());
         capabilities.setCapability("platformName", mobilePhone.getPlatForm());
         capabilities.setCapability("platformVersion", mobilePhone.getPlatVersion());
+        capabilities.setCapability(MobileCapabilityType.AUTOMATION_NAME, AutomationName.ANDROID_UIAUTOMATOR2);
         //处理其他配置信息
         List<JSONObject> appConOthers = appConfigs.getOthers();
         if (appConOthers.size()!=0){

@@ -198,6 +198,7 @@ public class UiWebCaseServiceImpl extends ServiceImpl<UiWebCaseMapper, UiWebCase
             }else if (type.equals("2")){
                 // 查询开启AppiumServer
                 boolean appiumStatus = appUtils.AppiumStart();
+                System.out.println("AppiumServer结果"+appiumStatus);
                 if (appiumStatus){
                     // 获取对应的获取DesiredCapabilities配置信息
                     String phoneId  = jsonObject.getString("phone");

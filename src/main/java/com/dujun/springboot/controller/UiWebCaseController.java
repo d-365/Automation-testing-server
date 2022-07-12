@@ -120,7 +120,6 @@ public class UiWebCaseController {
             type.put("value",assertType.toString());
             types.add(type);
         }
-
         return Result.success(types);
     }
 

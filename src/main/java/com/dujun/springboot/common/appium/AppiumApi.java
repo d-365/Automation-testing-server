@@ -13,7 +13,6 @@ import io.appium.java_client.android.nativekey.AndroidKey;
 import io.appium.java_client.android.nativekey.KeyEvent;
 import io.appium.java_client.ios.IOSDriver;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.touch.TouchActions;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -202,7 +201,13 @@ public class AppiumApi {
      */
     public static String catch_toast(AppiumDriver driver){
         String message = "//*[@class='android.widget.Toast']";
-        return ByXpath(driver,message).getText();
+        try {
+            WebElement element = driver.findElement(By.xpath(message));
+            return element.getText();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return "";
     }
 
     /**
@@ -212,14 +217,20 @@ public class AppiumApi {
      */
     public static String catch_toast(AppiumDriver driver,String text){
         String messages = String.format("//*[contains(@text,'%1$s')]",text);
-        return ByXpath(driver,messages).getText();
+        try {
+            WebElement element = driver.findElement(By.xpath(messages));
+            return element.getText();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return "";
     }
 
     /**
      * 坐标定位
-     * @param driver
-     * @param pointX
-     * @param pointY
+     * @param driver 1
+     * @param pointX 2
+     * @param pointY 3
      */
     public static  void byRelative(AppiumDriver driver,Integer pointX, Integer pointY){
         Integer width = driver.manage().window().getSize().width;

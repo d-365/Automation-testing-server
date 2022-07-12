@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.dujun.springboot.entity.MobilePhone;
 import com.dujun.springboot.mapper.MobilePhoneMapper;
 import com.dujun.springboot.utils.cmdTaskUtils;
+import javafx.scene.Parent;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.scheduling.Trigger;
 import org.springframework.scheduling.annotation.SchedulingConfigurer;
@@ -19,6 +20,8 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Log4j2
 @Component
@@ -61,6 +64,7 @@ public class UpPhoneStatus implements SchedulingConfigurer {
             for (MobilePhone phone : phones) {
                 if (phone.getIp()!=null&&!phone.getIp().equals("")&&data.contains(phone.getIp())){
                     phone.setStatus(0);
+                    phone.setLevel(phone_level());
                 }else {
                     phone.setStatus(1);
                 }
@@ -70,6 +74,26 @@ public class UpPhoneStatus implements SchedulingConfigurer {
         } catch (IOException ioException) {
             ioException.printStackTrace();
         }
+    }
+
+    /**
+     * 查询手机电量信息
+     */
+    public String phone_level(){
+        try {
+            String data = cmdTaskUtils.getCmdResult("cmd /c adb shell dumpsys battery");
+            System.out.println(data);
+            String regex = "(.*?level: )(.*?)(,)";
+            Pattern pattern = Pattern.compile(regex);
+            Matcher matcher = pattern.matcher(data);
+            if (matcher.find()){
+                return matcher.group(2);
+            }
+
+        } catch (IOException ioException) {
+            ioException.printStackTrace();
+        }
+        return "";
     }
 
 

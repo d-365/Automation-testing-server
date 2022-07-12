@@ -17,6 +17,7 @@ import com.dujun.springboot.tools.RandomValue;
 import com.dujun.springboot.tools.StringTools;
 import com.dujun.springboot.tools.dateTools;
 import com.dujun.springboot.utils.MailTool;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.awt.*;
@@ -294,7 +295,7 @@ public class RunPlanServiceImpl extends ServiceImpl<RunPlanMapper, RunPlan> impl
             return Result.error("计划未执行,App为空");
         }
         // 判断appiumServer是否可正常开启
-        boolean appServerStatus = appUtils.AppiumStart();
+        Boolean appServerStatus = appUtils.AppiumStart();
         if (!appServerStatus){
             return Result.error("计划未执行,AppiumServer无法启动");
         }

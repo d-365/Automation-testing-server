@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50638
 File Encoding         : 65001
 
-Date: 2022-06-14 14:30:33
+Date: 2022-07-12 15:01:00
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -30,7 +30,7 @@ CREATE TABLE `action` (
   `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `del_flag` int(10) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------
 -- Records of action
@@ -62,6 +62,19 @@ INSERT INTO `action` VALUES ('24', '取消Alert弹窗', '0', 'DISMISSALERT', '�
 INSERT INTO `action` VALUES ('25', '按照name切换Frame', '0', 'SWITCHFRAMEBYNAME', '按照name切换Frame', '9', '2022-06-14 10:22:51', '2022-06-14 10:22:51', '0');
 INSERT INTO `action` VALUES ('26', '按照元素切换Frame', '0', 'SWITCHFRAMEBYELEMENT', '按照元素切换Frame', '9', '2022-06-14 10:23:04', '2022-06-14 10:23:04', '0');
 INSERT INTO `action` VALUES ('27', '切换回默认内容', '0', 'TODEFAULTCONTENT', '切换回默认内容', '9', '2022-06-14 10:23:18', '2022-06-14 10:23:18', '0');
+INSERT INTO `action` VALUES ('28', '常用操作', '1', '', '', '0', '2022-07-01 11:40:29', '2022-07-01 11:40:29', '0');
+INSERT INTO `action` VALUES ('29', '线程等待', '1', 'SLEEP', '', '28', '2022-07-01 11:40:52', '2022-07-01 11:40:52', '0');
+INSERT INTO `action` VALUES ('30', '手势操作', '1', '', '', '7', '2022-07-01 11:42:07', '2022-07-01 11:42:07', '0');
+INSERT INTO `action` VALUES ('31', '手势操作', '1', '', '', '0', '2022-07-01 11:42:26', '2022-07-01 11:42:26', '0');
+INSERT INTO `action` VALUES ('32', '键盘输入', '1', 'pressKey', '多个字符用中文逗号  ， 隔开', '31', '2022-07-01 11:43:14', '2022-07-01 11:43:14', '0');
+INSERT INTO `action` VALUES ('33', '键盘删除', '1', 'key_del', '可选 删除次数 Integer 默认一次', '31', '2022-07-01 11:44:35', '2022-07-01 11:44:35', '0');
+INSERT INTO `action` VALUES ('34', 'toast捕捉', '1', 'catch_toast', '', '28', '2022-07-01 11:45:21', '2022-07-01 11:45:21', '0');
+INSERT INTO `action` VALUES ('35', '视图操作', '1', '', '', '0', '2022-07-01 11:45:43', '2022-07-01 11:45:43', '0');
+INSERT INTO `action` VALUES ('36', '切换到H5视图', '1', 'switch_to_H5', '', '35', '2022-07-01 11:46:03', '2022-07-01 11:46:03', '0');
+INSERT INTO `action` VALUES ('37', '切换到原生视图', '1', 'switch_to_native', '', '35', '2022-07-01 11:46:16', '2022-07-01 11:46:16', '0');
+INSERT INTO `action` VALUES ('38', '元素操作', '1', '', '', '0', '2022-07-01 15:26:50', '2022-07-01 15:26:50', '0');
+INSERT INTO `action` VALUES ('39', '点击元素', '1', 'click', '', '38', '2022-07-01 15:27:06', '2022-07-01 15:27:06', '0');
+INSERT INTO `action` VALUES ('40', '元素输入', '1', 'input', null, '28', '2022-07-08 14:18:32', '2022-07-08 14:20:27', '0');
 
 -- ----------------------------
 -- Table structure for api_case
@@ -119,12 +132,36 @@ CREATE TABLE `api_info` (
   `set_up_ids` varchar(255) DEFAULT NULL,
   `tear_down_ids` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------
 -- Records of api_info
 -- ----------------------------
 INSERT INTO `api_info` VALUES ('1', '内部后台登录', null, '1', '6', '/api/crm/admin/v1/system/staff/login', 'POST', null, null, '已完成', '[{\"HeadersKey\":\"Content-Type\",\"HeadersValue\":\"application/json;charset=UTF-8\"}]', '[{}]', '[{}]', '{\"account\":\"d\",\"password\":\"5d93ceb70e2bf5daa84ec3d0cd2c731a\",\"validate\":\"\"}', '2', '[{\"dataSource\":\"\",\"extractExpress\":\"\",\"realType\":\"\",\"realValue\":\"\",\"varName\":\"\"}]', '[{\"assertResult\":null,\"dataSource\":\"\",\"expectRelation\":\"\",\"expectValue\":\"\",\"extractExpress\":\"\",\"realValue\":\"\"}]', null, null, null, null, null, null, null, null, '[{}]', '1', '[2]', '[]');
+INSERT INTO `api_info` VALUES ('2', '内部后台登录1', null, '1', '7', '/api/crm/admin/v1/system/staff/login', 'POST', '1', null, '已完成', '[{\"HeadersKey\":\"Content-Type\",\"HeadersValue\":\"application/json;charset=UTF-8\"}]', '[{}]', '[{}]', '{\"account\":\"d\",\"password\":\"5d93ceb70e2bf5daa84ec3d0cd2c731a\",\"validate\":\"\"}', '2', '[{\"dataSource\":\"\",\"extractExpress\":\"\",\"realType\":\"\",\"realValue\":\"\",\"varName\":\"\"}]', '[{\"assertResult\":null,\"dataSource\":\"\",\"expectRelation\":\"\",\"expectValue\":\"\",\"extractExpress\":\"\",\"realValue\":\"\"}]', null, null, null, null, null, null, null, null, '[{}]', '1', '[2]', '[]');
+
+-- ----------------------------
+-- Table structure for app_config
+-- ----------------------------
+DROP TABLE IF EXISTS `app_config`;
+CREATE TABLE `app_config` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(20) NOT NULL COMMENT 'App名称',
+  `app_package` varchar(50) NOT NULL COMMENT 'App包名',
+  `app_activity` varchar(50) NOT NULL COMMENT 'App启动页',
+  `no_reset` int(2) NOT NULL DEFAULT '1' COMMENT '启动前是否重置APP    1 重置  0 不重置',
+  `automation_name` varchar(20) NOT NULL DEFAULT 'uiautomator2' COMMENT '自动化执行引擎  appium uiaotomator1  uiautomator2',
+  `others` varchar(255) DEFAULT NULL COMMENT '其他启动配置信息',
+  `del_flag` int(2) DEFAULT '0' COMMENT '删除标志 0 未删除 1 已删除',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8mb4 COMMENT='APP 启动配置表';
+
+-- ----------------------------
+-- Records of app_config
+-- ----------------------------
+INSERT INTO `app_config` VALUES ('1', '好单多多（old）', 'com.wanqiandaikuan.xddd', 'ui.activity.SplashActivity', '1', 'uiautomator2', '[]', '0', '2022-06-23 15:15:40', '2022-07-06 14:57:45');
 
 -- ----------------------------
 -- Table structure for auto_config
@@ -153,13 +190,13 @@ INSERT INTO `auto_config` VALUES ('2', 'elementType', 'button,input,alert', null
 -- ----------------------------
 DROP TABLE IF EXISTS `case_api_relation`;
 CREATE TABLE `case_api_relation` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `api_id` int(11) DEFAULT NULL,
   `case_id` int(11) DEFAULT NULL,
   `status` int(255) DEFAULT NULL,
   `api_info` varchar(255) DEFAULT NULL,
   `number` int(11) DEFAULT NULL,
   `type` int(11) DEFAULT NULL,
-  `id` int(11) NOT NULL AUTO_INCREMENT,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -201,7 +238,7 @@ CREATE TABLE `category_api` (
   `update_by` varchar(255) DEFAULT NULL,
   `update_time` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------
 -- Records of category_api
@@ -209,6 +246,7 @@ CREATE TABLE `category_api` (
 INSERT INTO `category_api` VALUES ('4', '0', null, 'CRM', null, '0', null, null, null, null);
 INSERT INTO `category_api` VALUES ('5', '4', null, '登录', null, '0', null, null, null, null);
 INSERT INTO `category_api` VALUES ('6', '5', 'POST', '内部后台登录', null, '1', null, null, null, null);
+INSERT INTO `category_api` VALUES ('7', '6', 'POST', '内部后台登录1', null, '2', null, null, null, null);
 
 -- ----------------------------
 -- Table structure for db_config
@@ -265,15 +303,15 @@ CREATE TABLE `menu` (
   `parent_id` int(11) DEFAULT NULL,
   `number` int(100) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=35 DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------
 -- Records of menu
 -- ----------------------------
 INSERT INTO `menu` VALUES ('1', '接口自动化', '/interface', null, '1');
 INSERT INTO `menu` VALUES ('2', 'Web自动化', '/selenium', null, '2');
-INSERT INTO `menu` VALUES ('3', '用户管理', '/user', null, '3');
-INSERT INTO `menu` VALUES ('4', '公共管理', '/common', null, '4');
+INSERT INTO `menu` VALUES ('3', '用户管理', '/user', null, '6');
+INSERT INTO `menu` VALUES ('4', '公共配置', '/common', null, '4');
 INSERT INTO `menu` VALUES ('5', '测试工具', '/tools', null, '5');
 INSERT INTO `menu` VALUES ('9', '测试页面', '/Tester', null, '9');
 INSERT INTO `menu` VALUES ('11', '接口列表', '/interface/list', '1', '11');
@@ -290,99 +328,136 @@ INSERT INTO `menu` VALUES ('23', 'Action', '/common/action', '4', '41');
 INSERT INTO `menu` VALUES ('24', '项目管理', '/common/projects', '4', '42');
 INSERT INTO `menu` VALUES ('25', 'CRM工具', '/tools/crm', '5', '51');
 INSERT INTO `menu` VALUES ('26', '测试demo', '/test', '9', '91');
+INSERT INTO `menu` VALUES ('28', 'App管理', '/common/appConfig', '4', '43');
+INSERT INTO `menu` VALUES ('29', '执行机管理', '/common/mobilePhone', '4', '44');
+INSERT INTO `menu` VALUES ('30', 'App自动化', '/Appium', null, '3');
+INSERT INTO `menu` VALUES ('31', '页面元素', '/appium/page', '30', '61');
+INSERT INTO `menu` VALUES ('32', '用例管理', '/appium/case', '30', '62');
+INSERT INTO `menu` VALUES ('33', '测试计划', '/appium/plan', '30', '63');
+INSERT INTO `menu` VALUES ('34', '测试报告', '/appium/report', '30', '64');
+
+-- ----------------------------
+-- Table structure for mobile_phone
+-- ----------------------------
+DROP TABLE IF EXISTS `mobile_phone`;
+CREATE TABLE `mobile_phone` (
+  `id` int(255) NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) DEFAULT NULL COMMENT '手机名称',
+  `plat_form` varchar(50) NOT NULL COMMENT '平台信息',
+  `plat_version` varchar(50) NOT NULL COMMENT '平台版本',
+  `ip` varchar(20) NOT NULL COMMENT 'IP地址',
+  `level` varchar(10) DEFAULT NULL COMMENT '电量信息',
+  `status` int(2) NOT NULL DEFAULT '0' COMMENT '手机状态--  0 上线  1 下线  2 使用中',
+  `del_flag` int(2) NOT NULL DEFAULT '0' COMMENT '删除标志',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COMMENT='APP-执行机';
+
+-- ----------------------------
+-- Records of mobile_phone
+-- ----------------------------
+INSERT INTO `mobile_phone` VALUES ('1', 'OPPO', 'ANDROID', '8.1.0', '192.168.2.45', '39', '0', '0', '2022-06-23 14:49:56', '2022-07-11 11:44:59');
 
 -- ----------------------------
 -- Table structure for page_element
 -- ----------------------------
 DROP TABLE IF EXISTS `page_element`;
 CREATE TABLE `page_element` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `element_name` varchar(255) DEFAULT NULL,
   `element_type` varchar(255) DEFAULT NULL,
   `location_way` varchar(255) DEFAULT NULL,
   `location_value` varchar(255) DEFAULT NULL,
   `remark` varchar(255) DEFAULT NULL,
-  `create_time` datetime DEFAULT NULL,
-  `update_time` datetime DEFAULT NULL,
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `page_id` int(11) DEFAULT NULL,
   `conditions` varchar(255) DEFAULT NULL,
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `type` int(10) DEFAULT '1' COMMENT '1 WEB  2 APP',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------
 -- Records of page_element
 -- ----------------------------
-INSERT INTO `page_element` VALUES ('账号输入框', 'input', 'xpath', '//*[@id=\"account\"]', '', null, null, '2', 'visibilityOfElementLocated', '1');
-INSERT INTO `page_element` VALUES ('密码输入框', 'input', 'xpath', '//*[@id=\"password\"]', '', null, null, '2', 'visibilityOfElementLocated', '2');
+INSERT INTO `page_element` VALUES ('1', '账号输入框', 'input', 'xpath', '//*[@id=\"account\"]', '', '2022-06-16 14:56:16', '2022-07-07 14:40:02', '2', 'visibilityOfElementLocated', '1');
+INSERT INTO `page_element` VALUES ('2', '密码输入框', 'input', 'xpath', '//*[@id=\"password\"]', '', '2022-06-16 14:56:19', '2022-07-07 14:40:03', '2', 'visibilityOfElementLocated', '1');
+INSERT INTO `page_element` VALUES ('4', '温馨提示--同意', 'button', 'xpath', '//*[@resource-id=\"com.wanqiandaikuan.xddd:id/tvConfirm\"]', '', '2022-07-07 14:41:51', '2022-07-07 14:41:51', '8', 'elementToBeClickable', '1');
+INSERT INTO `page_element` VALUES ('5', '切换密码登录', 'button', 'xpath', '//*[@resource-id=\"com.wanqiandaikuan.xddd:id/tv_pass_login\"]', '', '2022-07-07 14:47:47', '2022-07-07 14:47:47', '9', '', '1');
+INSERT INTO `page_element` VALUES ('6', '手机号输入框', 'input', 'id', 'com.wanqiandaikuan.xddd:id/cetInput', '', '2022-07-07 14:56:30', '2022-07-08 17:41:27', '9', '', '1');
+INSERT INTO `page_element` VALUES ('7', '密码输入框', 'input', 'id', 'com.wanqiandaikuan.xddd:id/etPassword', '', '2022-07-07 14:57:27', '2022-07-07 14:57:27', '9', '', '1');
+INSERT INTO `page_element` VALUES ('8', '协议按钮', 'input', 'id', 'com.wanqiandaikuan.xddd:id/iv_select_yd', '', '2022-07-07 14:58:31', '2022-07-07 14:58:31', '9', '', '1');
+INSERT INTO `page_element` VALUES ('9', '登录按钮', 'button', 'id', 'com.wanqiandaikuan.xddd:id/btnLogin', '', '2022-07-07 14:58:56', '2022-07-07 14:58:56', '9', '', '1');
 
 -- ----------------------------
 -- Table structure for plan_param
 -- ----------------------------
 DROP TABLE IF EXISTS `plan_param`;
 CREATE TABLE `plan_param` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `plan_id` int(11) DEFAULT NULL,
   `api_ids` varchar(255) DEFAULT NULL,
   `case_ids` varchar(255) DEFAULT NULL,
-  `id` int(11) NOT NULL AUTO_INCREMENT,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------
 -- Records of plan_param
 -- ----------------------------
-INSERT INTO `plan_param` VALUES ('1', null, '[2]', '1');
-INSERT INTO `plan_param` VALUES ('2', null, '[2]', '2');
-INSERT INTO `plan_param` VALUES ('3', null, '[2]', '3');
+INSERT INTO `plan_param` VALUES ('1', '1', null, '[2]');
+INSERT INTO `plan_param` VALUES ('2', '2', null, '[2]');
+INSERT INTO `plan_param` VALUES ('3', '3', null, '[2]');
+INSERT INTO `plan_param` VALUES ('4', '4', '[7]', '[]');
+INSERT INTO `plan_param` VALUES ('5', '6', null, '[4]');
 
 -- ----------------------------
 -- Table structure for plan_result
 -- ----------------------------
 DROP TABLE IF EXISTS `plan_result`;
 CREATE TABLE `plan_result` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `plan_id` int(11) DEFAULT NULL,
-  `plan_name` varchar(255) DEFAULT NULL,
-  `result_status` int(255) DEFAULT NULL,
-  `end_time` datetime DEFAULT NULL,
-  `start_time` datetime DEFAULT NULL,
-  `remark` varchar(255) DEFAULT NULL,
-  `result` varchar(255) DEFAULT NULL,
-  `api_success_count` int(255) DEFAULT NULL,
-  `api_failed_count` int(255) DEFAULT NULL,
+  `plan_name` varchar(10) DEFAULT NULL,
+  `plan_type` int(11) DEFAULT NULL,
+  `result_status` int(10) DEFAULT NULL,
+  `remark` varchar(10) DEFAULT NULL,
+  `result` varchar(10) DEFAULT NULL,
+  `api_success_count` int(10) DEFAULT NULL,
+  `api_failed_count` int(10) DEFAULT NULL,
   `case_success_count` int(11) DEFAULT NULL,
   `case_failed_count` int(11) DEFAULT NULL,
-  `plan_type` int(11) DEFAULT NULL,
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `start_time` datetime DEFAULT CURRENT_TIMESTAMP,
+  `end_time` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------
 -- Records of plan_result
 -- ----------------------------
-INSERT INTO `plan_result` VALUES ('3', 'WebPlan1', '1', '2022-06-14 10:53:54', '2022-06-14 10:53:46', null, null, null, null, '1', '0', '1', '1');
 
 -- ----------------------------
 -- Table structure for plan_result_detail
 -- ----------------------------
 DROP TABLE IF EXISTS `plan_result_detail`;
 CREATE TABLE `plan_result_detail` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `plan_result_id` int(11) DEFAULT NULL,
   `case_id` int(11) DEFAULT NULL,
   `case_number` int(11) DEFAULT NULL,
   `api_id` bigint(20) DEFAULT NULL,
-  `api_info` varchar(255) DEFAULT NULL,
+  `api_info` varchar(9999) DEFAULT NULL,
   `result` int(255) DEFAULT NULL,
-  `create_time` datetime DEFAULT NULL,
   `result_console` varchar(255) DEFAULT NULL,
   `case_name` varchar(255) DEFAULT NULL,
   `assert_result` varchar(255) DEFAULT NULL,
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------
 -- Records of plan_result_detail
 -- ----------------------------
-INSERT INTO `plan_result_detail` VALUES ('1', '2', null, null, null, '1', null, '[{\"code\":0,\"msg\":\"步骤ID1,执行成功---打开网址: http://testcrm.qyhnet.com/user/login\"},{\"code\":0,\"msg\":\"步骤ID2,执行成功--输入元素为:dujun\"},{\"code\":0,\"msg\":\"步骤ID3,执行成功----driver沉睡3000 ms\"}]', null, '[]', '1');
 
 -- ----------------------------
 -- Table structure for plan_round
@@ -402,7 +477,7 @@ CREATE TABLE `plan_round` (
   `operate_data` varchar(255) DEFAULT NULL,
   `params` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------
 -- Records of plan_round
@@ -457,19 +532,19 @@ INSERT INTO `prt_domain` VALUES ('3', '1', '2', 'https://crm.qyhnet.com', null, 
 -- ----------------------------
 DROP TABLE IF EXISTS `role`;
 CREATE TABLE `role` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `role_name` varchar(255) DEFAULT NULL,
   `permission_url` text,
-  `create_time` datetime DEFAULT NULL,
-  `update_time` datetime DEFAULT NULL,
-  `del_flag` varchar(255) DEFAULT NULL,
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `del_flag` varchar(255) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------
 -- Records of role
 -- ----------------------------
-INSERT INTO `role` VALUES ('test', '[\"/interface\",\"/interface/list\",\"/case/list\",\"/case/plan\",\"/case/result\",\"/selenium\",\"/selenium/page\",\"/selenium/case\",\"/selenium/plan\",\"/selenium/report\",\"/user\",\"/user/userList\",\"/user/role\",\"/common\",\"/common/action\",\"/common/projects\",\"/tools\",\"/tools/crm\",\"/Tester\",\"/test\"]', null, null, null, '2');
+INSERT INTO `role` VALUES ('2', 'test', '[\"/interface\",\"/interface/list\",\"/case/list\",\"/case/plan\",\"/case/result\",\"/selenium\",\"/selenium/page\",\"/selenium/case\",\"/selenium/plan\",\"/selenium/report\",\"/Appium\",\"/appium/page\",\"/appium/case\",\"/appium/plan\",\"/appium/report\",\"/common\",\"/common/action\",\"/common/projects\",\"/common/appConfig\",\"/common/mobilePhone\",\"/tools\",\"/tools/crm\",\"/user\",\"/user/userList\",\"/user/role\",\"/Tester\",\"/test\"]', '2022-06-15 16:01:50', '2022-06-15 16:01:57', '0');
 
 -- ----------------------------
 -- Table structure for run_plan
@@ -489,16 +564,19 @@ CREATE TABLE `run_plan` (
   `plan_type` int(11) DEFAULT NULL,
   `clock_exec_count` int(255) DEFAULT NULL,
   `browser_type` varchar(255) DEFAULT NULL,
+  `app_id` int(10) DEFAULT NULL COMMENT '运行APP',
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
   `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `del_flag` int(11) DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------
 -- Records of run_plan
 -- ----------------------------
-INSERT INTO `run_plan` VALUES ('3', 'WebPlan1', null, '1', '1', '0', '1', '0 0 0 1/1 * ?', '0', '', '1', null, 'Chrome', '2022-06-14 10:52:29', '2022-06-14 10:53:08', '0');
+INSERT INTO `run_plan` VALUES ('3', 'WebPlan1', null, '1', '1', '0', '1', '0 0 0 1/1 * ?', '0', '', '1', null, 'Chrome', null, '2022-06-14 10:52:29', '2022-06-14 10:53:08', '0');
+INSERT INTO `run_plan` VALUES ('4', 'ApiPlan', null, '1', '1', '0', '0', '', '0', '', '0', null, null, null, '2022-06-14 17:32:36', '2022-06-14 17:32:36', '0');
+INSERT INTO `run_plan` VALUES ('6', 'appPlan2', null, '2', '1', '0', '0', '0 0 0 1/1 * ?', '0', '', '2', null, '', '1', '2022-07-06 10:06:50', '2022-07-06 10:06:50', '0');
 
 -- ----------------------------
 -- Table structure for ui_web_case
@@ -508,19 +586,22 @@ CREATE TABLE `ui_web_case` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) DEFAULT NULL,
   `parent_id` int(11) NOT NULL DEFAULT '0',
-  `type` int(11) DEFAULT NULL,
+  `type` int(11) DEFAULT NULL COMMENT '0  文件夹  1 用例',
   `remark` varchar(255) DEFAULT NULL,
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
   `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `del_flag` int(11) DEFAULT '0',
+  `case_type` int(10) DEFAULT '1' COMMENT '1 WEB 2 App',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------
 -- Records of ui_web_case
 -- ----------------------------
-INSERT INTO `ui_web_case` VALUES ('1', 'CRM 登录', '0', '0', '', '2022-06-14 10:06:25', '2022-06-14 10:06:28', '0');
-INSERT INTO `ui_web_case` VALUES ('2', 'case1', '1', '1', '', '2022-06-14 10:07:22', '2022-06-14 10:07:22', '0');
+INSERT INTO `ui_web_case` VALUES ('1', 'CRM 登录', '0', '0', '', '2022-06-14 10:06:25', '2022-06-14 10:06:28', '0', '1');
+INSERT INTO `ui_web_case` VALUES ('2', 'case1', '1', '1', '', '2022-06-14 10:07:22', '2022-06-14 10:07:22', '0', '1');
+INSERT INTO `ui_web_case` VALUES ('3', '轻易花APP', '0', '0', '', '2022-06-28 16:59:12', '2022-06-28 16:59:12', '0', '2');
+INSERT INTO `ui_web_case` VALUES ('4', '登录', '3', '1', '', '2022-06-28 17:00:43', '2022-06-28 17:00:43', '0', '2');
 
 -- ----------------------------
 -- Table structure for user
@@ -535,7 +616,7 @@ CREATE TABLE `user` (
   `role_id` int(10) DEFAULT NULL,
   `env_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------
 -- Records of user
@@ -547,28 +628,36 @@ INSERT INTO `user` VALUES ('1', 'dujun', 'c60d82cfae878d88e506dac4b8da34cc', 'du
 -- ----------------------------
 DROP TABLE IF EXISTS `web_case_step`;
 CREATE TABLE `web_case_step` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `case_id` int(11) DEFAULT NULL,
   `sort` int(11) DEFAULT NULL,
-  `step_describe` varchar(255) DEFAULT NULL,
+  `step_describe` varchar(20) DEFAULT NULL,
   `action_id` int(11) DEFAULT NULL,
-  `action_summary` varchar(255) DEFAULT NULL,
+  `action_summary` varchar(20) DEFAULT NULL,
   `element_id` int(11) DEFAULT NULL,
-  `status` int(255) DEFAULT NULL,
-  `create_time` datetime DEFAULT NULL,
-  `update_time` datetime DEFAULT NULL,
-  `action_value` varchar(255) DEFAULT NULL,
-  `assert_type` int(11) DEFAULT NULL,
-  `assert_value` varchar(255) DEFAULT NULL,
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `status` int(20) DEFAULT NULL,
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `action_value` varchar(20) DEFAULT NULL,
+  `assert_type` varchar(10) DEFAULT NULL,
+  `assert_value` varchar(20) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------
 -- Records of web_case_step
 -- ----------------------------
-INSERT INTO `web_case_step` VALUES ('2', '1', '打开网址', '10', 'OPENURL', null, '0', null, null, 'http://testcrm.qyhnet.com/user/login', null, null, '1');
-INSERT INTO `web_case_step` VALUES ('2', '2', '文本输入', '15', 'INPUT', '1', '0', null, null, 'dujun', null, null, '2');
-INSERT INTO `web_case_step` VALUES ('2', '3', '强制等待', '17', 'SLEEP', null, '0', null, null, '3000', null, null, '3');
+INSERT INTO `web_case_step` VALUES ('1', '2', '1', '打开网址', '10', 'OPENURL', null, '0', null, null, 'http://testcrm.qyhne', null, null);
+INSERT INTO `web_case_step` VALUES ('2', '2', '2', '文本输入', '15', 'INPUT', '1', '0', null, null, 'dujun', null, null);
+INSERT INTO `web_case_step` VALUES ('3', '2', '3', '强制等待', '17', 'SLEEP', null, '0', null, null, '3000', null, null);
+INSERT INTO `web_case_step` VALUES ('9', '4', '1', '点击元素', '39', 'click', '4', '0', '2022-07-07 17:04:13', '2022-07-07 17:04:13', '', '', '');
+INSERT INTO `web_case_step` VALUES ('10', '4', '2', '点击元素', '39', 'click', '5', '0', '2022-07-07 17:39:58', '2022-07-07 17:39:58', '', null, null);
+INSERT INTO `web_case_step` VALUES ('13', '4', '6', '点击元素', '39', 'click', '8', '0', '2022-07-07 17:40:45', '2022-07-07 17:40:45', '', null, null);
+INSERT INTO `web_case_step` VALUES ('14', '4', '7', '点击元素', '39', 'click', '9', '0', '2022-07-07 17:40:45', '2022-07-07 17:40:45', '', null, null);
+INSERT INTO `web_case_step` VALUES ('15', '4', '4', '元素输入', '40', 'input', '6', '0', '2022-07-08 14:31:57', '2022-07-08 14:31:57', '17637898368', null, null);
+INSERT INTO `web_case_step` VALUES ('16', '4', '5', '元素输入', '40', 'input', '7', '0', '2022-07-08 14:32:49', '2022-07-08 14:32:49', 'qwer12345', null, null);
+INSERT INTO `web_case_step` VALUES ('17', '4', '8', '线程等待', '29', 'SLEEP', null, '0', '2022-07-08 17:46:06', '2022-07-08 17:46:06', '3000', null, null);
+INSERT INTO `web_case_step` VALUES ('18', '4', '7', 'toast捕捉', '34', 'catch_toast', null, '0', '2022-07-08 17:46:26', '2022-07-08 17:46:26', '请输入正确的手机号或密码', null, null);
 
 -- ----------------------------
 -- Table structure for web_page
@@ -577,13 +666,20 @@ DROP TABLE IF EXISTS `web_page`;
 CREATE TABLE `web_page` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) DEFAULT NULL,
-  `parent_id` int(11) DEFAULT NULL,
+  `parent_id` int(11) DEFAULT '0',
   `del_flag` int(255) NOT NULL DEFAULT '0',
+  `type` int(11) DEFAULT '1' COMMENT '1 WEB  2 App',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------
 -- Records of web_page
 -- ----------------------------
-INSERT INTO `web_page` VALUES ('1', 'CRM', '0', '0');
-INSERT INTO `web_page` VALUES ('2', '登录', '1', '0');
+INSERT INTO `web_page` VALUES ('1', 'CRM', '0', '0', '1');
+INSERT INTO `web_page` VALUES ('2', '登录', '1', '0', '1');
+INSERT INTO `web_page` VALUES ('6', '轻易花APP', '0', '0', '2');
+INSERT INTO `web_page` VALUES ('7', '登录', '6', '0', '2');
+INSERT INTO `web_page` VALUES ('8', '启动页', '7', '0', '2');
+INSERT INTO `web_page` VALUES ('9', '登录页', '7', '0', '2');
+INSERT INTO `web_page` VALUES ('10', '7', '3', '0', '1');
+INSERT INTO `web_page` VALUES ('11', '7', '10', '0', '1');
