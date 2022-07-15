@@ -5,9 +5,9 @@ package com.dujun.springboot.common.selenium;
  */
 public enum WebAssertType {
 
-    titleIs("页面标题"),
-    urlIs("页面地址"),
-    toastAssert("toast断言");
+    TITLEIS("页面标题"),
+    URLIS("页面地址"),
+    TOASTASSERT("toast断言");
 
 
     private final String describe;

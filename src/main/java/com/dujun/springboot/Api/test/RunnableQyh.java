@@ -23,13 +23,13 @@ public class RunnableQyh implements Runnable{
     @Override
     public void run() {
         String phone = RandomValue.getTel();
-        Qyh qyh = new Qyh("18397858213");
+        Qyh qyh = new Qyh(phone);
         String city = RandomValue.getAddress();
-        HashMap<String,Object> payload = ApiOrderData.qyh_applyData("南阳市");
+        HashMap<String,Object> payload = ApiOrderData.qyh_applyData("北京市");
         CompletableFuture<String> completableFuture = CompletableFuture.supplyAsync(()->{
                 JSONObject jsonObject = qyh.fillForm(JSON.toJSONString(payload));
                 System.out.println(jsonObject);
-                log.debug(jsonObject);
+            log.debug(jsonObject);
                 return "";
             });
         try {

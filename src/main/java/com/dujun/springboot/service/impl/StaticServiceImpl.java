@@ -34,15 +34,14 @@ public class StaticServiceImpl implements StaticService {
     @Resource
     private StaticMapper staticMapper;
 
-
     @Override
     public Result<HomeStatics> home() {
         // 获取api接口自动化执行数据
         ApiAutoStatics apiAutoStatics = new ApiAutoStatics();
         apiAutoStatics.setApiCount(staticMapper.apiCount());
         apiAutoStatics.setNewApiCount(staticMapper.newApiCount(dateTools.currentDay(-7)));
-        apiAutoStatics.setCaseCount(staticMapper.caseCount("case_category"));
-        apiAutoStatics.setNewCaseCount(staticMapper.newCaseCount("case_category",dateTools.currentDay(-7)));
+        apiAutoStatics.setCaseCount(staticMapper.ApiCaseCount("case_category"));
+        apiAutoStatics.setNewCaseCount(staticMapper.newApiCaseCount("case_category",dateTools.currentDay(-7)));
         apiAutoStatics.setPlanCount(staticMapper.planCount(0));
         apiAutoStatics.setNewPlanCount(staticMapper.newPlanCount(dateTools.currentDay(-7),0));
         apiAutoStatics.setClockCount(staticMapper.clockCount(0));
@@ -51,28 +50,20 @@ public class StaticServiceImpl implements StaticService {
         StaticPlan rate = staticMapper.planRate(0);
         if (rate.getPlanCount() != 0){
             DecimalFormat df = new DecimalFormat("0.00");
-
             double failed = rate.getFailed() / rate.getPlanCount();
-            failed = Double.parseDouble(df.format(failed*100));
-
             double success = 1 - failed;
+            failed = Double.parseDouble(df.format(failed*100));
             success = Double.parseDouble(df.format(success*100));
-
-//            BigDecimal f = new BigDecimal(String.valueOf(failed));
-//            BigDecimal slat = new BigDecimal(String.valueOf(100));
-
             apiAutoStatics.setSuccessRatio(success);
-//            apiAutoStatics.setFailedRatio(f.multiply(slat).doubleValue());
             apiAutoStatics.setFailedRatio(failed);
-
         }
 
         // 获取Web自动化执行数据
         ApiAutoStatics webStatics = new ApiAutoStatics();
         // 用例数
-        webStatics.setCaseCount(staticMapper.caseCount("ui_web_case"));
+        webStatics.setCaseCount(staticMapper.caseCount("ui_web_case",1));
         // 本周新增用例数
-        webStatics.setNewCaseCount(staticMapper.newCaseCount("ui_web_case",dateTools.currentDay(-7)));
+        webStatics.setNewCaseCount(staticMapper.newCaseCount("ui_web_case",dateTools.currentDay(-7),1));
         // 测试计划总数
         webStatics.setPlanCount(staticMapper.planCount(1));
         // 本周新增测试计划数
@@ -86,17 +77,11 @@ public class StaticServiceImpl implements StaticService {
         StaticPlan webRate = staticMapper.planRate(1);
         if (webRate.getPlanCount() != 0){
             DecimalFormat df = new DecimalFormat("0.00");
-
             double failed = webRate.getFailed() / webRate.getPlanCount();
-            failed = Double.parseDouble(df.format(failed*100));
-//            BigDecimal f = new BigDecimal(String.valueOf(failed));
-//            BigDecimal slat = new BigDecimal(String.valueOf(100));
-
             double success = 1 - failed;
+            failed = Double.parseDouble(df.format(failed*100));
             success = Double.parseDouble(df.format(success*100));
-
             webStatics.setSuccessRatio(success);
-//            webStatics.setFailedRatio(f.multiply(slat).doubleValue());
             webStatics.setFailedRatio(failed);
         }
 
@@ -104,7 +89,47 @@ public class StaticServiceImpl implements StaticService {
         HomeStatics homeStatics = new HomeStatics();
         homeStatics.setApiAutoStatics(apiAutoStatics);
         homeStatics.setWebAutoStatics(webStatics);
+        homeStatics.setAppAutoStatics(appStatic());
         return Result.success(homeStatics);
+    }
+
+    /**
+     * App首页用例数据统计
+     * @return ApiAutoStatics
+     */
+    public ApiAutoStatics appStatic(){
+        // 获取APP自动化执行数据
+        ApiAutoStatics appStatics = new ApiAutoStatics();
+        // 页面元素数
+        appStatics.setApiCount(staticMapper.pageElement(2));
+        // 本周新增页面数
+        appStatics.setNewApiCount(staticMapper.newPageElement(2,dateTools.currentDay(-7)));
+        // 用例数
+        appStatics.setCaseCount(staticMapper.caseCount("ui_web_case",2));
+        // 本周新增用例数
+        appStatics.setNewCaseCount(staticMapper.newCaseCount("ui_web_case",dateTools.currentDay(-7),2));
+        // 测试计划总数
+        appStatics.setPlanCount(staticMapper.planCount(2));
+        // 本周新增测试计划数
+        appStatics.setNewPlanCount(staticMapper.newPlanCount(dateTools.currentDay(-7),2));
+        // 定时计划总数
+        appStatics.setClockCount(staticMapper.clockCount(2));
+        // 定时计划执行总数
+        appStatics.setClockExecCount(staticMapper.clockExecCount(2));
+
+        // 计算Web计划执行成功率数据
+        StaticPlan appRate = staticMapper.planRate(2);
+        if (appRate.getPlanCount() != 0){
+            DecimalFormat df = new DecimalFormat("0.00");
+            double failed = appRate.getFailed() / appRate.getPlanCount();
+            double success = 1 - failed;
+            failed = Double.parseDouble(df.format(failed*100));
+            success = Double.parseDouble(df.format(success*100));
+            appStatics.setSuccessRatio(success);
+            appStatics.setFailedRatio(failed);
+        }
+
+        return appStatics;
     }
 
     @Override

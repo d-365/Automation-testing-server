@@ -161,6 +161,7 @@ public class PlanResultServiceImpl extends ServiceImpl<PlanResultMapper, PlanRes
 
         }
         planResultReport.setCaseRunResult((ArrayList<PlanResultDetail>) caseList);
+
         // 封装计划执行详情信息
         return Result.success(planResultReport);
     }

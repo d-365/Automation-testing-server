@@ -7,7 +7,9 @@
 package com.dujun.springboot.common.appium;
 
 import com.alibaba.fastjson.JSONObject;
+import com.dujun.springboot.VO.AssertConsole;
 import com.dujun.springboot.VO.UIConsole;
+import com.dujun.springboot.common.selenium.WebAssertType;
 import com.dujun.springboot.entity.AppConfig;
 import com.dujun.springboot.entity.MobilePhone;
 import com.dujun.springboot.entity.PageElement;
@@ -35,6 +37,9 @@ import static com.dujun.springboot.common.selenium.runWebPlan.portStart;
 @Component
 @Log4j2
 public class AppUtils {
+
+    @Resource
+    private CaseStepAssert caseAssert;
 
     @Resource
     private WebCaseStepMapper webCaseStepMapper;
@@ -167,5 +172,34 @@ public class AppUtils {
         }
         return driver;
     }
+
+    /**
+     * 执行断言操作
+     * @param driver AppiumDriver
+     * @param caseStep 用例步骤
+     * @return 断言结果
+     */
+    public AssertConsole execStepAssert(AppiumDriver driver, WebCaseStep caseStep){
+        AssertConsole assertConsole = new AssertConsole();
+        WebAssertType assertType;
+        try {
+            assertType = WebAssertType.valueOf(caseStep.getAssertType().trim().toUpperCase());
+            if (caseStep.getAssertValue()==null){
+                assertConsole.setMsg("断言的预期值不能为空");
+                assertConsole.setResult(false);
+            }else {
+                caseAssert.execAction(assertType,driver,caseStep,assertConsole);
+            }
+        }catch (Exception e){
+            assertConsole.setMsg("断言方式不存在");
+            assertConsole.setResult(false);
+        }
+        assertConsole.setExpectValue(caseStep.getAssertValue());
+        assertConsole.setAssertType(caseStep.getAssertType());
+        assertConsole.setStepId(caseStep.getId());
+        return assertConsole;
+    }
+
+
 
 }

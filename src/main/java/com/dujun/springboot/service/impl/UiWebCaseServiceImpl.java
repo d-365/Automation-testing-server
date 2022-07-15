@@ -18,6 +18,7 @@ import com.dujun.springboot.mapper.WebCaseStepMapper;
 import com.dujun.springboot.service.UiWebCaseService;
 import com.google.gson.JsonObject;
 import io.appium.java_client.AppiumDriver;
+import org.omg.CORBA.OBJ_ADAPTER;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
@@ -209,9 +211,9 @@ public class UiWebCaseServiceImpl extends ServiceImpl<UiWebCaseMapper, UiWebCase
                     if (driver!=null){
                         // 执行APP用例
                         log.debug("-----------------开始执行APP用例------------------");
-                        Future<List<UIConsole>> future = executor.submit(new ExecAppCase(caseId,driver));
+                        Future<HashMap<String, Object>> future = executor.submit(new ExecAppCase(caseId,driver));
                         try {
-                            consoles = future.get();
+                            consoles = (List<UIConsole>) future.get().get("result");
                             log.debug("----------------------------"+ consoles+"----------------------------");
                             driver.quit();
                             return Result.success(consoles);

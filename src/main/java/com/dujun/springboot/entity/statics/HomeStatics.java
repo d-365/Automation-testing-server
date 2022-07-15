@@ -20,7 +20,7 @@ public class HomeStatics {
     private ApiAutoStatics webAutoStatics;
 
     // App自动化统计
-    private String AppAutoStatics;
+    private ApiAutoStatics AppAutoStatics;
 
 
 }

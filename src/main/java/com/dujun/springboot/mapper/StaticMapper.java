@@ -20,11 +20,17 @@ public interface StaticMapper {
     @Select("SELECT COUNT(*) FROM category_api  WHERE source_type = 2 AND create_time > #{day};")
     int newApiCount(String day);
 
+    @Select("SELECT COUNT(*) FROM ${tableName}  WHERE type = 1 and case_type =#{caseType};")
+    int caseCount(String tableName,@Param("caseType") Integer caseType);
+
     @Select("SELECT COUNT(*) FROM ${tableName}  WHERE type = 1;")
-    int caseCount(String tableName);
+    int ApiCaseCount(String tableName);
+
+    @Select("SELECT COUNT(*)  FROM ${tableName}   WHERE type = 1 AND create_time > #{day} AND case_type = #{caseType};")
+    int newCaseCount(@Param("tableName")String tableName,@Param("day") String day,@Param("caseType") Integer caseType);
 
     @Select("SELECT COUNT(*)  FROM ${tableName}   WHERE type = 1 AND create_time > #{day};")
-    int newCaseCount(@Param("tableName")String tableName,@Param("day") String day);
+    int newApiCaseCount(@Param("tableName")String tableName,@Param("day") String day);
 
     @Select("SELECT COUNT(*) FROM run_plan where plan_type = #{planType};")
     int planCount(Integer planType);
@@ -40,6 +46,13 @@ public interface StaticMapper {
 
     StaticPlan planRate(Integer planType);
 
+    // 页面元素总数
+    @Select("SELECT COUNT(id) FROM page_element WHERE type = #{type};")
+    int pageElement(@Param("type") Integer type);
+
+    // 本周新增页面元素总数
+    @Select("SELECT COUNT(id) FROM page_element WHERE type = #{type} and create_time > #{day};")
+    int newPageElement(@Param("type") Integer type,@Param("day") String day);
 
     // 查询当天自动化成功数
     @Select("SELECT sum(case_success_count) as count  FROM plan_result WHERE start_time LIKE '${today}%' and plan_type = #{planType};")

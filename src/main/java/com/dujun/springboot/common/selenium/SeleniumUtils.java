@@ -101,14 +101,14 @@ public class SeleniumUtils {
         }
 
         switch (assertType){
-            case urlIs:
+            case URLIS:
                 String driverUrl = MySelenium.getCurrentUrl(driver);
                 if (Objects.equals(driverUrl, assertValue)){
                     result = true;
                 }
                 assertConsole.setRealityValue(driverUrl);
                 break;
-            case titleIs:
+            case TITLEIS:
                 String driverTitle = MySelenium.getTitle(driver);
                 if (Objects.equals(driverTitle, assertValue)){
                     result = true;

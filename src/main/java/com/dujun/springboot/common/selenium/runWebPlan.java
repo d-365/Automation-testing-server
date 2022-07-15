@@ -147,7 +147,6 @@ public class  runWebPlan implements Callable<String> {
                     planResultDetail.setAssertResult(assertMsg);
                     planResultDetailMapper.insert(planResultDetail);
                 }
-
             }
 
         }catch (Exception e){
@@ -264,7 +263,7 @@ public class  runWebPlan implements Callable<String> {
                 String gridPath = path +"static"+File.separator+"data"+File.separator+"selenium-server-4.1.3.jar";
                 File file = new File(gridPath);
                 System.out.println(file.getAbsolutePath());
-                cmdTaskUtils.execCommand(String.format("java -jar %s standalone",file.getAbsolutePath()));
+                cmdTaskUtils.execCommand(String.format("cmd /k start java -jar %s standalone",file.getAbsolutePath()));
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }

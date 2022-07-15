@@ -287,5 +287,22 @@ public class AppiumApi {
         return element.isDisplayed();
     }
 
+    /**
+     * 获取当前页面标题
+     * @param driver AppiumDriver
+     * @return 页面标题
+     */
+    public static String getTitle(AppiumDriver driver){
+        return driver.getTitle();
+    }
+
+    /**
+     * 获取当前页面URL
+     * @param driver AppiumDriver
+     * @return 当前页面URL
+     */
+    public static String getUrl(AppiumDriver driver){
+        return driver.getCurrentUrl();
+    }
 
 }

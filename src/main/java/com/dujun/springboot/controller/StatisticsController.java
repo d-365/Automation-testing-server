@@ -22,8 +22,8 @@ public class StatisticsController {
     @Autowired
     private StaticServiceImpl staticService;
 
-    /*
-      首页数据汇总
+    /**
+     *首页数据汇总
      */
     @GetMapping("/home")
     public Result<HomeStatics> homeStatics(){

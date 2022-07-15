@@ -17,7 +17,6 @@ spring:
           url: jdbc:mysql://121.40.229.114:3306/tester_plat?useUnicode=true&useSSL=false&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
           username: dujun
           password: test1997
-
       druid:
         test-on-borrow: true
         test-while-idle: true

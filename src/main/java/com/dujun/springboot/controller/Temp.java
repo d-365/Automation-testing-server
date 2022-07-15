@@ -7,6 +7,9 @@
 package com.dujun.springboot.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import com.dujun.springboot.common.appium.AppiumApi;
+import io.appium.java_client.AppiumDriver;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -46,6 +49,13 @@ public class Temp {
         param.put("code", 1);
         param.put("msg", "success");
         return param.toJSONString();
+    }
+
+    @GetMapping("/1")
+    public String data(){
+        AppiumDriver driver = null;
+        driver.quit();
+        return "";
     }
 
 

@@ -6,12 +6,9 @@
 
 package com.dujun.springboot.VO;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import javax.security.auth.message.callback.PrivateKeyCallback;
 
 /**
  * 断言控制台
