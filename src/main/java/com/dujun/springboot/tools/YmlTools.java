@@ -8,6 +8,7 @@ package com.dujun.springboot.tools;
 
 import org.springframework.core.io.ClassPathResource;
 import org.yaml.snakeyaml.Yaml;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
@@ -15,10 +16,6 @@ import java.util.Map;
 public class YmlTools {
 
     Map properties;
-
-    public YmlTools(){
-
-    }
 
     public YmlTools(String filePath){
         InputStream inputStream = null;
@@ -45,12 +42,10 @@ public class YmlTools {
             return res == null ? defaultValue :(T) res;
         }
         // 下面肯定是取多个的情况
-        String finalValue = null;
         Object tempObject = properties;
         for (int i = 0; i < separatorKeys.length; i++) {
             //如果是user[0].path这种情况,则按list处理
             String innerKey = separatorKeys[i];
-
             Map<String, Object> mapTempObj = (Map) tempObject;
             Object object = mapTempObj.get(innerKey);
             // 如果没有对应的配置项,则返回设置的默认值
@@ -64,7 +59,6 @@ public class YmlTools {
                 //循环结束
                 return (T) targetObj;
             }
-
         }
         return null;
     }
@@ -72,7 +66,8 @@ public class YmlTools {
 
     public static void main(String[] args) {
         YmlTools ymlTools = new YmlTools("globalConfig.yml");
-        Object s = ymlTools.getValueByKey("redis.test.qyh","");
+        Object s = ymlTools.getValueByKey("online.report.address", "");
+        System.out.println(s);
 
     }
 

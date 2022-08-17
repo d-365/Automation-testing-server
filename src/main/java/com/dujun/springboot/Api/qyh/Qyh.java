@@ -27,7 +27,7 @@ public class Qyh {
     private String token = "";
     public static MysqlTools mysqlTools = new MysqlTools();
     private final String phone;
-    public final request request = new request();
+    public request request = new request();
 
     public Qyh (String phone){
         this.phone = phone;

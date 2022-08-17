@@ -24,7 +24,7 @@ public class qyh_mock {
     @Test
     public void test_apply() {
         ExecutorService es = Executors.newCachedThreadPool();
-        for (int i = 0; i < 2000; i++) {
+        for (int i = 0; i < 1; i++) {
             es.submit(new RunnableQyh());
         }
         es.shutdown();
@@ -37,13 +37,14 @@ public class qyh_mock {
         }
     }
 
+
     @Test
     public void crm_init() {
         // 新建公司+ 公司主账户
         MysqlTools mysqlTools = new MysqlTools();
-        for (int i =0;i<1;i++){
-            data_init(mysqlTools);
-//            crm_addAdvertising(mysqlTools);
+        for (int i =0;i<1;i++) {
+//            data_init(mysqlTools);
+            crm_addAdvertising(mysqlTools);
         }
         // 更新账户余额
         String sql = "UPDATE qyh.crm_company_account SET total_money = 5000 , recharge_money = 2500 ,free_money = 2500;";
@@ -145,8 +146,6 @@ public class qyh_mock {
             e.printStackTrace();
         }
     }
-
-
 
     @Test
     public void weight(){

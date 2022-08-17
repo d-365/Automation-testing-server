@@ -18,6 +18,7 @@ import com.dujun.springboot.utils.BeanContext;
 import io.appium.java_client.AppiumDriver;
 import lombok.extern.log4j.Log4j2;
 import org.openqa.selenium.remote.DesiredCapabilities;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -42,17 +43,17 @@ public class ExecAppPlan implements Callable<String> {
     }
 
     @Override
-    public String call() throws Exception {
+    public String call() {
         int caseSuccess = 0;
         int caseFailed = 0;
-        log.debug(String.format("-----------------------开始执行APP测试计划%s--------------------",plan.getId()));
+        log.debug(String.format("-----------------------开始执行APP测试计划%s--------------------", plan.getId()));
         // 获取DesiredCapabilities配置信息
-        DesiredCapabilities desiredCapabilities = appUtils.getDesiredCapabilities(plan.getAppId(),execPhone.getId());
+        DesiredCapabilities desiredCapabilities = appUtils.getDesiredCapabilities(plan.getAppId(), execPhone.getId());
         // 获取AppiumDriver
-        AppiumDriver driver = appUtils.getDriver(desiredCapabilities);
+        AppiumDriver driver = appUtils.getDriver("", desiredCapabilities);
         // 获取-执行-测试用例
         try {
-            if (driver!=null){
+            if (driver != null) {
                 // 1 计划执行前-初始化动作
                 // 1.1  手机状态变更（使用中）
                 execPhone.setStatus(2);
@@ -137,7 +138,6 @@ public class ExecAppPlan implements Callable<String> {
             }
             log.debug("----------------------测试计划执行完毕，关闭AppiumDriver---------------------------");
         }
-
         return "执行完毕";
 
     }

@@ -1,7 +1,5 @@
 package com.dujun.springboot.utils;
 
-import com.mysql.cj.x.protobuf.MysqlxDatatypes;
-
 import javax.activation.DataHandler;
 import javax.activation.FileDataSource;
 import javax.mail.*;
@@ -9,9 +7,7 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import java.io.File;
-import java.text.Normalizer;
 import java.util.Properties;
-import java.util.Scanner;
 
 /**
  * author     : dujun

@@ -13,12 +13,20 @@ public enum AppActionEnum {
     SWITCH_TO_NATIVE("切换到原生视图"),
     CLICK("点击元素"),
     INPUT("文本输入"),
-    ;
+    CLEAR("文本清除"),
+    SWIPE_TOP("向上滑动"),
+    SWIPE_BOTTOM("向下滑动"),
+    SWIPE_LEFT("向左滑动"),
+    SWIPE_RIGHT("向右滑动"),
+    TAP_CLICK("使用界面坐标（比例系数）进行定位点击"),
+    EXECJS("执行JS命令");
 
     private final String describe;
+
     public String getDescribe() {
         return describe;
     }
+
     AppActionEnum(String describe) {
         this.describe = describe;
     }

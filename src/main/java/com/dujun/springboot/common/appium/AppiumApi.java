@@ -13,12 +13,17 @@ import io.appium.java_client.android.nativekey.AndroidKey;
 import io.appium.java_client.android.nativekey.KeyEvent;
 import io.appium.java_client.ios.IOSDriver;
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.touch.TouchActions;
+import org.openqa.selenium.interactions.PointerInput;
+import org.openqa.selenium.interactions.Sequence;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+
 import java.net.URL;
+import java.time.Duration;
+import java.util.Collections;
 import java.util.Set;
 
 public class AppiumApi {
@@ -61,8 +66,8 @@ public class AppiumApi {
     public static WebElement ById(AppiumDriver driver, String id,MyExpected expected){
         WebElement element = null;
         try {
-            element = new WebDriverWait(driver,5).until(MyExpectedConditions.run(By.id(id),expected));
-        }catch (Exception e){
+            element = new WebDriverWait(driver, 5).until(MyExpectedConditions.run(By.id(id), expected));
+        } catch (TimeoutException e) {
             e.printStackTrace();
         }
         return element;
@@ -77,8 +82,8 @@ public class AppiumApi {
     public static WebElement ById (AppiumDriver driver,String id){
         WebElement element = null;
         try {
-            element = new WebDriverWait(driver,5).until(ExpectedConditions.visibilityOfElementLocated(By.id(id)));
-        }catch (Exception e){
+            element = new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOfElementLocated(By.id(id)));
+        } catch (TimeoutException e) {
             e.printStackTrace();
         }
         return element;
@@ -94,8 +99,8 @@ public class AppiumApi {
     public static WebElement ByXpath(AppiumDriver driver, String xpath,MyExpected expected){
         WebElement element = null;
         try {
-            element = new WebDriverWait(driver,3).until(MyExpectedConditions.run(By.xpath(xpath),expected));
-        }catch (Exception e){
+            element = new WebDriverWait(driver, 3).until(MyExpectedConditions.run(By.xpath(xpath), expected));
+        } catch (TimeoutException e) {
             e.printStackTrace();
         }
         return element;
@@ -110,8 +115,8 @@ public class AppiumApi {
     public static WebElement ByXpath (AppiumDriver driver,String xpath){
         WebElement element = null;
         try {
-            element = new WebDriverWait(driver,5).until(ExpectedConditions.visibilityOfElementLocated(By.xpath(xpath)));
-        }catch (Exception e){
+            element = new WebDriverWait(driver, 5).until(ExpectedConditions.presenceOfElementLocated(By.xpath(xpath)));
+        } catch (TimeoutException e) {
             e.printStackTrace();
         }
         return element;
@@ -127,8 +132,8 @@ public class AppiumApi {
     public static WebElement ElementLocation(AppiumDriver driver,By by ,MyExpected expected){
         WebElement element = null;
         try {
-            element = new WebDriverWait(driver,3).until(MyExpectedConditions.run(by,expected));
-        }catch (Exception e){
+            element = new WebDriverWait(driver, 3).until(MyExpectedConditions.run(by, expected));
+        } catch (TimeoutException e) {
             e.printStackTrace();
         }
         return element;
@@ -137,17 +142,21 @@ public class AppiumApi {
     /**
      * 获取WebElement元素 -- 万能 ExpectedConditions
      */
-    public static WebElement findElement(AppiumDriver driver, String conditions, By by){
+    public static WebElement findElement(AppiumDriver driver, String conditions, By by) {
         WebElement element = null;
         MyConditions myConditions = MyConditions.valueOf(conditions.trim());
-        switch (myConditions){
-            case elementToBeClickable:
-                element = new WebDriverWait(driver, 3).until(ExpectedConditions.elementToBeClickable(by));
-                break;
-            case visibilityOfElementLocated:
-            default:
-                element = new WebDriverWait(driver, 3).until(ExpectedConditions.visibilityOfElementLocated(by));
-                break;
+        try {
+            switch (myConditions) {
+                case elementToBeClickable:
+                    element = new WebDriverWait(driver, 3).until(ExpectedConditions.elementToBeClickable(by));
+                    break;
+                case visibilityOfElementLocated:
+                default:
+                    element = new WebDriverWait(driver, 3).until(ExpectedConditions.visibilityOfElementLocated(by));
+                    break;
+            }
+        } catch (TimeoutException e) {
+            e.printStackTrace();
         }
         return element;
     }
@@ -178,33 +187,93 @@ public class AppiumApi {
 
     /**
      * 元素输入
+     *
      * @param element WebElement
      */
-    public static void send_keys(WebElement element,String... code) {
+    public static void send_keys(WebElement element, String... code) {
         element.sendKeys(code);
     }
 
     /**
-     * 向左滑动
+     * 向上滑动
+     *
      * @param driver AppiumDriver
      */
-    public void swipe_left(AppiumDriver driver){
-        Integer width = driver.manage().window().getSize().width;
-        Integer height = driver.manage().window().getSize().height;
-        TouchActions action = new TouchActions(driver);
+    public static void swipe_top(AppiumDriver driver) {
+        int width = driver.manage().window().getSize().width;
+        int height = driver.manage().window().getSize().height;
+        PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
+        Sequence dragNDrop = new Sequence(finger, 1);
+        dragNDrop.addAction(finger.createPointerMove(Duration.ofMillis(0), PointerInput.Origin.viewport(), width / 2, height / 2));
+        dragNDrop.addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
+        dragNDrop.addAction(finger.createPointerMove(Duration.ofMillis(700), PointerInput.Origin.viewport(), width / 2, 0));
+        dragNDrop.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
+        driver.perform(Collections.singletonList(dragNDrop));
+    }
+
+    /**
+     * 向下滑动
+     *
+     * @param driver AppiumDriver
+     */
+    public static void swipe_bottom(AppiumDriver driver) {
+        int width = driver.manage().window().getSize().width;
+        int height = driver.manage().window().getSize().height;
+        PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
+        Sequence dragNDrop = new Sequence(finger, 1);
+        dragNDrop.addAction(finger.createPointerMove(Duration.ofMillis(0), PointerInput.Origin.viewport(), width / 2, height / 2));
+        dragNDrop.addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
+        dragNDrop.addAction(finger.createPointerMove(Duration.ofMillis(700), PointerInput.Origin.viewport(), width / 2, height));
+        dragNDrop.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
+        driver.perform(Collections.singletonList(dragNDrop));
+    }
+
+    /**
+     * 向左滑动
+     *
+     * @param driver AppiumDriver
+     */
+    public static void swipe_left(AppiumDriver driver) {
+        int width = driver.manage().window().getSize().width;
+        int height = driver.manage().window().getSize().height;
+        PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
+        Sequence dragNDrop = new Sequence(finger, 1);
+        dragNDrop.addAction(finger.createPointerMove(Duration.ofMillis(0), PointerInput.Origin.viewport(), width / 2, height / 2));
+        dragNDrop.addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
+        dragNDrop.addAction(finger.createPointerMove(Duration.ofMillis(700), PointerInput.Origin.viewport(), 0, height / 2));
+        dragNDrop.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
+        driver.perform(Collections.singletonList(dragNDrop));
+    }
+
+    /**
+     * 向右滑动
+     *
+     * @param driver AppiumDriver
+     */
+    public static void swipe_right(AppiumDriver driver) {
+        int width = driver.manage().window().getSize().width;
+        int height = driver.manage().window().getSize().height;
+        PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
+        Sequence dragNDrop = new Sequence(finger, 1);
+        dragNDrop.addAction(finger.createPointerMove(Duration.ofMillis(0), PointerInput.Origin.viewport(), 0, height / 2));
+        dragNDrop.addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
+        dragNDrop.addAction(finger.createPointerMove(Duration.ofMillis(700), PointerInput.Origin.viewport(), width / 2, height));
+        dragNDrop.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
+        driver.perform(Collections.singletonList(dragNDrop));
     }
 
     /**
      * 捕捉toast提示
-     * @param driver  AppiumDriver
+     *
+     * @param driver AppiumDriver
      * @return String
      */
-    public static String catch_toast(AppiumDriver driver){
+    public static String catch_toast(AppiumDriver driver) {
         String message = "//*[@class='android.widget.Toast']";
         try {
-            WebElement element = driver.findElement(By.xpath(message));
+            WebElement element = new WebDriverWait(driver, 5).until(ExpectedConditions.presenceOfElementLocated(By.xpath(message)));
             return element.getText();
-        }catch (Exception e){
+        } catch (TimeoutException e) {
             e.printStackTrace();
         }
         return "";
@@ -216,29 +285,35 @@ public class AppiumApi {
      * @return String
      */
     public static String catch_toast(AppiumDriver driver,String text){
-        String messages = String.format("//*[contains(@text,'%1$s')]",text);
+        String messages = String.format("//*[contains(@text,'%1$s')]", text);
         try {
-            WebElement element = driver.findElement(By.xpath(messages));
+            WebElement element = new WebDriverWait(driver, 5).until(ExpectedConditions.presenceOfElementLocated(By.xpath(messages)));
             return element.getText();
-        }catch (Exception e){
+        } catch (TimeoutException e) {
             e.printStackTrace();
         }
         return "";
     }
 
     /**
-     * 坐标定位
+     * 根据界面坐标点击元素
+     *
      * @param driver 1
-     * @param pointX 2
-     * @param pointY 3
+     * @param pointX 横坐标比例系数（X实际坐标 / 手机x轴长度）
+     * @param pointY 纵坐标比例系数 （Y实际坐标 / 手机Y轴长度）
      */
-    public static  void byRelative(AppiumDriver driver,Integer pointX, Integer pointY){
-        Integer width = driver.manage().window().getSize().width;
-        Integer height = driver.manage().window().getSize().height;
-        // 比例系数
-        Integer x = pointX / width;
-        Integer y = pointY / height;
-
+    public static void TapClick(AppiumDriver driver, Double pointX, Double pointY) {
+        int width = driver.manage().window().getSize().width;
+        int height = driver.manage().window().getSize().height;
+        // 实际坐标
+        int x = (int) (pointX * width);
+        int y = (int) (pointY * height);
+        PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
+        Sequence dragNDrop = new Sequence(finger, 1);
+        dragNDrop.addAction(finger.createPointerMove(Duration.ofMillis(0), PointerInput.Origin.viewport(), x, y));
+        dragNDrop.addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
+        dragNDrop.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
+        driver.perform(Collections.singletonList(dragNDrop));
     }
 
     /**
@@ -292,17 +367,37 @@ public class AppiumApi {
      * @param driver AppiumDriver
      * @return 页面标题
      */
-    public static String getTitle(AppiumDriver driver){
+    public static String getTitle(AppiumDriver driver) {
         return driver.getTitle();
     }
 
     /**
      * 获取当前页面URL
+     *
      * @param driver AppiumDriver
      * @return 当前页面URL
      */
-    public static String getUrl(AppiumDriver driver){
+    public static String getUrl(AppiumDriver driver) {
         return driver.getCurrentUrl();
+    }
+
+    /**
+     * 清除文本元素
+     *
+     * @param element WebElement
+     */
+    public static void clear(WebElement element) {
+        element.clear();
+    }
+
+    /**
+     * 执行JS脚本
+     *
+     * @param driver  AppiumDriver
+     * @param command JS命令
+     */
+    public static void execJs(AppiumDriver driver, String command){
+        driver.execute(command);
     }
 
 }

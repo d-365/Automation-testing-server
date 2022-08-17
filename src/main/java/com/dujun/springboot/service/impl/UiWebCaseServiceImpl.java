@@ -4,23 +4,22 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dujun.springboot.VO.Result;
 import com.dujun.springboot.VO.UIConsole;
 import com.dujun.springboot.common.appium.AppUtils;
 import com.dujun.springboot.common.appium.ExecAppCase;
-import com.dujun.springboot.common.selenium.SeleniumUtils;
 import com.dujun.springboot.common.selenium.executeCases;
 import com.dujun.springboot.entity.UiWebCase;
 import com.dujun.springboot.entity.WebCaseStep;
 import com.dujun.springboot.mapper.UiWebCaseMapper;
 import com.dujun.springboot.mapper.WebCaseStepMapper;
 import com.dujun.springboot.service.UiWebCaseService;
-import com.google.gson.JsonObject;
+import com.dujun.springboot.utils.UserHttpAgentUtils;
 import io.appium.java_client.AppiumDriver;
-import org.omg.CORBA.OBJ_ADAPTER;
 import org.openqa.selenium.remote.DesiredCapabilities;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.testng.collections.Lists;
@@ -28,6 +27,7 @@ import org.testng.collections.Lists;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -62,7 +62,8 @@ public class UiWebCaseServiceImpl extends ServiceImpl<UiWebCaseMapper, UiWebCase
     public Result<?> caseList(Integer caseType) {
         LambdaQueryWrapper<UiWebCase> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(UiWebCase::getCaseType,caseType);
-        queryWrapper.eq(UiWebCase::getDelFlag,0);
+        queryWrapper.eq(UiWebCase::getDelFlag, 0);
+        queryWrapper.orderByDesc(UiWebCase::getCreateTime);
         // 查询所有的webCase
         List<UiWebCase> AllWebCases = webCaseMapper.selectList(queryWrapper);
         // 查找出所有一级菜单
@@ -70,7 +71,6 @@ public class UiWebCaseServiceImpl extends ServiceImpl<UiWebCaseMapper, UiWebCase
         for (UiWebCase parentCase : parentWebCase) {
             parentCase.setChildren(getChildren(parentCase.getId(),AllWebCases));
         }
-
         return Result.success(parentWebCase);
     }
 
@@ -105,11 +105,12 @@ public class UiWebCaseServiceImpl extends ServiceImpl<UiWebCaseMapper, UiWebCase
 
     // 获取用例步骤列表
     @Override
-    public Result<?> steps(Integer caseId) {
+    public Result<?> steps(Integer caseId, Integer current, Integer size) {
+        IPage<WebCaseStep> page = new Page<>(current, size);
         QueryWrapper<WebCaseStep> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("case_id",caseId);
+        queryWrapper.eq("case_id", caseId);
         queryWrapper.orderByAsc("sort");
-        List<WebCaseStep> webCaseSteps = webCaseStepMapper.selectList(queryWrapper);
+        IPage<WebCaseStep> webCaseSteps = webCaseStepMapper.selectPage(page, queryWrapper);
         return Result.success(webCaseSteps);
     }
 
@@ -195,39 +196,49 @@ public class UiWebCaseServiceImpl extends ServiceImpl<UiWebCaseMapper, UiWebCase
                     consoles = future.get();
                 } catch (Exception  e) {
                     e.printStackTrace();
-                    return Result.success("用例调试失败，请检查后重试");
+                    return Result.error("用例调试失败，请检查后重试");
                 }
-            }else if (type.equals("2")){
-                // 查询开启AppiumServer
-                boolean appiumStatus = appUtils.AppiumStart();
-                System.out.println("AppiumServer结果"+appiumStatus);
-                if (appiumStatus){
+            }else if (type.equals("2")) {
+                try {
+                    AppiumDriver driver;
+                    // 获取用例IP地址
+                    String userAddress = UserHttpAgentUtils.getUserRealIP(request);
+                    String localAddress = InetAddress.getLocalHost().getHostAddress();
                     // 获取对应的获取DesiredCapabilities配置信息
-                    String phoneId  = jsonObject.getString("phone");
+                    String phoneId = jsonObject.getString("phone");
                     String appConId = jsonObject.getString("app");
-                    DesiredCapabilities desiredCapabilities = appUtils.getDesiredCapabilities(Integer.valueOf(appConId),Integer.valueOf(phoneId));
-                    //  获取AppiumDriver
-                    AppiumDriver driver = appUtils.getDriver(desiredCapabilities);
-                    if (driver!=null){
+                    DesiredCapabilities desiredCapabilities = appUtils.getDesiredCapabilities(Integer.valueOf(appConId), Integer.valueOf(phoneId));
+
+                    // 服务端调试
+                    if (Objects.equals(userAddress, localAddress)) {
+                        // 查询开启AppiumServer
+                        log.debug("-------Appium服务端调试--------");
+                        boolean appiumStatus = appUtils.AppiumStart();
+                        if (appiumStatus) {
+                            //  获取AppiumDriver
+                            driver = appUtils.getDriver(userAddress, desiredCapabilities);
+                        } else {
+                            return Result.error("服务端AppiumServer启动失败");
+                        }
+                    } else {
+                        // 客户端调试
+                        log.debug("-------Appium客户端调试--------");
+                        driver = appUtils.getDriver(userAddress, desiredCapabilities);
+                    }
+                    if (driver != null) {
                         // 执行APP用例
                         log.debug("-----------------开始执行APP用例------------------");
-                        Future<HashMap<String, Object>> future = executor.submit(new ExecAppCase(caseId,driver));
-                        try {
-                            consoles = (List<UIConsole>) future.get().get("result");
-                            log.debug("----------------------------"+ consoles+"----------------------------");
-                            driver.quit();
-                            return Result.success(consoles);
-                        } catch (Exception  e) {
-                            e.printStackTrace();
-                            return Result.success("用例调试失败，请检查后重试");
-                        }
-                    }else {
-                        consoles.add(new UIConsole(1,"Appium连接Server失败"));
-                        return Result.success(consoles);
+                        Future<HashMap<String, Object>> future = executor.submit(new ExecAppCase(caseId, driver));
+                        HashMap<String, Object> result = future.get();
+                        log.debug("----------------------------App用例执行完毕----------------------------");
+                        driver.quit();
+                        return Result.success(result);
+                    } else {
+                        return Result.error("Appium连接Server失败");
                     }
-                }else {
-                    consoles.add(new UIConsole(1,"AppiumServer启动失败"));
-                    return Result.success(consoles);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return Result.error("Appium调试用例失败，请检查后重试");
                 }
             }
         }

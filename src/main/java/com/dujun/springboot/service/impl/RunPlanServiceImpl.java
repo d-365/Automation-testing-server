@@ -15,24 +15,23 @@ import com.dujun.springboot.mapper.*;
 import com.dujun.springboot.service.RunPlanService;
 import com.dujun.springboot.tools.RandomValue;
 import com.dujun.springboot.tools.StringTools;
+import com.dujun.springboot.tools.YmlTools;
 import com.dujun.springboot.tools.dateTools;
 import com.dujun.springboot.utils.MailTool;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.springframework.stereotype.Service;
+
 import javax.annotation.Resource;
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 /**
  * <p>
- *  计划执行服务实现类
+ * 计划执行服务实现类
  * </p>
  *
  * @author dujun
@@ -75,30 +74,16 @@ public class RunPlanServiceImpl extends ServiceImpl<RunPlanMapper, RunPlan> impl
     // 用例关联表
     private ApiCaseMapper apiCaseMapper;
 
-    //计划列表
-    @Override
-    public Result<List<RunPlan>> planList(RunPlan planFilter) {
-        String name = planFilter.getName();
-        String status = planFilter.getStatus();
-        Integer planType = planFilter.getPlanType();
-        QueryWrapper<RunPlan> queryWrapper = new QueryWrapper<>(null);
-        if (planType !=null){
-            queryWrapper.eq("plan_type",planType);
-        }
-        if(name != null){
-            queryWrapper.like("name",name);
-        }
-        if(status != null){
-            queryWrapper.eq("status",status);
-        }
-        List<RunPlan> planList = planInfoMapper.selectList(queryWrapper);
-        for (RunPlan plan : planList) {
-            int planId = plan.getId();
-            PlanParam planParam = paramMapper.byPlanId(planId);
-//            PlanParam planParam = paramMapper.selectOne(new QueryWrapper<PlanParam>().eq("plan_id",planId));
-            plan.setPlanParam(planParam);
-        }
-        return Result.success(planList);
+    // 计划运行完毕发送邮件
+    public static void planSendMail(RunPlan planInfo, Integer planResultId, int success, int failed) {
+        YmlTools ymlTools = new YmlTools("globalConfig.yml");
+        String reportAddress = ymlTools.getValueByKey("online.report.address", "");
+        String SendEmail = planInfo.getSendEmail();
+        String regex = "；|;";
+        String[] to = StringTools.split(SendEmail, regex);
+        String object = planInfo.getName() + "--自动化执行报告";
+        String context = String.format("执行成功数量: %1$s ,  <br/>执行失败数量: %2$s , <br/>详情请点击: <a href = '%3$s/#/web/report?id=%4$s'>查看详情<a/>", success, failed, reportAddress, planResultId);
+        MailTool.sendEmail(to, object, context);
     }
 
     // 删除计划
@@ -109,37 +94,63 @@ public class RunPlanServiceImpl extends ServiceImpl<RunPlanMapper, RunPlan> impl
         return Result.success();
     }
 
+    //计划列表
+    @Override
+    public Result<List<RunPlan>> planList(RunPlan planFilter) {
+        String name = planFilter.getName();
+        String status = planFilter.getStatus();
+        Integer planType = planFilter.getPlanType();
+        QueryWrapper<RunPlan> queryWrapper = new QueryWrapper<>(null);
+        queryWrapper.orderByDesc("create_time");
+        if (planType != null) {
+            queryWrapper.eq("plan_type", planType);
+        }
+        if (name != null) {
+            queryWrapper.like("name", name);
+        }
+        if (status != null) {
+            queryWrapper.eq("status", status);
+        }
+        List<RunPlan> planList = planInfoMapper.selectList(queryWrapper);
+        for (RunPlan plan : planList) {
+            int planId = plan.getId();
+            PlanParam planParam = paramMapper.byPlanId(planId);
+            plan.setPlanParam(planParam);
+        }
+        return Result.success(planList);
+    }
+
     // 新增修改计划
     @Override
-    public Result<?> update(RunPlan plan){
+    public Result<?> update(RunPlan plan) {
         PlanParam planParam = plan.getPlanParam();
-        if(plan.getId() == null){
+        if (plan.getId() == null) {
             planInfoMapper.insert(plan);
 
-            if (planParam!=null){
+            if (planParam != null) {
                 planParam.setPlanId(plan.getId());
                 paramMapper.insert(planParam);
             }
 
-        }else {
+        } else {
             planInfoMapper.updateById(plan);
-            if (planParam!=null){
+            if (planParam != null) {
                 paramMapper.updateById(planParam);
 
             }
         }
-        return Result.success() ;
+        return Result.success();
     }
 
     // 运行接口自动化计划(数据库获取数据）
     @Override
-    public Result<?> runApiPlan(RunPlan planInfo){
+    public Result<?> runApiPlan(RunPlan planInfo) {
         // 获取计划中的apiIds 和 caseIds
-        PlanParam planParam = paramMapper.selectOne(new QueryWrapper<PlanParam>().eq("plan_id",planInfo.getId()));
+        PlanParam planParam = paramMapper.selectOne(new QueryWrapper<PlanParam>().eq("plan_id", planInfo.getId()));
         planInfo.setPlanParam(planParam);
         PlanResult planResult = planResultInit(planInfo);
         // 解析apiId
-        ArrayList<Integer> apiIds =  planInfo.getPlanParam().getApiIds();
+        ArrayList<Integer> apiIds = planInfo.getPlanParam().getApiIds();
         int api_successCount = 0;
         int api_failedCount = 0;
         int case_successCount = 0;
@@ -150,33 +161,35 @@ public class RunPlanServiceImpl extends ServiceImpl<RunPlanMapper, RunPlan> impl
         try {
             // 执行单个接口请求
             for (Integer apiId : apiIds) {
-                ApiInfo apiInfo = apiInfoMapper.selectOne(new QueryWrapper<ApiInfo>().eq("api_suite_id",apiId));
+                ApiInfo apiInfo = apiInfoMapper.selectOne(new QueryWrapper<ApiInfo>().eq("api_suite_id", apiId));
                 // 查询封装对应的前置后置动作
                 ApiCommon.setUpTearDownDispose(apiInfo);
-                ApiInfo apiResult = ApiCommon.apiDebugDb(envId,apiInfo);
+                ApiInfo apiResult = ApiCommon.apiDebugDb(envId, apiInfo);
                 PlanResultDetail planResultDetail = new PlanResultDetail();
                 planResultDetail.setApiId(apiInfo.getId());
                 planResultDetail.setApiInfo(apiResult);
                 planResultDetail.setResult(apiResult.getResult());
                 planResultDetail.setPlanResultId(planResult.getId());
                 planResultDetailMapper.insert(planResultDetail);
-                if(apiResult.getResult()){
+                if (apiResult.getResult()) {
                     api_successCount++;
-                }else {api_failedCount++;}
+                } else {
+                    api_failedCount++;
+                }
             }
 
             // 解析caseId
             ArrayList<Integer> caseCategoryIds = planInfo.getPlanParam().getCaseIds();
 
-            if (caseCategoryIds.size()!=0){
+            if (caseCategoryIds.size() != 0) {
                 for (Integer categoryId : caseCategoryIds) {
                     // 根据用例分类ID 查询 对应apiId
                     List<Integer> caseApiIds = apiCaseMapper.selectApiIdsByCategory(categoryId);
-                    if(caseApiIds.size()!=0){
+                    if (caseApiIds.size() != 0) {
                         int i = 0;
-                        while ( i < caseApiIds.size()) {
+                        while (i < caseApiIds.size()) {
                             ApiInfo apiInfo = apiInfoMapper.selectById(caseApiIds.get(i));
-                            ApiInfo apiResult = ApiCommon.apiDebugDb(envId,apiInfo);
+                            ApiInfo apiResult = ApiCommon.apiDebugDb(envId, apiInfo);
                             PlanResultDetail planResultDetail = new PlanResultDetail();
                             planResultDetail.setApiId(apiInfo.getId());
                             planResultDetail.setApiInfo(apiResult);
@@ -187,31 +200,31 @@ public class RunPlanServiceImpl extends ServiceImpl<RunPlanMapper, RunPlan> impl
                             caseResult = apiResult.getResult();
                             i++;
                         }
-                        if (caseResult){
+                        if (caseResult) {
                             case_successCount++;
-                        }else {
+                        } else {
                             case_failedCount++;
                         }
                     }
                 }
             }
 
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
         // 判断计划执行结果
-        Boolean runResult = planEndResult(api_successCount,api_failedCount,case_successCount,case_failedCount,planResult);
+        Boolean runResult = planEndResult(api_successCount, api_failedCount, case_successCount, case_failedCount, planResult);
 
         // 判断是否发送邮件
         Integer isSendEmail = planInfo.getIsSendEmail();
-        int success = api_successCount+ case_successCount;
-        int failed = api_failedCount +case_failedCount;
-        if(isSendEmail == 1){
-            planSendMail(planInfo,planResult.getId(),success, failed);
-        }else if (isSendEmail == 2){
-            if (!runResult){
-                planSendMail(planInfo,planResult.getId(),success,failed);
+        int success = api_successCount + case_successCount;
+        int failed = api_failedCount + case_failedCount;
+        if (isSendEmail == 1) {
+            planSendMail(planInfo, planResult.getId(), success, failed);
+        } else if (isSendEmail == 2) {
+            if (!runResult) {
+                planSendMail(planInfo, planResult.getId(), success, failed);
             }
         }
         return Result.success();
@@ -219,7 +232,7 @@ public class RunPlanServiceImpl extends ServiceImpl<RunPlanMapper, RunPlan> impl
     }
 
     // 初始化接口自动化plan_result计划执行结果
-    public  PlanResult planResultInit(RunPlan planInfo){
+    public PlanResult planResultInit(RunPlan planInfo) {
         PlanResult planResult = new PlanResult();
         planResult.setPlanType(planInfo.getPlanType());
         planResult.setPlanName(planInfo.getName());
@@ -232,48 +245,38 @@ public class RunPlanServiceImpl extends ServiceImpl<RunPlanMapper, RunPlan> impl
     }
 
     // 判断接口计划执行结果
-    public Boolean planEndResult(Integer apiSuccessCount ,Integer apiFailedCount, Integer caseSuccessCount, Integer caseFailedCount,PlanResult planResult){
+    public Boolean planEndResult(Integer apiSuccessCount, Integer apiFailedCount, Integer caseSuccessCount, Integer caseFailedCount, PlanResult planResult) {
         boolean runResult = false;
         planResult.setApiSuccessCount(apiSuccessCount);
         planResult.setApiFailedCount(apiFailedCount);
         planResult.setCaseSuccessCount(caseSuccessCount);
         planResult.setCaseFailedCount(caseFailedCount);
         planResult.setEndTime(dateTools.currentTime());
-        if (apiFailedCount ==0 && caseFailedCount ==0){
+        if (apiFailedCount == 0 && caseFailedCount == 0) {
             planResult.setResultStatus(1);
             runResult = true;
-        }else {
+        } else {
             planResult.setResultStatus(2);
         }
         planResultMapper.updateById(planResult);
         return runResult;
     }
 
-    // 计划运行完毕发送邮件
-    public static void planSendMail(RunPlan planInfo,Integer planResultId,int success,int failed){
-        String SendEmail = planInfo.getSendEmail();
-        String regex = "；|;";
-        String[] to = StringTools.split(SendEmail,regex);
-        String object = planInfo.getName()+"--自动化执行报告";
-        String text = "执行成功数量: "+success+"<br/>执行失败数量: "+failed+
-                "<br/>详情请点击: "+"<a href = 'http://localhost:8080/plan/report?id="+planResultId+"' >查看详情<a/>";
-        MailTool.sendEmail(to,object,text);
-    }
-
     @Override
     // 获取测试计划详情中的setup 和 tearDown
-    public Result<?> setupList(Integer planId){
+    public Result<?> setupList(Integer planId) {
         LambdaQueryWrapper<PlanRound> setupQuery = new LambdaQueryWrapper<>();
-        setupQuery.eq(PlanRound::getPlanId,planId).eq(PlanRound::getType,0);
+        setupQuery.eq(PlanRound::getPlanId, planId).eq(PlanRound::getType, 0);
         List<PlanRound> setup = planRoundMapper.selectList(setupQuery);
 
         LambdaQueryWrapper<PlanRound> tearDownQuery = new LambdaQueryWrapper<>();
-        tearDownQuery.eq(PlanRound::getPlanId,planId).eq(PlanRound::getType,1);
+        tearDownQuery.eq(PlanRound::getPlanId, planId).eq(PlanRound::getType, 1);
         List<PlanRound> tearDown = planRoundMapper.selectList(tearDownQuery);
 
-        HashMap<String,List<PlanRound>> result =new HashMap<String,List<PlanRound>>(){};
-        result.put("setup",setup);
-        result.put("tearDown",tearDown);
+        HashMap<String, List<PlanRound>> result = new HashMap<String, List<PlanRound>>() {
+        };
+        result.put("setup", setup);
+        result.put("tearDown", tearDown);
 
         return Result.success(result);
     }
@@ -291,22 +294,22 @@ public class RunPlanServiceImpl extends ServiceImpl<RunPlanMapper, RunPlan> impl
     public Result<?> appPlanExec(Integer planId) {
         RunPlan plan = planInfoMapper.selectById(planId);
         // 判断APP是否为空
-        if (plan.getAppId()==null){
+        if (plan.getAppId() == null) {
             return Result.error("计划未执行,App为空");
         }
         // 判断appiumServer是否可正常开启
         Boolean appServerStatus = appUtils.AppiumStart();
-        if (!appServerStatus){
+        if (!appServerStatus) {
             return Result.error("计划未执行,AppiumServer无法启动");
         }
         // 判断是否有空闲的手机
         List<MobilePhone> phone = phoneMapper.onlinePhone();
-        if (phone.size()>0){
-            Integer randomInteger = RandomValue.getInteger(0,phone.size());
+        if (phone.size() > 0) {
+            Integer randomInteger = RandomValue.getInteger(0, phone.size());
             MobilePhone execPhone = phone.get(randomInteger);
             // 执行APP测试计划
             ExecutorService executor = Executors.newCachedThreadPool();
-            Future<String> appFutures = executor.submit(new ExecAppPlan(plan,execPhone));
+            Future<String> appFutures = executor.submit(new ExecAppPlan(plan, execPhone));
             String runResult = "";
             try {
                 runResult = appFutures.get();
@@ -314,7 +317,7 @@ public class RunPlanServiceImpl extends ServiceImpl<RunPlanMapper, RunPlan> impl
                 e.printStackTrace();
             }
             return Result.success(runResult);
-        }else {
+        } else {
             return Result.error("计划未执行,没有空闲的测试机");
         }
     }
@@ -326,16 +329,17 @@ public class RunPlanServiceImpl extends ServiceImpl<RunPlanMapper, RunPlan> impl
      * 3： 获取对应用例步骤列表
      * 4： 遍历用例列表执行
      * 5： 用例执行结果保存到数据库
+     *
      * @param planId 计划ID
      * @return Result
      */
     @Override
     public Result<?> webRun(Integer planId) {
-        boolean gridStart = runWebPlan.portStart("127.0.0.1",4444);
-        if (!gridStart){
+        boolean gridStart = runWebPlan.portStart("127.0.0.1", 4444);
+        if (!gridStart) {
             runWebPlan.gridStart();
-            boolean gridStart2 = runWebPlan.portStart("127.0.0.1",4444);
-            if (!gridStart2){
+            boolean gridStart2 = runWebPlan.portStart("127.0.0.1", 4444);
+            if (!gridStart2) {
                 return Result.error("本机seleniumGrid未成功启动");
             }
         }
@@ -344,8 +348,8 @@ public class RunPlanServiceImpl extends ServiceImpl<RunPlanMapper, RunPlan> impl
         String runResult = "";
         try {
             runResult = futures.get();
-            if (!Objects.equals(runResult, "执行完成")){
-               return Result.error(runResult);
+            if (!Objects.equals(runResult, "执行完成")) {
+                return Result.error(runResult);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -364,48 +368,44 @@ public class RunPlanServiceImpl extends ServiceImpl<RunPlanMapper, RunPlan> impl
 
     // 更新保存前置后置操作
     public Result<?> updateRound(String payload) {
-
         JSONObject jsonObject = JSONObject.parseObject(payload);
-
         // 前置数据
         JSONArray setUpRounds = jsonObject.getJSONArray("setUp");
         for (Object planRound : setUpRounds) {
-            PlanRound setup= JSONObject.parseObject(planRound.toString(), PlanRound.class);
+            PlanRound setup = JSONObject.parseObject(planRound.toString(), PlanRound.class);
             Result<?> result = updateRoundHelp(setup);
-            if (Objects.equals(result.getCode(), "1")){
+            if (Objects.equals(result.getCode(), "1")) {
                 return result;
             }
         }
-
         // 后置数据
         JSONArray tearDownRounds = jsonObject.getJSONArray("tearDown");
         for (Object planRound : tearDownRounds) {
             PlanRound tearDown = JSONObject.parseObject(planRound.toString(), PlanRound.class);
             tearDown.setType(1);
             Result<?> result = updateRoundHelp(tearDown);
-            if (Objects.equals(result.getCode(), "1")){
+            if (Objects.equals(result.getCode(), "1")) {
                 return result;
             }
         }
-
         return Result.success();
     }
 
-    public Result<?> updateRoundHelp(PlanRound round){
+    public Result<?> updateRoundHelp(PlanRound round) {
         Result<?> result = new Result<>();
-        if (round.getActionId() == null){
+        if (round.getActionId() == null) {
             result.setMsg("操作不能为空");
             result.setCode(String.valueOf(1));
             return result;
         }
-        if (round.getActionKey()==null && round.getActionValue() ==null){
+        if (round.getActionKey() == null && round.getActionValue() == null) {
             result.setMsg("参数不能为空");
             result.setCode(String.valueOf(1));
             return result;
         }
-        if (round.getId()!=null){
+        if (round.getId() != null) {
             planRoundMapper.updateById(round);
-        }else {
+        } else {
             planRoundMapper.insert(round);
         }
         result.setMsg("操作成功");

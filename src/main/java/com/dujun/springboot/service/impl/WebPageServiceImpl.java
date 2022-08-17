@@ -1,7 +1,7 @@
 package com.dujun.springboot.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dujun.springboot.VO.Result;
 import com.dujun.springboot.entity.PageElement;
 import com.dujun.springboot.entity.WebCaseStep;
@@ -11,14 +11,11 @@ import com.dujun.springboot.mapper.PageElementMapper;
 import com.dujun.springboot.mapper.WebCaseStepMapper;
 import com.dujun.springboot.mapper.WebPageMapper;
 import com.dujun.springboot.service.WebPageService;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 import org.testng.collections.Lists;
 
 import javax.annotation.Resource;
-import javax.swing.text.View;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -46,8 +43,8 @@ public class WebPageServiceImpl extends ServiceImpl<WebPageMapper, WebPage> impl
 
     @Override
     public Result<List<WebPage>> PAGE_LIST(Integer type) {
-        List<WebPage> pageList = webPageMapper.selectList(new QueryWrapper<WebPage>().eq("del_flag",0).eq("type",type));
-        List<WebPage> parentPage = pageList.stream().filter(item->item.getParentId() == 0).collect(Collectors.toList());
+        List<WebPage> pageList = webPageMapper.selectList(new QueryWrapper<WebPage>().eq("del_flag", 0).eq("type", type).orderByDesc("create_time"));
+        List<WebPage> parentPage = pageList.stream().filter(item -> item.getParentId() == 0).collect(Collectors.toList());
         for (WebPage webPage : parentPage) {
             PAGE_LIST_HELP(pageList,webPage);
         }

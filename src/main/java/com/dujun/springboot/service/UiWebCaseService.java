@@ -1,11 +1,8 @@
 package com.dujun.springboot.service;
 
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.dujun.springboot.VO.Result;
 import com.dujun.springboot.entity.UiWebCase;
-import com.baomidou.mybatisplus.extension.service.IService;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -32,7 +29,7 @@ public interface UiWebCaseService extends IService<UiWebCase> {
     Result<?> deepCopy(UiWebCase WebCase);
 
     // 获取用例步骤
-    Result<?> steps(Integer caseId);
+    Result<?> steps(Integer caseId, Integer current, Integer size);
 
     // 删除用例步骤
     Result<?> delCaseStep(Integer stepId);

@@ -17,9 +17,9 @@ import com.dujun.springboot.utils.BeanContext;
 import com.dujun.springboot.utils.cmdTaskUtils;
 import lombok.extern.log4j.Log4j2;
 import org.openqa.selenium.WebDriver;
-import org.springframework.stereotype.Component;
 import org.springframework.util.ResourceUtils;
 import org.testng.collections.Lists;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.Socket;
@@ -61,7 +61,6 @@ public class  runWebPlan implements Callable<String> {
         boolean finalPlanResult;
         plan = RunPlanMapper.selectById(planId);
         planResult = runPlanService.planResultInit(plan);
-
         // 执行前置操作
         try {
             // 1:执行前置操作
@@ -78,7 +77,6 @@ public class  runWebPlan implements Callable<String> {
         }catch (Exception e){
             e.printStackTrace();
         }
-
         // 执行计划用例信息
         try {
             // 2: planID获取用例列表
@@ -86,13 +84,11 @@ public class  runWebPlan implements Callable<String> {
             if (planParam.getCaseIds().size() == 0){
                 return "测试计划为空";
             }
-
             // 判断计划中浏览器参数是否为空，为空默认谷歌浏览器执行
             String browser="chrome";
             if (plan.getBrowserType()!=null&& !Objects.equals(plan.getBrowserType(), "")){
                 browser = plan.getBrowserType();
             }
-
             // 2.1: 启动WebDriver
             try {
                 String remoteAddress = "http://127.0.0.1:4444";
@@ -101,7 +97,6 @@ public class  runWebPlan implements Callable<String> {
                 e.printStackTrace();
                 return "执行失败：无法创建driver实例";
             }
-
             //3: 遍历用例列表--获取对应用例步骤列表
             List<UIConsole> consoleMsg;
             List<AssertConsole> assertMsg;
@@ -110,45 +105,38 @@ public class  runWebPlan implements Callable<String> {
                 // 用例执行结果信息
                 consoleMsg = Lists.newArrayList();
                 // 用例断言信息
-                 assertMsg = Lists.newArrayList();
+                assertMsg = Lists.newArrayList();
                 // 获取用例步骤信息
                 LambdaQueryWrapper<WebCaseStep> lambdaQueryWrapper = new LambdaQueryWrapper<>();
-                lambdaQueryWrapper.eq(WebCaseStep::getCaseId,webCaseId);
-                lambdaQueryWrapper.eq(WebCaseStep::getStatus,0);
+                lambdaQueryWrapper.eq(WebCaseStep::getCaseId, webCaseId);
+                lambdaQueryWrapper.eq(WebCaseStep::getStatus, 0);
                 List<WebCaseStep> webCaseSteps = webCaseStepMapper.selectList(lambdaQueryWrapper);
-                try {
-                    // 4: 遍历执行用例步骤信息
-                    for (WebCaseStep CaseStep : webCaseSteps) {
-                        // 执行用例
-                        UIConsole console = seleniumUtils.execWebCase(driver,CaseStep);
-                        consoleMsg.add(console);
-                        // 断言操作
-                        if (!Objects.equals(CaseStep.getAssertType(), "") && CaseStep.getAssertType()!=null){
-                            AssertConsole assertConsole = seleniumUtils.execAssert(driver,CaseStep);
-                            assertMsg.add(assertConsole);
-                        }
+                // 4: 遍历执行用例步骤信息
+                for (WebCaseStep CaseStep : webCaseSteps) {
+                    // 执行用例
+                    UIConsole console = seleniumUtils.execWebCase(driver, CaseStep);
+                    consoleMsg.add(console);
+                    // 断言操作
+                    if (!Objects.equals(CaseStep.getAssertType(), "") && CaseStep.getAssertType() != null) {
+                        AssertConsole assertConsole = seleniumUtils.execAssert(driver, CaseStep);
+                        assertMsg.add(assertConsole);
                     }
-
-                }catch (Exception e){
-                    e.printStackTrace();
-                }finally {
-                    // 5: 用例执行结果保存到数据库中
-                    Boolean caseResult = getWebCaseResult(consoleMsg,assertMsg);
-                    if (caseResult){
-                        case_successCount++;
-                    }else {
-                        case_failedCount++;
-                    }
-                    PlanResultDetail planResultDetail = new PlanResultDetail();
-                    planResultDetail.setCaseId(webCaseId);
-                    planResultDetail.setResult(caseResult);
-                    planResultDetail.setPlanResultId(planResult.getId());
-                    planResultDetail.setResultConsole(consoleMsg);
-                    planResultDetail.setAssertResult(assertMsg);
-                    planResultDetailMapper.insert(planResultDetail);
                 }
+                // 5: 用例执行结果保存到数据库中
+                Boolean caseResult = getWebCaseResult(consoleMsg, assertMsg);
+                if (caseResult) {
+                    case_successCount++;
+                } else {
+                    case_failedCount++;
+                }
+                PlanResultDetail planResultDetail = new PlanResultDetail();
+                planResultDetail.setCaseId(webCaseId);
+                planResultDetail.setResult(caseResult);
+                planResultDetail.setPlanResultId(planResult.getId());
+                planResultDetail.setResultConsole(consoleMsg);
+                planResultDetail.setAssertResult(assertMsg);
+                planResultDetailMapper.insert(planResultDetail);
             }
-
         }catch (Exception e){
             e.printStackTrace();
             case_failedCount++;
@@ -170,7 +158,6 @@ public class  runWebPlan implements Callable<String> {
             planResult.setCaseFailedCount(case_failedCount);
             planResult.setCaseSuccessCount(case_successCount);
             planResultMapper.updateById(planResult);
-
             // 6:判断是否发送邮件
             Integer isSendEmail = plan.getIsSendEmail();
             if(isSendEmail == 1){
@@ -197,7 +184,6 @@ public class  runWebPlan implements Callable<String> {
         }catch (Exception e){
             e.printStackTrace();
         }
-
         return runMessage;
     }
 

@@ -15,6 +15,7 @@ import com.dujun.springboot.utils.BeanContext;
 import io.appium.java_client.AppiumDriver;
 import lombok.extern.log4j.Log4j2;
 import org.testng.collections.Lists;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
@@ -48,7 +49,6 @@ public class ExecAppCase implements Callable<HashMap<String,Object>> {
             stepQueryWrapper.eq(WebCaseStep::getStatus,0);
             stepQueryWrapper.orderByAsc(WebCaseStep::getSort);
             List<WebCaseStep> webCaseSteps = webCaseStepMapper.selectList(stepQueryWrapper);
-
             for (WebCaseStep webCaseStep : webCaseSteps) {
                 // 执行用例步骤
                 log.debug(String.format("-----------------执行APP用例步骤%s------------------",webCaseStep.getId()));
@@ -61,7 +61,6 @@ public class ExecAppCase implements Callable<HashMap<String,Object>> {
                     assertConsoles.add(assertConsole);
                 }
             }
-
         }catch (Exception e){
             e.printStackTrace();
             consoleMsg.add(new UIConsole(1,"系统异常"));

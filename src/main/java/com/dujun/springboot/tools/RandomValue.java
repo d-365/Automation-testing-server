@@ -6,9 +6,6 @@
 
 package com.dujun.springboot.tools;
 
-import com.baomidou.mybatisplus.extension.api.R;
-import org.eclipse.jdt.internal.compiler.classfmt.MethodInfoWithAnnotations;
-
 import java.util.Random;
 
 public class RandomValue {

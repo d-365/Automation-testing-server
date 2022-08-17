@@ -3,17 +3,17 @@ package com.dujun.springboot.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * <p>
- * 
+ *
  * </p>
  *
  * @author dujun
@@ -34,12 +34,16 @@ public class WebPage implements Serializable {
     private Integer parentId;
 
     @TableField(exist = false)
-    private List<WebPage>  children = new ArrayList<>();
+    private List<WebPage> children = new ArrayList<>();
 
     /**
      * 1 WEB  2 App
      */
     private Integer type;
+
+    private String createTime;
+
+    private String updateTime;
 
 
 }

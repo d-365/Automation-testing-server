@@ -1,7 +1,7 @@
-/**
- * author     : dujun
- * date       : 2021/12/2 13:58
- * description: 告诉大家我是干啥的
+/*
+  author     : dujun
+  date       : 2021/12/2 13:58
+  description: 告诉大家我是干啥的
  */
 
 package com.dujun.springboot.utils;
@@ -9,9 +9,6 @@ package com.dujun.springboot.utils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.http.Header;
-import org.apache.http.HttpMessage;
-import org.apache.http.HttpRequest;
-import org.apache.http.HttpResponse;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
@@ -25,16 +22,16 @@ import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class request {
 
     //创建HttpClient对象
      CloseableHttpClient httpClient = HttpClientBuilder.create().build();
      CloseableHttpResponse response = null;
-
 
      RequestConfig requestConfig = RequestConfig.custom()
             .setConnectTimeout(10000)
@@ -55,14 +52,13 @@ public class request {
     }
 
     // get 传递参数 带请求头信息
-    public   CloseableHttpResponse get(String url , HashMap<String,String> headers, HashMap<String,String> params) throws URISyntaxException {
-
+    public CloseableHttpResponse get(String url, HashMap<String, String> headers, HashMap<String, String> params) {
         try {
             // 添加get请求参数
-            URIBuilder uriBuilder  = new URIBuilder(url);
-            for(Map.Entry<String,String> entry_params : params.entrySet()){
-                if(entry_params.getKey() != null && entry_params.getValue()!=null ){
-                    uriBuilder.addParameter(entry_params.getKey(),entry_params.getValue());
+            URIBuilder uriBuilder = new URIBuilder(url);
+            for (Map.Entry<String, String> entry_params : params.entrySet()) {
+                if (entry_params.getKey() != null && entry_params.getValue() != null) {
+                    uriBuilder.addParameter(entry_params.getKey(), entry_params.getValue());
                 }
             }
 
@@ -105,12 +101,12 @@ public class request {
     }
 
     // post（自动将map转换成json)
-    public  <T> CloseableHttpResponse post(String url, HashMap<String, String> headers, HashMap<T,T> payload){
+    public <T, K> CloseableHttpResponse post(String url, HashMap<String, String> headers, HashMap<T, K> payload) {
 
         HttpPost request = new HttpPost(url);
         // 加载请求头
-        for(String entry  : headers.keySet()) {
-            if(entry != null){
+        for (String entry : headers.keySet()) {
+            if (entry != null) {
                 request.addHeader(entry, headers.get(entry));
             }
         }
@@ -199,7 +195,6 @@ public class request {
     /**
      * @param response HttpResponse 对象
      * @return 返回Json格式的HTTP响应体
-     * @throws IOException
      */
     public  JSONObject getResponseJson(CloseableHttpResponse response){
         String responseStr = null;

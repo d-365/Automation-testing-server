@@ -136,7 +136,7 @@ public class AppUtils {
         capabilities.setCapability("automationName", appConfigs.getAutomationName());
         capabilities.setCapability("appPackage", appConfigs.getAppPackage());
         capabilities.setCapability("appActivity", appConfigs.getAppActivity());
-        capabilities.setCapability("noReset", appConfigs.getNoReset());
+        capabilities.setCapability("noReset", !appConfigs.getNoReset());
         capabilities.setCapability("platformName", mobilePhone.getPlatForm());
         capabilities.setCapability("platformVersion", mobilePhone.getPlatVersion());
         capabilities.setCapability(MobileCapabilityType.AUTOMATION_NAME, AutomationName.ANDROID_UIAUTOMATOR2);
@@ -154,19 +154,24 @@ public class AppUtils {
 
     /**
      * 获取对应AppiumDriver
+     *
      * @param capabilities appium配置
      * @return AppiumDriver
      */
-    public AppiumDriver getDriver(DesiredCapabilities capabilities){
+    public AppiumDriver getDriver(String address, DesiredCapabilities capabilities) {
+        if (address.equals("")) {
+            address = "127.0.0.1";
+        }
         String platform = capabilities.getPlatformName().toString();
         AppiumDriver driver = null;
+        String remoteIp = String.format("http://%1$s:4723/wd/hub", address);
         try {
-            if (Objects.equals(platform.toUpperCase(), "ANDROID")){
-                driver = AppiumApi.getAndroidDriver("http://127.0.0.1:4723/wd/hub",capabilities);
-            }else if (Objects.equals(platform.toUpperCase(), "IOS")){
-                driver = AppiumApi.getIosDriver("http://127.0.0.1:4723/wd/hub",capabilities);
+            if (Objects.equals(platform.toUpperCase(), "ANDROID")) {
+                driver = AppiumApi.getAndroidDriver(remoteIp, capabilities);
+            } else if (Objects.equals(platform.toUpperCase(), "IOS")) {
+                driver = AppiumApi.getIosDriver(remoteIp, capabilities);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }

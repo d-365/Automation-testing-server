@@ -5,22 +5,22 @@
  */
 
 package com.dujun.springboot.data;
+
 import com.alibaba.fastjson.JSON;
-import org.aspectj.weaver.patterns.HasMemberTypePattern;
 
 import java.util.HashMap;
 
 public class ApiOrderData {
     // 电销填单数据
-    public static  HashMap<Object,Object> tmk_data(String phone,String city){
-        return new HashMap<Object, Object>(){{
-            put("realname","du");
-            put("age",55);
-            put("sex","1");
-            put("loan_money","10");
-            put("loan_time",1);
-            put("loan_goal","结婚贷款");
-            put("loan_id_name","上班族");
+    public static HashMap<String, Object> tmk_data(String phone, String city) {
+        return new HashMap<String, Object>() {{
+            put("realname", "du");
+            put("age", 55);
+            put("sex", "1");
+            put("loan_money", "10");
+            put("loan_time", 1);
+            put("loan_goal", "结婚贷款");
+            put("loan_id_name", "上班族");
             put("city_name", city);
             put("social_security", "连续6个月");
             put("provident_fund", "连续6个月");

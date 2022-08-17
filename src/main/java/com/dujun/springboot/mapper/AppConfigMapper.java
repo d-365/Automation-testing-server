@@ -1,10 +1,9 @@
 package com.dujun.springboot.mapper;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dujun.springboot.VO.option.AppConfigOp;
 import com.dujun.springboot.entity.AppConfig;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
@@ -21,7 +20,7 @@ public interface AppConfigMapper extends BaseMapper<AppConfig> {
 
     Page<AppConfig> appConfigs(Page<AppConfig> appConfigPage,String name);
 
-    @Select("SELECT id,name FROM app_config WHERE del_flag = 0;")
+    @Select("SELECT id,name FROM app_config WHERE del_flag = 0 ORDER BY create_time DESC;")
     List<AppConfigOp> APP_CONFIG_OPS();
 
 }

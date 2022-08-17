@@ -6,6 +6,20 @@
 
 package com.dujun.springboot.service;
 
-public interface ToolsService{
+import com.dujun.springboot.VO.Result;
+import com.dujun.springboot.entity.tools.TmkApply;
 
+public interface ToolsService {
+
+    Result<?> tmkApply(String phone, String city);
+
+    Result<?> tmkApplyLoop(TmkApply tmkApplyData);
+
+    Result<?> tmkApplyRandom(TmkApply tmkApplyData);
+
+    Result<?> qyhApply(String phone, String city);
+
+    Result<?> qyhApplyStart(String phone, String city, int loop);
+
+    Result<?> qyhApplyEnd();
 }

@@ -1,9 +1,8 @@
 /**
- * author     : dujun
- * date       : 2021/12/30 13:57
- * description: 告诉大家我是干啥的
+ * @author : dujun
+ * @date : 2021/12/30 13:57
+ * @description: 告诉大家我是干啥的
  */
-
 package com.dujun.springboot.entity.tools;
 
 import lombok.Data;

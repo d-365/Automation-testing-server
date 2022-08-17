@@ -17,6 +17,10 @@ public class MyExpectedConditions {
         switch (myExpected){
             case elementToBeClickable:
                 return ExpectedConditions.elementToBeClickable(by);
+            case visibilityOfElementLocated:
+                return ExpectedConditions.visibilityOfElementLocated(by);
+            case presenceOfElementLocated:
+                return ExpectedConditions.presenceOfElementLocated(by);
             default:
                 return null;
         }

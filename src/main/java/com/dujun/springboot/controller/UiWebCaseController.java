@@ -61,8 +61,8 @@ public class UiWebCaseController {
 
     //用例步骤列表
     @GetMapping("/steps/{caseId}")
-    public Result<?> steps(@PathVariable("caseId") Integer caseId) {
-        return webCaseService.steps(caseId);
+    public Result<?> steps(@PathVariable("caseId") Integer caseId, @RequestParam(defaultValue = "10") Integer size, @RequestParam(defaultValue = "1") Integer current) {
+        return webCaseService.steps(caseId, current, size);
     }
 
     @DeleteMapping("/caseStep/delete/{stepId}")

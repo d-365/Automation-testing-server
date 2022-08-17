@@ -17,5 +17,5 @@ import java.util.HashMap;
 @NoArgsConstructor
 public class tmkApply {
     private String loanId;
-    private HashMap<Object,Object> payload;
+    private HashMap<String, Object> payload;
 }

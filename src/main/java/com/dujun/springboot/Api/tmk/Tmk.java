@@ -1,7 +1,7 @@
-/**
- * author     : dujun
- * date       : 2021/12/21 14:10
- * description: 告诉大家我是干啥的
+/*
+  author     : dujun
+  date       : 2021/12/21 14:10
+  description: 告诉大家我是干啥的
  */
 
 package com.dujun.springboot.Api.tmk;
@@ -27,14 +27,12 @@ public class Tmk {
         login(username,password);
 
     }
-
     // 通用的headers
     public HashMap<String,String> getHeaders(String token){
-        HashMap<String,String> headers = new HashMap<String, String>(){{
-            put("Content-Type","application/json;charset=UTF-8");
-            put("token",token);
+        return new HashMap<String, String>() {{
+            put("Content-Type", "application/json;charset=UTF-8");
+            put("token", token);
         }};
-        return headers;
     }
 
     /**
@@ -59,11 +57,10 @@ public class Tmk {
     }
 
     // 电销填单
-    public JSONObject apply(HashMap<Object,Object> payload){
-        HashMap<String,String> headers = getHeaders(token);
+    public JSONObject apply(HashMap<String, Object> payload) {
+        HashMap<String, String> headers = getHeaders(token);
         String login_url = "http://testdrktm.wanqiandaikuan.com/api/tmk/electricity/telemarketing/apply";
-        CloseableHttpResponse response = request.post(login_url,headers,payload);
-        System.out.println(request.getResponseJson(response));
+        CloseableHttpResponse response = request.post(login_url, headers, payload);
         return request.getResponseJson(response);
     }
 

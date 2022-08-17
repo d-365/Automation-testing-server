@@ -26,7 +26,6 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -253,8 +252,6 @@ public  class ApiCommon {
                 try {
                     response = request.get(url,headers,params);
                     endTime = new Date().getTime();
-                } catch (URISyntaxException e) {
-                    e.printStackTrace();
                 } catch (IllegalArgumentException illegalArgumentException){
                     return Result.error("Name may not be null");
                 }

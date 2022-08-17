@@ -11,8 +11,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.dujun.springboot.Api.qyh.Qyh;
 import com.dujun.springboot.data.ApiOrderData;
 import com.dujun.springboot.tools.RandomValue;
-import com.google.gson.JsonObject;
 import lombok.extern.log4j.Log4j2;
+
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -25,13 +25,14 @@ public class RunnableQyh implements Runnable{
         String phone = RandomValue.getTel();
         Qyh qyh = new Qyh(phone);
         String city = RandomValue.getAddress();
-        HashMap<String,Object> payload = ApiOrderData.qyh_applyData("北京市");
-        CompletableFuture<String> completableFuture = CompletableFuture.supplyAsync(()->{
-                JSONObject jsonObject = qyh.fillForm(JSON.toJSONString(payload));
-                System.out.println(jsonObject);
+        HashMap<String, Object> payload = ApiOrderData.qyh_applyData("南阳市");
+        System.out.println(JSONObject.toJSONString(payload));
+        CompletableFuture<String> completableFuture = CompletableFuture.supplyAsync(() -> {
+            JSONObject jsonObject = qyh.fillForm(JSON.toJSONString(payload));
+            System.out.println(jsonObject);
             log.debug(jsonObject);
-                return "";
-            });
+            return "";
+        });
         try {
             completableFuture.get();
         } catch (InterruptedException | ExecutionException e) {

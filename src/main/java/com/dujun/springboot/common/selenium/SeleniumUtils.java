@@ -41,7 +41,6 @@ public class SeleniumUtils {
 
     // 执行用例步骤
     public UIConsole execWebCase(WebDriver driver,WebCaseStep caseStep){
-
         UIConsole uiConsole;
         actionEnum actionKey;
         try {
@@ -83,7 +82,7 @@ public class SeleniumUtils {
 
     // 执行断言操作
     public AssertConsole execAssert(WebDriver driver, WebCaseStep caseStep){
-        WebAssertType assertType = WebAssertType.valueOf(caseStep.getAssertType());
+        WebAssertType assertType = WebAssertType.valueOf(caseStep.getAssertType().trim().toUpperCase());
         String assertValue = caseStep.getAssertValue().trim();
         String msg = "";
         boolean result =false;
@@ -91,7 +90,6 @@ public class SeleniumUtils {
         AssertConsole assertConsole = new AssertConsole();
         assertConsole.setAssertType(caseStep.getAssertType());
         assertConsole.setExpectValue(assertValue);
-
         if (Objects.equals(assertValue, "")){
             msg = "断言值为空,请检查后重试";
             assertConsole.setMsg(msg);
@@ -99,7 +97,6 @@ public class SeleniumUtils {
             assertConsole.setStepId(caseStep.getId());
             return assertConsole;
         }
-
         switch (assertType){
             case URLIS:
                 String driverUrl = MySelenium.getCurrentUrl(driver);
