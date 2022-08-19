@@ -34,7 +34,7 @@ public class PlanTiming implements SchedulingConfigurer {
 
     private volatile ScheduledTaskRegistrar registrar;
 
-    @Scheduled(fixedRate = 6000)
+    @Scheduled(fixedRate = 60000000)
     public void sendTimeCancelOrder() {
         List<CronTask> cronTasks = registrar.getCronTaskList();
         System.out.println(cronTasks);

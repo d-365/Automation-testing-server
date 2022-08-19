@@ -1,7 +1,9 @@
 package com.dujun.springboot.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dujun.springboot.entity.DingRobot;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * <p>
@@ -12,5 +14,7 @@ import com.dujun.springboot.entity.DingRobot;
  * @since 2022-08-18
  */
 public interface DingRobotMapper extends BaseMapper<DingRobot> {
+
+    Page<DingRobot> robotList(Page<DingRobot> page, @Param("name") String name, @Param("status")Integer status);
 
 }

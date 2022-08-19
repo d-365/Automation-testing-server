@@ -84,6 +84,10 @@ public class PlanResult implements Serializable {
     // 计划类型
     private Integer planType;
 
+    /**
+     * 测试报告地址
+     */
+    private String resultAddress;
 
 
 }

@@ -12,6 +12,7 @@ import com.dujun.springboot.VO.UIConsole;
 import com.dujun.springboot.entity.*;
 import com.dujun.springboot.mapper.*;
 import com.dujun.springboot.service.impl.RunPlanServiceImpl;
+import com.dujun.springboot.tools.YmlTools;
 import com.dujun.springboot.tools.dateTools;
 import com.dujun.springboot.utils.BeanContext;
 import com.dujun.springboot.utils.cmdTaskUtils;
@@ -157,6 +158,10 @@ public class  runWebPlan implements Callable<String> {
             planResult.setEndTime(dateTools.currentTime());
             planResult.setCaseFailedCount(case_failedCount);
             planResult.setCaseSuccessCount(case_successCount);
+            YmlTools ymlTools = new YmlTools("globalConfig.yml");
+            String reportAddress = ymlTools.getValueByKey("online.report.address", "");
+            String planAddress = String.format("%1$s/#/web/report?id=%2$s",reportAddress,planResult.getId());
+            planResult.setResultAddress(planAddress);
             planResultMapper.updateById(planResult);
             // 6:判断是否发送邮件
             Integer isSendEmail = plan.getIsSendEmail();

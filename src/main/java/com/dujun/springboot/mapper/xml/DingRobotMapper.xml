@@ -2,4 +2,16 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.dujun.springboot.mapper.DingRobotMapper">
 
+    <select id="robotList" resultType="com.dujun.springboot.entity.DingRobot">
+        SELECT id,name,status,at_phone,robot_address,robot_type FROM ding_robot
+        <where>
+            del_flag = 0
+            <if test="name!=null and name!='' ">
+                and name = #{name}
+            </if>
+            <if test="status!=null">
+                and status = #{status}
+            </if>
+        </where>
+    </select>
 </mapper>

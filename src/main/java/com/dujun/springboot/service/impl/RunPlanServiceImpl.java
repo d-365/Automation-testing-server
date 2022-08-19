@@ -9,6 +9,7 @@ import com.dujun.springboot.VO.Result;
 import com.dujun.springboot.common.ApiCommon;
 import com.dujun.springboot.common.appium.AppUtils;
 import com.dujun.springboot.common.appium.ExecAppPlan;
+import com.dujun.springboot.common.myAnnotation.DingRobotAn;
 import com.dujun.springboot.common.selenium.runWebPlan;
 import com.dujun.springboot.entity.*;
 import com.dujun.springboot.mapper.*;
@@ -258,6 +259,10 @@ public class RunPlanServiceImpl extends ServiceImpl<RunPlanMapper, RunPlan> impl
         } else {
             planResult.setResultStatus(2);
         }
+        YmlTools ymlTools = new YmlTools("globalConfig.yml");
+        String reportAddress = ymlTools.getValueByKey("online.report.address", "");
+        String planAddress = String.format("%1$s/#/web/report?id=%2$s",reportAddress,planResult.getId());
+        planResult.setResultAddress(planAddress);
         planResultMapper.updateById(planResult);
         return runResult;
     }
@@ -291,6 +296,7 @@ public class RunPlanServiceImpl extends ServiceImpl<RunPlanMapper, RunPlan> impl
      * 执行APP测试计划
      **/
     @Override
+    @DingRobotAn
     public Result<?> appPlanExec(Integer planId) {
         RunPlan plan = planInfoMapper.selectById(planId);
         // 判断APP是否为空
@@ -334,6 +340,7 @@ public class RunPlanServiceImpl extends ServiceImpl<RunPlanMapper, RunPlan> impl
      * @return Result
      */
     @Override
+    @DingRobotAn
     public Result<?> webRun(Integer planId) {
         boolean gridStart = runWebPlan.portStart("127.0.0.1", 4444);
         if (!gridStart) {

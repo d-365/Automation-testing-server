@@ -47,6 +47,9 @@ mybatis-plus:
   global-config:
     db-config:
       id-type: auto
+      logic-delete-field: delFlag
+      logic-not-delete-value: 0
+      logic-delete-value: 1
 
 # 简洁配置-不打印sql执行结果
 logging:

@@ -14,5 +14,9 @@ import com.dujun.springboot.entity.DingRobot;
  */
 public interface DingRobotService extends IService<DingRobot> {
 
-    Result<?> robotList(Integer size, Integer current, String name, String status);
+    Result<?> robotList(Integer size, Integer current, String name, Integer status);
+
+    Result<?> updateRobot(DingRobot robot);
+
+    Result<?> del(Integer id);
 }
