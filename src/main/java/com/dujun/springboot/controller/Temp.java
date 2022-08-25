@@ -7,19 +7,16 @@
 package com.dujun.springboot.controller;
 
 import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.dujun.springboot.VO.Result;
 import com.dujun.springboot.entity.User;
 import com.dujun.springboot.mapper.UserMapper;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/temp")
@@ -59,13 +56,10 @@ public class Temp {
         return param.toJSONString();
     }
 
-    @GetMapping("/test1")
-    public Result<?> test1() {
-        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.select("id", "account");
-        queryWrapper.like(true, "f", "data");
-        List<Map<String, Object>> user = userMapper.selectMaps(queryWrapper);
-        return Result.success(user);
+    @PostMapping("/test1")
+    public Result<?> test1(@Validated @RequestBody(required = false) User user, BindingResult bindingResult) {
+        bindingResult.getAllErrors().forEach(System.out::println);
+        return Result.success("success");
     }
 
     @GetMapping("/start")

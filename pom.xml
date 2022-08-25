@@ -226,18 +226,18 @@
         <dependency>
             <groupId>redis.clients</groupId>
             <artifactId>jedis</artifactId>
-<!--            <version>4.0.1</version>-->
+            <!--            <version>4.0.1</version>-->
         </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
         </dependency>
-<!--        &lt;!&ndash;springSecurity&ndash;&gt;-->
-<!--        <dependency>-->
-<!--            <groupId>org.springframework.boot</groupId>-->
-<!--            <artifactId>spring-boot-starter-security</artifactId>-->
-<!--            <version>2.6.8</version>-->
-<!--        </dependency>-->
+        <!--springSecurity-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+            <version>2.6.8</version>
+        </dependency>
         <!--Appium-java-->
         <dependency>
             <groupId>io.appium</groupId>

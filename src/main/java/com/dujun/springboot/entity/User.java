@@ -37,9 +37,6 @@ public class User implements Serializable {
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
-//    @TableField(exist = false)
-//    private Set<GrantedAuthority> authorities;
-
     /**
      * 管理员登陆名称
      */

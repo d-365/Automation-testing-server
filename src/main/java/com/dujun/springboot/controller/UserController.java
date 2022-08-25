@@ -11,8 +11,6 @@ import com.dujun.springboot.service.impl.MenuServiceImpl;
 import com.dujun.springboot.service.impl.RoleServiceImpl;
 import com.dujun.springboot.service.impl.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.CacheManager;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -46,7 +44,6 @@ public class UserController {
         if(user == null || Objects.equals(user.getAccount(), "") || Objects.equals(user.getPassword(),"")){
             return Result.error("用户名或密码不能为空");
         }
-        System.out.println(user.getAccount());
          return userService.login(user.getAccount(),user.getPassword());
     }
 
