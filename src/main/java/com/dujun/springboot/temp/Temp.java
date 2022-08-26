@@ -6,11 +6,10 @@
 
 package com.dujun.springboot.temp;
 
+import org.checkerframework.checker.units.qual.K;
 import org.junit.Test;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.*;
 
 public class Temp {
 
@@ -26,7 +25,13 @@ public class Temp {
     }
 
     public static void main(String[] args) {
-
+        HashMap<Integer, List<Integer>> hashMap = new HashMap<Integer, List<Integer>>(){{
+            put(5,new ArrayList<Integer>(){{add(1);}});
+            put(9,new ArrayList<Integer>(){{add(2);}});
+        }};
+        List<Map.Entry<Integer, List<Integer>>> set = new ArrayList<>(hashMap.entrySet());
+        set.sort((q,w)-> -(q.getKey().compareTo(w.getKey())));
+        System.out.println(set.get(0));
     }
 
     public void fun2() {

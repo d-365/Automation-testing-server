@@ -37,6 +37,11 @@ public class UserController {
     @Autowired
     private MenuServiceImpl menuService;
 
+    @PostMapping("/index")
+    public Result<?> index(){
+        System.out.println("成功了");
+        return Result.success("success");
+    }
 
     //用户登录
     @PostMapping(value = "/login")

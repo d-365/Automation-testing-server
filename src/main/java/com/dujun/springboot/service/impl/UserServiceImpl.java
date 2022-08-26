@@ -1,25 +1,16 @@
 package com.dujun.springboot.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.dujun.springboot.VO.Result;
-import com.dujun.springboot.entity.Role;
 import com.dujun.springboot.entity.User;
 import com.dujun.springboot.entity.sonEntity.UserInfo;
-import com.dujun.springboot.mapper.RoleMapper;
 import com.dujun.springboot.mapper.UserMapper;
 import com.dujun.springboot.service.UserService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dujun.springboot.utils.JwtUtil;
 import com.dujun.springboot.utils.encryptionUtils;
-//import org.springframework.security.core.GrantedAuthority;
-//import org.springframework.security.core.authority.SimpleGrantedAuthority;
-//import org.springframework.security.core.userdetails.UserDetails;
-//import org.springframework.security.core.userdetails.UserDetailsService;
-//import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -94,12 +85,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         UserInfo userInfo = new UserInfo();
         Integer envId = null;
         String EnvName = "";
-//        try{
-////            envId = userEnvMapper.selectOne(new QueryWrapper<UserEnv>().eq("user_id",userId)).getEnvId();
-////            EnvName = envMapper.selectById(envId).getEnvName();
-//        }catch (NullPointerException e){
-//            e.printStackTrace();
-//        }
         userInfo.setEnvId(envId);
         userInfo.setEnvName(EnvName);
         return Result.success(userInfo);
