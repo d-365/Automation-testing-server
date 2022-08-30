@@ -7,6 +7,8 @@
 package com.dujun.springboot.config.common;
 
 import com.dujun.springboot.VO.Result;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -14,9 +16,21 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(NullPointerException.class)
-    public Result<?> exception(NullPointerException nullPointerException){
+    public Result<?> nullPointerException(NullPointerException nullPointerException){
         nullPointerException.printStackTrace();
         return Result.error("空指针"+nullPointerException);
     }
+
+    @ExceptionHandler(Exception.class)
+    public Result<?> otherException(Exception e){
+        e.printStackTrace();
+        return Result.error("系统异常");
+    }
+
+//    @ExceptionHandler(AccessDeniedException.class)
+//    public Result<?> accessDeniedException(Exception e){
+//        e.printStackTrace();
+//        return Result.error(String.valueOf(HttpStatus.FORBIDDEN.value()),"用户权限不足");
+//    }
 
 }

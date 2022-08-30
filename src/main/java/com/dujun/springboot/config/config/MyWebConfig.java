@@ -25,6 +25,7 @@ import java.util.List;
 @Configuration
 public class MyWebConfig implements WebMvcConfigurer {
 
+    /*拦截器*/
     @Autowired
     private MyInterceptor myInterceptor;
 
@@ -46,28 +47,21 @@ public class MyWebConfig implements WebMvcConfigurer {
         return filterRegistration;
     }
 
-//    /*注册拦截器*/
-//    @Override
-//    public void addInterceptors(InterceptorRegistry registry) {
-//        List<String> excludePath = new ArrayList<String>(){{
-//            add("/user/login");
-//            add("/user/save");
-//            add("/loginPlus");
-//            add("/test/*");
-//            add("/error");
-//        }};
-//        registry.addInterceptor(myInterceptor).addPathPatterns("/**").excludePathPatterns(excludePath);
-//    }
-
     /*跨域处理*/
     @Override
     public void addCorsMappings(CorsRegistry registry) {
+        // 设置允许跨域的路径
         registry.addMapping("/**")
+                // 设置允许跨域请求的域名
                 .allowedOriginPatterns("*")
-                .allowedMethods("GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS")
+                // 是否允许cookie
                 .allowCredentials(true)
-                .maxAge(3600)
-                .allowedHeaders("*");
+                // 设置允许的请求方式
+                .allowedMethods("GET", "POST", "DELETE", "PUT")
+                // 设置允许的header属性
+                .allowedHeaders("*")
+                // 跨域允许时间
+                .maxAge(3600);
     }
 
     /**
@@ -78,6 +72,10 @@ public class MyWebConfig implements WebMvcConfigurer {
         return new PaginationInterceptor();
     }
 
+    /**
+     * 静态资源路径
+     * @param registry registry
+     */
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry){
         registry

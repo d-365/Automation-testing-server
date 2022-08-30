@@ -10,7 +10,9 @@ import com.dujun.springboot.entity.User;
 import com.dujun.springboot.service.impl.MenuServiceImpl;
 import com.dujun.springboot.service.impl.RoleServiceImpl;
 import com.dujun.springboot.service.impl.UserServiceImpl;
+import org.openqa.selenium.HasAuthentication;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -58,8 +60,14 @@ public class UserController {
         return userService.saveUser(user);
     }
 
-    //用户列表
+    /**
+     * 用户列表
+     * @param account 账号
+     * @param roleId 密码
+     * @return Result
+     */
     @GetMapping(value = "/userList")
+    @PreAuthorize("hasAuthority('/userList')")
     public Result<List<User>> userList(String account,Integer roleId){
         System.out.println("用户列表");
         return userService.userList(account,roleId);

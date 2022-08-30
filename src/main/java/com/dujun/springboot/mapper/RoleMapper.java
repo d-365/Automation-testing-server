@@ -17,7 +17,7 @@ import java.util.List;
  */
 public interface RoleMapper extends BaseMapper<Role> {
 
-    /*
+    /**
       角色列表
      */
     List<Role> ROLE_LIST(String roleName,Integer page,Integer size);

@@ -52,12 +52,16 @@ public class JwtUtil {
 
     // 获取token payload 中信息
     public static String getTokenStr(String token,String data) {
+
         try {
             DecodedJWT jwt = JWT.decode(token);
-            return jwt.getClaim(data).asString();
+            if (verify(token)){
+                return jwt.getClaim(data).asString();
+            }
         } catch (JWTDecodeException e) {
             return null;
         }
+        return null;
     }
 
     // 校验token 是否正确

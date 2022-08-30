@@ -7,35 +7,53 @@
 package com.dujun.springboot.config.config;
 
 
-import com.dujun.springboot.config.springSecurity.MyAuthenticationFail;
-import com.dujun.springboot.config.springSecurity.MyAuthenticationSuccess;
-import io.appium.java_client.pagefactory.OverrideWidget;
+import com.dujun.springboot.config.springSecurity.AccessDeniedHandlerImpl;
+import com.dujun.springboot.config.springSecurity.AuthenticationEntryPointImpl;
+import com.dujun.springboot.config.springSecurity.AuthenticationTokenFilter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
-    MyAuthenticationSuccess myAuthenticationSuccess;
+    private AuthenticationTokenFilter authenticationTokenFilter;
 
     @Autowired
-    MyAuthenticationFail myAuthenticationFail;
+    private AuthenticationEntryPointImpl authenticationEntryPoint;
+
+    @Autowired
+    private AccessDeniedHandlerImpl accessDeniedHandler;
+
+    @Bean
+    @Override
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
+    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http
-                .csrf().disable().formLogin()
-                .loginPage("/user/login").loginProcessingUrl("/user/login")
-                .usernameParameter("account").passwordParameter("password")
-                .successHandler(myAuthenticationSuccess).failureHandler(myAuthenticationFail)
+        http.csrf().disable()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
                 .antMatchers("/user/login").anonymous()
-                .anyRequest().authenticated()
-                ;
+                .anyRequest().authenticated();
+
+        //把token校验过滤器添加到过滤器链中
+        http.addFilterBefore(authenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
+        http.exceptionHandling()
+                .authenticationEntryPoint(authenticationEntryPoint)
+                .accessDeniedHandler(accessDeniedHandler);
+
+        //允许跨域
+        http.cors();
     }
 
 }

@@ -2,6 +2,7 @@ package com.dujun.springboot.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.dujun.springboot.VO.Result;
+import com.dujun.springboot.config.springSecurity.SecurityUser;
 import com.dujun.springboot.entity.User;
 import com.dujun.springboot.entity.sonEntity.UserInfo;
 import com.dujun.springboot.mapper.UserMapper;
@@ -9,6 +10,10 @@ import com.dujun.springboot.service.UserService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dujun.springboot.utils.JwtUtil;
 import com.dujun.springboot.utils.encryptionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.List;
@@ -25,25 +30,25 @@ import java.util.Objects;
 @Service
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
 
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
     @Resource
     private UserMapper userMapper;
 
     public Result<?> login(String account, String password) {
-        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("account",account);
-        queryWrapper.eq("password",encryptionUtils.md5Encryption(password));
-        // 查找用户是否存在
-        User user = userMapper.selectOne(queryWrapper);
-        if(user!=null){
-            String token = JwtUtil.sign(user);
-            user.setPassword(null);
-            user.setToken(token);
-            return Result.success(user);
-        }else {
-            return Result.error("用户名或密码错误");
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(account,password);
+        Authentication authenticate = authenticationManager.authenticate(authenticationToken);
+        if(Objects.isNull(authenticate)){
+            throw new RuntimeException("用户名或密码错误");
         }
-
+        //生成token
+        SecurityUser securityUser = (SecurityUser) authenticate.getPrincipal();
+        User user = securityUser.getUser();
+        String token = JwtUtil.sign(user);
+        user.setToken(token);
+        // TODO 将token放入redis
+        return Result.success(user);
     }
 
     public Result<?> saveUser(User user){

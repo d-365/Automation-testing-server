@@ -5,9 +5,11 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 
-//@SpringBootApplication(exclude = {SecurityAutoConfiguration.class})
 @SpringBootApplication()
+// 开启SpringSecurity接口权限注解
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 @MapperScan("com.dujun.springboot.mapper")
 @EnableScheduling
 @EnableCaching
