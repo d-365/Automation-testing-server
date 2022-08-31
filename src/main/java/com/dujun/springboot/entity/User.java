@@ -12,8 +12,6 @@ import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 
-//import org.springframework.security.core.GrantedAuthority;
-//import org.springframework.security.core.userdetails.UserDetails;
 
 /**
  * <p>

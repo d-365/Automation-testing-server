@@ -2,11 +2,11 @@ package com.dujun.springboot.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dujun.springboot.VO.Result;
 import com.dujun.springboot.entity.Action;
 import com.dujun.springboot.mapper.ActionMapper;
 import com.dujun.springboot.service.ActionService;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 import org.testng.collections.Lists;
 
@@ -108,7 +108,6 @@ public class ActionServiceImpl extends ServiceImpl<ActionMapper, Action> impleme
         for (Action action_parent : parentAction) {
             action_parent.setChildren(actionTreeDeep(action_parent.getId(),actions));
         }
-
         return Result.success(parentAction);
     };
 
