@@ -39,11 +39,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+
+        final String[] SECURITY_IGNORE_API_PATH = {
+                "/user/login", "/mq/*", "/webSocket/*"
+        };
+
         http.csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .antMatchers("/user/login").anonymous()
+                .antMatchers(SECURITY_IGNORE_API_PATH).anonymous()
+//                .antMatchers("/mq/*").anonymous()
                 .anyRequest().authenticated();
 
         //把token校验过滤器添加到过滤器链中
@@ -51,7 +57,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.exceptionHandling()
                 .authenticationEntryPoint(authenticationEntryPoint)
                 .accessDeniedHandler(accessDeniedHandler);
-
         //允许跨域
         http.cors();
     }

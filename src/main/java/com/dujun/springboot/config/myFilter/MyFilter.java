@@ -22,6 +22,7 @@ public class MyFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) {
+        log.debug("过滤器执行");
         HttpServletRequest request = (HttpServletRequest)servletRequest;
         String requestUri = request.getRequestURI();
         if (!requestUri.contains("favicon.ico")){

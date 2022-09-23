@@ -48,7 +48,6 @@ public class ToolsController {
 
     /**
      * 轻易花填单
-     *
      * @param apply 填单数据--手机号--城市
      * @return Result
      */
@@ -61,7 +60,6 @@ public class ToolsController {
 
     /**
      * 轻易花填单开始
-     *
      * @param apply 填单数据--手机号--城市
      * @return Result
      */
@@ -75,7 +73,6 @@ public class ToolsController {
 
     /**
      * 轻易花填单结束
-     *
      * @return Result
      */
     @PostMapping("/qyhApply/end")

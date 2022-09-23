@@ -24,13 +24,13 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public Result<?> otherException(Exception e){
         e.printStackTrace();
-        return Result.error("系统异常");
+        return Result.error("系统异常啦");
     }
 
-//    @ExceptionHandler(AccessDeniedException.class)
-//    public Result<?> accessDeniedException(Exception e){
-//        e.printStackTrace();
-//        return Result.error(String.valueOf(HttpStatus.FORBIDDEN.value()),"用户权限不足");
-//    }
+    @ExceptionHandler(AccessDeniedException.class)
+    public Result<?> accessDeniedException(AccessDeniedException e){
+        e.printStackTrace();
+        return Result.error(String.valueOf(HttpStatus.FORBIDDEN.value()),"用户权限不足");
+    }
 
 }

@@ -61,8 +61,4 @@ public class encryptionUtils {
         return  Base64Coder.decodeString(cipherText);
     }
 
-    public static void main(String[] args) {
-        System.out.println(md5Encryption("123456"));
-    }
-
 }

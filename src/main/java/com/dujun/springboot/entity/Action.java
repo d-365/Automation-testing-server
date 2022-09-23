@@ -1,15 +1,12 @@
 package com.dujun.springboot.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
-
 import java.util.ArrayList;
 import java.util.Date;
-
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.io.Serializable;
 import java.util.List;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -68,6 +65,5 @@ public class Action implements Serializable {
 
     @TableField(exist = false)
     private List<Action> children = new ArrayList<>();
-
 
 }

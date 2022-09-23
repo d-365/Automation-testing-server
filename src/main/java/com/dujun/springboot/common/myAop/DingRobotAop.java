@@ -13,7 +13,6 @@ import com.dujun.springboot.entity.PlanResult;
 import com.dujun.springboot.mapper.DingRobotMapper;
 import com.dujun.springboot.mapper.PlanResultMapper;
 import com.dujun.springboot.utils.request;
-import lombok.extern.log4j.Log4j;
 import lombok.extern.log4j.Log4j2;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -21,9 +20,6 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.PutMapping;
-import sun.rmi.runtime.Log;
-
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.HashMap;

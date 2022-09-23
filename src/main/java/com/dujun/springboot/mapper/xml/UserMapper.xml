@@ -27,5 +27,14 @@
         </where>
         ;
     </select>
+    <select id="userExport" resultType="com.dujun.springboot.VO.exportVo.UserExport">
+        select account,nick_name,password,env_id from user;
+    </select>
+    <select id="sqlTest" resultType="com.dujun.springboot.entity.User">
+        SELECT id,account,nick_name FROM user
+        <where>
+            and id = ${account}
+        </where>
+    </select>
 
 </mapper>

@@ -13,7 +13,6 @@ import com.dujun.springboot.tools.RandomValue;
 import com.dujun.springboot.utils.MysqlTools;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
-
 import java.sql.ResultSet;
 import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
@@ -36,7 +35,6 @@ public class qyh_mock {
             }
         }
     }
-
 
     @Test
     public void crm_init() {

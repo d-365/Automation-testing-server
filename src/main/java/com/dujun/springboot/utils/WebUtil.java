@@ -14,6 +14,7 @@ public class WebUtil {
 
     public static void renderString(HttpServletResponse response, String data){
         response.setCharacterEncoding("UTF-8");
+        response.setStatus(200);
         response.setContentType("application/json; charset=utf-8");
         try {
             PrintWriter out = response.getWriter();

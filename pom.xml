@@ -19,11 +19,51 @@
     </properties>
 
     <dependencies>
+        <!--websocket-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-websocket</artifactId>
+        </dependency>
+
+<!--        &lt;!&ndash; 引入websocket &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.boot</groupId>-->
+<!--            <artifactId>spring-boot-starter-websocket</artifactId>-->
+<!--        </dependency>-->
+
+
+<!--        &lt;!&ndash; http://repo1.maven.org/maven2/com/xuxueli/xxl-job-core/ &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>com.xuxueli</groupId>-->
+<!--            <artifactId>xxl-job-core</artifactId>-->
+<!--            <version>2.3.0</version>-->
+<!--        </dependency>-->
+
+        <!--微信模版消息推送三方sdk-->
+        <dependency>
+            <groupId>com.github.binarywang</groupId>
+            <artifactId>weixin-java-mp</artifactId>
+            <version>4.1.0</version>
+        </dependency>
+
+        <!--HSSFWorkbook-->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>5.0.0</version>
+        </dependency>
+
         <!--rocketMq-->
+<!--        <dependency>-->
+<!--            <groupId>org.apache.rocketmq</groupId>-->
+<!--            <artifactId>rocketmq-client</artifactId>-->
+<!--            <version>4.4.0</version>-->
+<!--        </dependency>-->
+        <!--rocketmq-->
         <dependency>
             <groupId>org.apache.rocketmq</groupId>
-            <artifactId>rocketmq-client</artifactId>
-            <version>4.4.0</version>
+            <artifactId>rocketmq-spring-boot-starter</artifactId>
+            <version>2.1.1</version>
         </dependency>
 
         <!--SpringAop-->

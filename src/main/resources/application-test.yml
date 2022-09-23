@@ -36,7 +36,6 @@ spring:
   jackson:
     time-zone: GMT+8
     date-format: yyyy-MM-dd HH:mm:ss
-
 # mybatis-plus
 mybatis-plus:
   # 打印sql执行结果
@@ -71,4 +70,9 @@ test:
 online:
   domain:
     qyh: "http://testadmin.qyhnet.com"
+
+rocketmq:
+  name-server: 121.40.229.114:9876
+  producer:
+    group: springBootGroup
 

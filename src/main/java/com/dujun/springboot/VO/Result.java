@@ -61,7 +61,7 @@ public class Result<T> {
 
     public static  <T> Result <T> error(String msg) {
         Result <T> result = new Result<>();
-        result.setCode("1");
+        result.setCode("401");
         result.setMsg(msg);
         return result;
     }

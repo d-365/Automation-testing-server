@@ -25,7 +25,7 @@ public class RunnableQyh implements Runnable{
         String phone = RandomValue.getTel();
         Qyh qyh = new Qyh(phone);
         String city = RandomValue.getAddress();
-        HashMap<String, Object> payload = ApiOrderData.qyh_applyData("南阳市");
+        HashMap<String, Object> payload = ApiOrderData.qyh_applyData("南京市");
         System.out.println(JSONObject.toJSONString(payload));
         CompletableFuture<String> completableFuture = CompletableFuture.supplyAsync(() -> {
             JSONObject jsonObject = qyh.fillForm(JSON.toJSONString(payload));

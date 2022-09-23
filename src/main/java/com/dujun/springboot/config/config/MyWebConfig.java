@@ -9,18 +9,19 @@ package com.dujun.springboot.config.config;
 import com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor;
 import com.dujun.springboot.config.inteceptor.MyInterceptor;
 import com.dujun.springboot.config.myFilter.MyFilter;
-import com.dujun.springboot.config.myListener.MyListener;
+import org.apache.catalina.Context;
+import org.apache.tomcat.util.scan.StandardJarScanner;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
-import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import java.util.ArrayList;
-import java.util.List;
+import org.springframework.http.client.ClientHttpRequestFactory;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.context.request.async.TimeoutCallableProcessingInterceptor;
+import org.springframework.web.servlet.config.annotation.*;
 
 @Configuration
 public class MyWebConfig implements WebMvcConfigurer {
@@ -29,14 +30,11 @@ public class MyWebConfig implements WebMvcConfigurer {
     @Autowired
     private MyInterceptor myInterceptor;
 
-    /*注册监听器*/
-    @Bean
-    public ServletListenerRegistrationBean<MyListener> myListener(){
-        ServletListenerRegistrationBean<MyListener> registrationBean = new ServletListenerRegistrationBean<>();
-        registrationBean.setListener(new MyListener());
-        return registrationBean;
+    /*注册拦截器*/
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(myInterceptor).addPathPatterns("/**");
     }
-
 
     /*注册过滤器*/
     @Bean
@@ -83,5 +81,20 @@ public class MyWebConfig implements WebMvcConfigurer {
                 .addResourceLocations("classpath:/static/");
     }
 
+    /**
+     * 不对jar包的META-INF/MANIFEST.MF进行扫描加载
+     */
+    @Bean
+    public TomcatServletWebServerFactory tomcatFactory() {
+        return new TomcatServletWebServerFactory() {
+            @Override
+            protected void postProcessContext(Context context) {
+                ((StandardJarScanner) context.getJarScanner()).setScanManifest(false);
+            }
+        };
+    }
+
 
 }
+
+

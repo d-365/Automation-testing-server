@@ -10,6 +10,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTDecodeException;
+import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.dujun.springboot.entity.User;
 
@@ -17,6 +18,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class JwtUtil {
 
@@ -51,12 +53,39 @@ public class JwtUtil {
     }
 
     // 获取token payload 中信息
-    public static String getTokenStr(String token,String data) {
+    public static String getTokenStr(String token, String data) {
 
         try {
             DecodedJWT jwt = JWT.decode(token);
             if (verify(token)){
                 return jwt.getClaim(data).asString();
+            }
+        } catch (JWTDecodeException e) {
+            return null;
+        }
+        return null;
+    }
+
+    // 获取token payload 中信息
+    public static Integer getTokenInt(String token, String data) {
+
+        try {
+            DecodedJWT jwt = JWT.decode(token);
+            if (verify(token)){
+                return jwt.getClaim(data).asInt();
+            }
+        } catch (JWTDecodeException e) {
+            return null;
+        }
+        return null;
+    }
+
+    // 获取token payload 中信息
+    public static Claim getToken(String token, String data) {
+        try {
+            DecodedJWT jwt = JWT.decode(token);
+            if (verify(token)){
+                return jwt.getClaim(data);
             }
         } catch (JWTDecodeException e) {
             return null;
