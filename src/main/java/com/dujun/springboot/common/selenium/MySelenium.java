@@ -14,7 +14,11 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.logging.LogType;
+import org.openqa.selenium.logging.LoggingPreferences;
 import org.openqa.selenium.print.PrintOptions;
+import org.openqa.selenium.remote.CapabilityType;
+import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.LocalFileDetector;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.Color;
@@ -26,6 +30,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Set;
+import java.util.logging.Level;
 
 public class MySelenium {
 
@@ -48,6 +53,11 @@ public class MySelenium {
                 WebDriverManager.chromedriver().setup();
                 ChromeOptions chromeOptions = new ChromeOptions();
                 chromeOptions.setPageLoadStrategy(PageLoadStrategy.NORMAL);
+                // 为了获取console的日志输出
+                LoggingPreferences logPrefs = new LoggingPreferences();
+                logPrefs.enable(LogType.BROWSER, Level.INFO);//输入为info的日志
+                chromeOptions.setCapability(CapabilityType.LOGGING_PREFS, logPrefs);
+                chromeOptions.setCapability(ChromeOptions.CAPABILITY, chromeOptions);
                 driver = new ChromeDriver(chromeOptions);
                 return driver;
 
@@ -96,7 +106,7 @@ public class MySelenium {
     }
 
     /**
-     * 从浏览器的地址栏中读取当前 URL
+     * 从浏览器的地址栏中读取当前URL
      */
     public static String getCurrentUrl(WebDriver driver){
         return driver.getCurrentUrl();
@@ -316,10 +326,11 @@ public class MySelenium {
 
     /**
      * 执行JavaScript脚本
+     * @return Object
      */
-    public static void executeScript(WebDriver driver,String script ){
+    public static Object executeScript(WebDriver driver, String script ){
         JavascriptExecutor js = (JavascriptExecutor)driver;
-        js.executeScript(script);
+        return js.executeScript(script);
     }
 
     /**

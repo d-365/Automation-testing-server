@@ -111,6 +111,11 @@ public class AppUtils {
         // 开启Appium服务
         AppiumServerStatus = portStart("0.0.0.0",4723);
         log.debug(AppiumServerStatus);
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         if (appiumStartCount<=2){
             if (!AppiumServerStatus){
                 cmdTaskUtils.execCommand("cmd /k start appium");
@@ -140,6 +145,10 @@ public class AppUtils {
         capabilities.setCapability("platformName", mobilePhone.getPlatForm());
         capabilities.setCapability("platformVersion", mobilePhone.getPlatVersion());
         capabilities.setCapability(MobileCapabilityType.AUTOMATION_NAME, AutomationName.ANDROID_UIAUTOMATOR2);
+        // 处理Android特有信息
+        if (mobilePhone.getPlatForm().contains("ANDROID")){
+            capabilities.setCapability("autoGrantPermissions",true);
+        }
         //处理其他配置信息
         List<JSONObject> appConOthers = appConfigs.getOthers();
         if (appConOthers.size()!=0){

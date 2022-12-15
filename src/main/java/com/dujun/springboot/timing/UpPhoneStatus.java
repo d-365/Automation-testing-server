@@ -96,5 +96,4 @@ public class UpPhoneStatus implements SchedulingConfigurer {
         return "";
     }
 
-
 }

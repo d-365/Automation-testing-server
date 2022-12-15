@@ -319,7 +319,6 @@ public  class ApiCommon {
         apiInfo.setRspAsserts(rspAsserts);
         console.addAll(AssertConsole);
 
-
         //接口请求结果
         apiInfo.setResult(code_result(statusCode,apiInfo.getReqAssert()));
 

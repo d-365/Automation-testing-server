@@ -201,29 +201,30 @@ public class UiWebCaseServiceImpl extends ServiceImpl<UiWebCaseMapper, UiWebCase
             }else if (type.equals("2")) {
                 try {
                     AppiumDriver driver;
-                    // 获取用例IP地址
-                    String userAddress = UserHttpAgentUtils.getUserRealIP(request);
-                    String localAddress = InetAddress.getLocalHost().getHostAddress();
                     // 获取对应的获取DesiredCapabilities配置信息
                     String phoneId = jsonObject.getString("phone");
                     String appConId = jsonObject.getString("app");
+                    String deBugType = jsonObject.getString("debugType");
                     DesiredCapabilities desiredCapabilities = appUtils.getDesiredCapabilities(Integer.valueOf(appConId), Integer.valueOf(phoneId));
-
                     // 服务端调试
-                    if (Objects.equals(userAddress, localAddress)) {
+                    if (Objects.equals(deBugType, "0")) {
                         // 查询开启AppiumServer
                         log.debug("-------Appium服务端调试--------");
                         boolean appiumStatus = appUtils.AppiumStart();
                         if (appiumStatus) {
                             //  获取AppiumDriver
-                            driver = appUtils.getDriver(userAddress, desiredCapabilities);
+                            driver = appUtils.getDriver("0.0.0.0", desiredCapabilities);
                         } else {
                             return Result.error("服务端AppiumServer启动失败");
                         }
                     } else {
                         // 客户端调试
+                        // 获取执行机IP地址
+//                        String userAddress = UserHttpAgentUtils.getUserRealIP(request);
+                        String clientIp = jsonObject.getString("clientIp");
+                        log.debug("clientIp"+clientIp);
                         log.debug("-------Appium客户端调试--------");
-                        driver = appUtils.getDriver(userAddress, desiredCapabilities);
+                        driver = appUtils.getDriver(clientIp, desiredCapabilities);
                     }
                     if (driver != null) {
                         // 执行APP用例

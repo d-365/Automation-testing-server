@@ -14,7 +14,7 @@ public class PlanTiming {
 
     @Scheduled(fixedRate = 5000)
     public void work(){
-        System.out.println("小hiIG你");
+        System.out.println("测试定时任务");
 //        quartzService.refreshTrigger();
     }
 

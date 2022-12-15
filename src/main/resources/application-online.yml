@@ -2,11 +2,6 @@ server:
   port: 1997
 
 spring:
-  # 时间转换
-  jackson:
-    time-zone: GMT+8
-    date-format: yyyy-MM-dd HH:mm:ss
-
   # 数据源
   datasource:
     dynamic:
@@ -28,7 +23,9 @@ spring:
       additional-exclude: WEB-INF/**
   freemarker:
     cache: false
-
+  jackson:
+    time-zone: GMT+8
+    date-format: yyyy-MM-dd HH:mm:ss
 # mybatis-plus
 mybatis-plus:
   # 打印sql执行结果
@@ -39,6 +36,9 @@ mybatis-plus:
   global-config:
     db-config:
       id-type: auto
+      logic-delete-field: delFlag
+      logic-not-delete-value: 0
+      logic-delete-value: 1
 
 # 简洁配置-不打印sql执行结果
 logging:
@@ -60,4 +60,9 @@ test:
 online:
   domain:
     qyh: "http://testadmin.qyhnet.com"
+
+#rocketmq:
+#  name-server: 121.40.229.114:9876
+#  producer:
+#    group: springBootGroup
 

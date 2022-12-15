@@ -79,7 +79,7 @@ public class Qyh {
     public void user_init(){
         int age = RandomValue.getNum(20,80);
         int sex = RandomValue.getInteger(1,2);
-        mysqlTools.execute(String.format("UPDATE qyh.qyh_customer_user SET real_name='test' , sex=%1$s ,age = %2$s WHERE phone = %3$s",sex,age,phone));
+        mysqlTools.execute(String.format("UPDATE qyh.qyh_customer_user SET real_name='test', sex=%1$s,age = %2$s WHERE phone = '%3$s';",sex,age,phone));
     }
 
     // 通用的headers(json)

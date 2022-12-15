@@ -16,7 +16,6 @@ import org.springframework.scheduling.annotation.SchedulingConfigurer;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Component;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -25,17 +24,12 @@ import java.util.HashMap;
 public class EatDngDing implements SchedulingConfigurer {
 
     private final ArrayList<String> eatList = new ArrayList<String>(){{
-        add("一鸣真咸奶吧( 酸奶 + 面包 )");
-        add("今天别吃了、饿着吧");
-        add("今天别吃了、饿着吧");
-        add("今天别吃了、饿着吧");
         add("今天别吃了、饿着吧");
     }};
 
     @Override
     public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
         taskRegistrar.addTriggerTask(task(),getTrigger());
-
     }
 
     /**
@@ -84,6 +78,5 @@ public class EatDngDing implements SchedulingConfigurer {
             return cronTrigger.nextExecutionTime(triggerContext);
         };
     }
-
 
 }

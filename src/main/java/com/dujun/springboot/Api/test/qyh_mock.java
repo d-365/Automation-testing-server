@@ -7,10 +7,13 @@
 package com.dujun.springboot.Api.test;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.dujun.springboot.Api.qyh.Qyh;
 import com.dujun.springboot.data.ApiOrderData;
 import com.dujun.springboot.tools.RandomValue;
 import com.dujun.springboot.utils.MysqlTools;
+import com.dujun.springboot.utils.request;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import java.sql.ResultSet;
@@ -21,7 +24,7 @@ import java.util.concurrent.Executors;
 public class qyh_mock {
 
     @Test
-    public void test_apply() {
+    public void test_apply() throws InterruptedException {
         ExecutorService es = Executors.newCachedThreadPool();
         for (int i = 0; i < 1; i++) {
             es.submit(new RunnableQyh());
@@ -200,7 +203,6 @@ public class qyh_mock {
         qyh.fillForm(JSON.toJSONString(payload));
         String queryAdId = String.format("SELECT crm_ad_id FROM qyh.qyh_order WHERE customer_phone = '%1$s';",phone);
         String adId = null;
-
         try {
             Thread.sleep(5000);
             ResultSet resultSet = mysqlTools.executeQuery(queryAdId);
@@ -212,5 +214,26 @@ public class qyh_mock {
         }
         return adId;
     }
+
+    /**
+     * 开启广告
+     */
+    public static void openStatus(){
+        String url = "http://testcrm.qyhnet.com/api/crm/admin/v1/advertising/updateUserStatus";
+        HashMap<String,String> header = new HashMap<String, String>(){{
+            put("Content-Type","application/json;charset=UTF-8");
+            put("token","eyJhbGciOiJIUzUxMiJ9.eyJyb2xlIjo1Nywic3RhZmZOYW1lIjoiZHVqdW4iLCJ1c2VyVHlwZSI6ImNybSIsImV4cCI6MTcwMTUwMzIzNCwiaWF0IjoxNjY5OTY3MjM0LCJzdGFmZklkIjo4Mn0.zQ-z8stDJEGGuW_vz_VMWDwSEmY3Kvxb_WGIdUnwt3nk5wWA8Q9fAs3Jkbfo441THt1aGDXjjoznN-L2mXNq5Q");
+        }};
+        JSONObject payload = new JSONObject(){{
+            put("id",5940);
+            put("userStatus","1");
+        }};
+        request request = new request();
+        System.out.println(payload.toString());
+        CloseableHttpResponse response =  request.post(url,header,payload.toJSONString());
+        JSONObject jsonObject = request.getResponseJson(response);
+        System.out.println(jsonObject);
+    }
+
 
 }

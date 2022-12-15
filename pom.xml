@@ -293,7 +293,7 @@
     </dependencies>
 
     <build>
-        <finalName>Site</finalName>
+        <finalName>testPlat</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

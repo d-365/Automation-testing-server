@@ -71,8 +71,8 @@ online:
   domain:
     qyh: "http://testadmin.qyhnet.com"
 
-rocketmq:
-  name-server: 121.40.229.114:9876
-  producer:
-    group: springBootGroup
+#rocketmq:
+#  name-server: 121.40.229.114:9876
+#  producer:
+#    group: springBootGroup
 

@@ -19,6 +19,7 @@ public class UserHttpAgentUtils {
         String ip = "";
         // 有的user可能使用代理，为处理用户使用代理的情况，使用x-forwarded-for
         if  (request.getHeader("x-forwarded-for") == null)  {
+            System.out.println(request.getHeader("x-forwarded-for"));
             ip = request.getRemoteAddr();
         }  else  {
             ip = request.getHeader("x-forwarded-for");
