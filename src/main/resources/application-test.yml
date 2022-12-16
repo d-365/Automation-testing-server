@@ -36,6 +36,15 @@ spring:
   jackson:
     time-zone: GMT+8
     date-format: yyyy-MM-dd HH:mm:ss
+  # redis配置
+  redis:
+    database: 0
+    host: 120.55.125.94
+    port: 6379
+    connect-timeout: 3000
+    password: 4A$2QgF4g7Orz*
+
+
 # mybatis-plus
 mybatis-plus:
   # 打印sql执行结果

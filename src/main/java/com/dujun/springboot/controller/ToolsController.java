@@ -80,4 +80,27 @@ public class ToolsController {
         return toolsService.qyhApplyEnd();
     }
 
+    /**
+     * 验证码 查询
+     * @return Result
+     */
+    @PostMapping("/sms/code/query")
+    public Result<?> codeQuery(@RequestBody JSONObject payload){
+        String phone = payload.getString("phone");
+        String type = payload.getString("type");
+        return toolsService.codeQuery(phone,type);
+    }
+
+    /**
+     * 验证码 修改
+     * @return Result
+     */
+    @PostMapping("/sms/code/update")
+    public Result<?> codeUpdate(@RequestBody JSONObject payload){
+        String phone = payload.getString("phone");
+        String type = payload.getString("type");
+        String code = payload.getString("smsCode");
+        return toolsService.codeUpdate(phone,code,type);
+    }
+
 }

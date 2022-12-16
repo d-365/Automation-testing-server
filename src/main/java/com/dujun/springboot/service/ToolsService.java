@@ -22,4 +22,8 @@ public interface ToolsService {
     Result<?> qyhApplyStart(String phone, String city, int loop);
 
     Result<?> qyhApplyEnd();
+
+    Result<?> codeQuery(String phone, String type);
+
+    Result<?> codeUpdate(String phone, String code, String type);
 }

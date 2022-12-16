@@ -70,8 +70,10 @@ public class ApiInfoServiceImpl extends ServiceImpl<ApiInfoMapper, ApiInfo> impl
         if (setUp.size()>0){
             List<Integer> setUpIds = new ArrayList<>();
             for (PlanRound planRound : setUp) {
-                planRound.setType(0);
-                setUpIds.add(updatePlanRound(planRound));
+                if (planRound != null){
+                    planRound.setType(0);
+                    setUpIds.add(updatePlanRound(planRound));
+                }
             }
             apiInfo.setSetUpIds(setUpIds);
         }
@@ -81,8 +83,10 @@ public class ApiInfoServiceImpl extends ServiceImpl<ApiInfoMapper, ApiInfo> impl
         if (tearDown.size()>0){
             List<Integer> tearDownIds = new ArrayList<>();
             for (PlanRound planRound : tearDown) {
-                planRound.setType(1);
-                tearDownIds.add(updatePlanRound(planRound));
+                if (planRound!=null){
+                    planRound.setType(1);
+                    tearDownIds.add(updatePlanRound(planRound));
+                }
             }
             apiInfo.setTearDownIds(tearDownIds);
         }

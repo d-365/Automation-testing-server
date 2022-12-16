@@ -12,6 +12,7 @@ import com.baomidou.dynamic.datasource.annotation.DS;
 import com.dujun.springboot.Api.qyh.Qyh;
 import com.dujun.springboot.Api.tmk.Tmk;
 import com.dujun.springboot.VO.Result;
+import com.dujun.springboot.VO.tools.SmsCode;
 import com.dujun.springboot.data.ApiOrderData;
 import com.dujun.springboot.entity.sonEntity.tmkApply;
 import com.dujun.springboot.entity.tools.TmkApply;
@@ -20,6 +21,10 @@ import com.dujun.springboot.service.ToolsService;
 import com.dujun.springboot.tools.RandomValue;
 import com.dujun.springboot.utils.MysqlTools;
 import lombok.extern.slf4j.Slf4j;
+import org.quartz.impl.matchers.StringMatcher;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -41,6 +46,9 @@ public class ToolsServiceImpl implements ToolsService {
     private ToolsMapper toolsMapper;
 
     volatile private boolean flag;
+
+    @Autowired
+    private StringRedisTemplate redisTemplate;
 
     public static MysqlTools mysqlConnection() {
         return new MysqlTools("jdbc:mysql://118.31.184.240:3306", "root", "3wHNY2Bq");
@@ -229,6 +237,80 @@ public class ToolsServiceImpl implements ToolsService {
     public Result<?> qyhApplyEnd() {
         flag = false;
         return Result.success();
+    }
+
+    @Override
+    public Result<?> codeQuery(String phone, String type) {
+        if (phone ==null || phone.equals("")){
+            return Result.error("手机号不能为空");
+        }
+        if (type == null || type.equals("")){
+            return Result.error("type不能为空");
+        }
+        ValueOperations<String, String> forValue = redisTemplate.opsForValue();
+        // 查询新平台后台验证码
+        if (type.equals( "0")){
+            String CRM = codeReplace(forValue.get(String.format("crm_%1$s", phone)));
+            String QS = codeReplace(forValue.get(String.format("admin_%1$s", phone)));;
+            String DRK  = codeReplace(forValue.get(String.format("drk_%1$s", phone)));
+            SmsCode smsCode = new SmsCode(CRM,QS,DRK);
+            if (CRM == null && QS == null && DRK == null){
+                return Result.error("先获取验证码或重置后查看");
+            }
+            return Result.success(smsCode);
+        }
+        return Result.success();
+    }
+
+    @Override
+    public Result<?> codeUpdate(String phone, String code, String type) {
+        if (phone ==null || phone.equals("")){
+            return Result.error("手机号不能为空");
+        }
+        if (type == null || type.equals("")){
+            return Result.error("type不能为空");
+        }
+        if (code == null || code.equals("")){
+            return Result.error("验证码不能为空");
+        }
+        ValueOperations<String, String> forValue = redisTemplate.opsForValue();
+        // 轻易花后台项目
+        if (type.equals("0")){
+            String crm_key = String.format("crm_%1$s", phone);
+            String drk_key = String.format("drk_%1$s", phone);
+            String qs_key = String.format("admin_%1$s", phone);
+            String CRM = forValue.get(crm_key);
+            String DRK = forValue.get(drk_key);
+            String QS = forValue.get(qs_key);
+            if (CRM == null){
+                forValue.set(crm_key,code);
+            }else {
+                forValue.getAndSet(crm_key,code);
+            }
+            if (DRK == null){
+                forValue.set(drk_key,code);
+            }else {
+                forValue.getAndSet(drk_key,code);
+            }
+            if (QS == null){
+                forValue.set(qs_key,code);
+            }else {
+                forValue.getAndSet(qs_key,code);
+            }
+        }
+        return Result.success();
+    }
+
+    /**
+     * 祛除 验证码中的双引号
+     * @param code String
+     * @return 处理后验证码
+     */
+    public String codeReplace(String code){
+        if (code !=null){
+            return code.replace("\"","");
+        }
+        return null;
     }
 
 }
