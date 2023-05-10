@@ -78,7 +78,7 @@ public class MysqlTools {
 
     //查询操作
     public ResultSet executeQuery(String sql) throws Exception {
-        ResultSet resultSet = null;
+        ResultSet resultSet;
         resultSet = connection.prepareStatement(sql).executeQuery();
         return resultSet;
     }
@@ -101,12 +101,5 @@ public class MysqlTools {
         }
     }
 
-    public static void main(String[] args) {
-        try {
-            ResultSet resultSet =  new MysqlTools().executeQuery("SELECT * FROM qyh.qyh_manager_user;");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
 }

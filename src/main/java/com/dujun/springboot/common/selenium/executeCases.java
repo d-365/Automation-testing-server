@@ -54,20 +54,20 @@ public class executeCases implements Callable<List<UIConsole>> {
         WebDriver driver = null;
         try {
             // 获取用例IP地址
-            String userAddress = UserHttpAgentUtils.getUserRealIP(request);
+            JSONObject jsonObject = JSON.parseObject(payload);
+
+            String userAddress = jsonObject.getString("clientIp");
             String port = "4444";
             String browserName;
             // 获取用户请求浏览器信息
-            JSONObject jsonObject = JSON.parseObject(payload);
             browserName = jsonObject.getString("device");
-            if (browserName==null || Objects.equals(browserName, "")){
+            if (browserName == null || Objects.equals(browserName, "")) {
                 String userBrowser = UserHttpAgentUtils.geUserBrowser(request);
-                if (userBrowser!=null){
+                if (userBrowser != null) {
                     String[] browser = userBrowser.split("/");
                     browserName = browser[0];
                 }
             }
-
             // 2: 连接远程seleniumServer
             String remoteUrl = "http://"+userAddress+":"+port;
             log.debug("用户的远程服务地址是" + remoteUrl);

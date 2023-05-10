@@ -2,6 +2,7 @@ package com.dujun.springboot.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -58,6 +59,7 @@ public class UiWebCase implements Serializable {
      */
     private Integer caseType;
 
+    @TableLogic
     private Integer delFlag;
 
 }

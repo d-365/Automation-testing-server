@@ -204,7 +204,7 @@ public class AppUtils {
             }else {
                 caseAssert.execAction(assertType,driver,caseStep,assertConsole);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             assertConsole.setMsg("断言方式不存在");
             assertConsole.setResult(false);
         }
@@ -214,6 +214,16 @@ public class AppUtils {
         return assertConsole;
     }
 
+    /**
+     * 获取元素属性值
+     *
+     * @param element   WebElement
+     * @param attribute 属性名称
+     * @return 属性值
+     */
+    public String getElementAttribute(WebElement element, String attribute) {
+        return element.getAttribute(attribute);
+    }
 
 
 }

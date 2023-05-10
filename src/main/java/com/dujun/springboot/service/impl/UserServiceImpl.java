@@ -50,6 +50,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         try {
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(account,password);
             authenticate = authenticationManager.authenticate(authenticationToken);
+
             if(Objects.isNull(authenticate)){
                 return Result.error("1000","用户名或密码错误");
             }

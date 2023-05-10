@@ -16,12 +16,14 @@ import org.springframework.scheduling.annotation.SchedulingConfigurer;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Component;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
 @Log4j2
 @Component
 public class EatDngDing implements SchedulingConfigurer {
+
 
     private final ArrayList<String> eatList = new ArrayList<String>(){{
         add("今天别吃了、饿着吧");
@@ -30,6 +32,7 @@ public class EatDngDing implements SchedulingConfigurer {
     @Override
     public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
         taskRegistrar.addTriggerTask(task(),getTrigger());
+//        taskRegistrar.addTriggerTask(task(),getTrigger());
     }
 
     /**

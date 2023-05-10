@@ -112,7 +112,9 @@ public class ApiCaseServiceImpl extends ServiceImpl<ApiCaseMapper, ApiCase> impl
     public Result<?> debugCase(Integer envId,ApiCase apiCase){
         ArrayList<ApiInfo> step = apiCase.getStep();
         for (ApiInfo apiInfo : step) {
-            ApiCommon.apiDebug(envId,apiInfo);
+            if (apiInfo != null) {
+                ApiCommon.apiDebug(envId, apiInfo);
+            }
         }
         Map<String, String> globalParams =  ApiCommon.getGlobalParams();
         log.info(String.valueOf(globalParams));

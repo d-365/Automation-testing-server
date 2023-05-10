@@ -47,9 +47,15 @@ public class UiWebCaseController {
         return webCaseService.update(uiWebCase);
     }
 
-    // 删除用例
+    /**
+     * 删除测试用例
+     *
+     * @param webCase 用例信息
+     * @return Result
+     * @throws Exception
+     */
     @PostMapping("/delete")
-    public Result<?> delWebCase(@RequestBody UiWebCase webCase) throws Exception {
+    public Result<?> delWebCase(@RequestBody UiWebCase webCase) {
         return webCaseService.delWebCase(webCase);
     }
 

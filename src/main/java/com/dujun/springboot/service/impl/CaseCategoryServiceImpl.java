@@ -1,6 +1,7 @@
 package com.dujun.springboot.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dujun.springboot.VO.Result;
 import com.dujun.springboot.entity.ApiCase;
 import com.dujun.springboot.entity.CaseApiRelation;
@@ -9,7 +10,6 @@ import com.dujun.springboot.mapper.ApiCaseMapper;
 import com.dujun.springboot.mapper.CaseApiRelationMapper;
 import com.dujun.springboot.mapper.CaseCategoryMapper;
 import com.dujun.springboot.service.CaseCategoryService;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
@@ -39,19 +39,17 @@ public class CaseCategoryServiceImpl extends ServiceImpl<CaseCategoryMapper, Cas
     @Resource
     private CaseApiRelationMapper caseApiRelationMapper;
 
-
-
     // 新增修改用例分类
-    public Result update_category(CaseCategory caseCategory){
+    public Result<?> update_category(CaseCategory caseCategory) {
         Long id = caseCategory.getId();
         ApiCase apiCase = new ApiCase();
-        if(id == null){
+        if (id == null) {
             caseCategoryMapper.insert(caseCategory);
-            if(caseCategory.getType() == 1){
+            if (caseCategory.getType() == 1) {
                 apiCase.setCategoryId(caseCategory.getId());
                 apiCaseMapper.insert(apiCase);
             }
-        }else {
+        } else {
             caseCategoryMapper.updateById(caseCategory);
         }
         return Result.success();
@@ -86,29 +84,25 @@ public class CaseCategoryServiceImpl extends ServiceImpl<CaseCategoryMapper, Cas
     }
 
 
-    //删除用例分类
     /**
+     * 删除用例分类
      *
      * @param id 分类ID
      */
     @Transactional
-    public Result delete(int id ){
+    public Result<?> delete(int id) {
         // 获取用例ID
-        ApiCase apiCase = apiCaseMapper.selectOne(new QueryWrapper<ApiCase>().eq("category_id",id));
-        int caseId = apiCase.getId();
-
-        // 删除用例接口关联表
-        caseApiRelationMapper.delete(new QueryWrapper<CaseApiRelation>().eq("case_id",caseId));
-
-        // 删除用例表
-        apiCaseMapper.deleteById(caseId);
-
+        ApiCase apiCase = apiCaseMapper.selectOne(new QueryWrapper<ApiCase>().eq("category_id", id));
+        if (apiCase != null) {
+            int caseId = apiCase.getId();
+            // 删除用例接口关联表
+            caseApiRelationMapper.delete(new QueryWrapper<CaseApiRelation>().eq("case_id", caseId));
+            // 删除用例表
+            apiCaseMapper.deleteById(caseId);
+        }
         // 删除分类数据
         caseCategoryMapper.deleteById(id);
-
         return Result.success();
     }
-
-
 
 }

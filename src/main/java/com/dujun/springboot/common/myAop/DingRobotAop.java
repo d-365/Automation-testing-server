@@ -1,4 +1,4 @@
-/**
+/*
  * author     : dujun
  * date       : 2022/8/18 16:25
  * description: 告诉大家我是干啥的
@@ -20,12 +20,14 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Component;
+
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 @Log4j2
+//切面
 @Aspect
 @Component
 public class DingRobotAop {
@@ -40,14 +42,18 @@ public class DingRobotAop {
      * 切入点
      */
     @Pointcut("@annotation(com.dujun.springboot.common.myAnnotation.DingRobotAn)")
-    public void robotPointCut(){}
+    public void robotPointCut() {
+    }
 
+    /**
+     * 通知
+     */
     @Around("robotPointCut()")
-    public Object round(ProceedingJoinPoint point){
-        Object[] args =  point.getArgs();
+    public Object round(ProceedingJoinPoint point) {
+        Object[] args = point.getArgs();
         Integer planId = (Integer) args[0];
         log.debug("前置机器人开始执行");
-        roundRobot(0,planId);
+        roundRobot(0, planId);
         Object result = null;
         try {
             result = point.proceed();
@@ -84,9 +90,7 @@ public class DingRobotAop {
                         }});
                     }});
                 }};
-                dingRobots.forEach((item)->{
-                    RobotExec(item,payload);
-                });
+                dingRobots.forEach((item) -> RobotExec(item, payload));
             }else if (robotType ==1){
                 LambdaQueryWrapper<PlanResult> planResultWrapper = new LambdaQueryWrapper<>();
                 planResultWrapper

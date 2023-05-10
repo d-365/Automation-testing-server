@@ -23,6 +23,7 @@ public enum actionEnum{
     TODEFAULTCONTENT("切换回默认内容"),
     EXECPYTHON("执行python文件"),
     QUERYSQL("执行查询sql"),
+    QYHAPPLY("轻易花APP用户填单"),
     UPDATESQL("执行sql-无结果");
 
     private final String describe;
@@ -32,6 +33,6 @@ public enum actionEnum{
     }
 
     actionEnum(String describe) {
-        this.describe =describe;
+        this.describe = describe;
     }
 }

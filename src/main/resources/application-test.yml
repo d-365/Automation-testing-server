@@ -44,7 +44,6 @@ spring:
     connect-timeout: 3000
     password: 4A$2QgF4g7Orz*
 
-
 # mybatis-plus
 mybatis-plus:
   # 打印sql执行结果

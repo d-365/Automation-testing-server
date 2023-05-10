@@ -17,8 +17,9 @@ import com.dujun.springboot.entity.WebCaseStep;
 import com.dujun.springboot.mapper.UiWebCaseMapper;
 import com.dujun.springboot.mapper.WebCaseStepMapper;
 import com.dujun.springboot.service.UiWebCaseService;
-import com.dujun.springboot.utils.UserHttpAgentUtils;
 import io.appium.java_client.AppiumDriver;
+import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,11 +28,11 @@ import org.testng.collections.Lists;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -56,7 +57,6 @@ public class UiWebCaseServiceImpl extends ServiceImpl<UiWebCaseMapper, UiWebCase
 
     @Resource
     private AppUtils appUtils;
-
 
     @Override
     public Result<?> caseList(Integer caseType) {
@@ -86,24 +86,32 @@ public class UiWebCaseServiceImpl extends ServiceImpl<UiWebCaseMapper, UiWebCase
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Result<?> delWebCase(UiWebCase webCase) throws Exception{
-        List<UiWebCase> webCases = new ArrayList<UiWebCase>(){{
-            add(webCase);
-        }};
-        // 查询对应的 case
-        delCaseDeep(webCases);
+    public Result<?> delWebCase(UiWebCase webCase) {
+        webCaseMapper.deleteById(webCase.getId());
+        delCaseStepDeep(webCase);
+        delCaseDeep(webCase.getChildren());
         return Result.success();
     }
 
     @Override
     public Result<?> deepCopy(UiWebCase webCase) {
+        // 被复制第一级用例ID
+        Integer rowWebCaseId = webCase.getId();
+
         webCase.setId(null);
+        webCase.setName(webCase.getName() + "Copy");
         webCaseMapper.insert(webCase);
-        deepCopyHelp(webCase.getChildren(),webCase.getId());
+
+        // 如果复制的是用例、把用例步骤也同步进行复制
+        deepCopyCaseStep(webCase, rowWebCaseId);
+
+        deepCopyHelp(webCase.getChildren(), webCase.getId());
         return Result.success();
     }
 
-    // 获取用例步骤列表
+    /**
+     * 获取用例步骤列表
+     */
     @Override
     public Result<?> steps(Integer caseId, Integer current, Integer size) {
         IPage<WebCaseStep> page = new Page<>(current, size);
@@ -115,37 +123,71 @@ public class UiWebCaseServiceImpl extends ServiceImpl<UiWebCaseMapper, UiWebCase
     }
 
     /**
-     * 递归复制
+     * 递归复制用例
      */
-    private void deepCopyHelp(List<UiWebCase> webCasesList,Integer parentId){
-        if (webCasesList.size() != 0){
+    private void deepCopyHelp(List<UiWebCase> webCasesList, Integer parentId){
+        if (webCasesList != null && webCasesList.size() != 0) {
             for (UiWebCase webCase : webCasesList) {
+                Integer rowCaseId = webCase.getId();
                 webCase.setId(null);
                 webCase.setParentId(parentId);
                 webCaseMapper.insert(webCase);
-                deepCopyHelp(webCase.getChildren(),webCase.getId());
+                deepCopyCaseStep(webCase, rowCaseId);
+                deepCopyHelp(webCase.getChildren(), webCase.getId());
             }
         }
+    }
 
+    private void deepCopyCaseStep(UiWebCase webCase, Integer rowWebCaseId) {
+        if (webCase.getType() == 1) {
+            LambdaQueryWrapper<WebCaseStep> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+            lambdaQueryWrapper.eq(WebCaseStep::getCaseId, rowWebCaseId);
+            List<WebCaseStep> webCaseSteps = webCaseStepMapper.selectList(lambdaQueryWrapper);
+            webCaseSteps.forEach(webCaseStep -> {
+                webCaseStep.setCaseId(webCase.getId());
+                webCaseStep.setId(null);
+                webCaseStepMapper.insert(webCaseStep);
+            });
+        }
     }
 
     /**
-     * 递归删除
+     * 递归删除测试用例
      */
-    private void delCaseDeep(List<UiWebCase> webCase){
-        for (UiWebCase MyWebCase : webCase) {
-            if (MyWebCase.getChildren() !=null){
-                if (MyWebCase.getChildren().size()!=0){
-                    delCaseDeep(MyWebCase.getChildren());
+    private void delCaseDeep(List<UiWebCase> webCase) {
+        if (webCase != null) {
+            for (UiWebCase MyWebCase : webCase) {
+                if (MyWebCase.getChildren() != null) {
+                    if (MyWebCase.getChildren().size() != 0) {
+                        delCaseDeep(MyWebCase.getChildren());
+                    }
                 }
+                webCaseMapper.deleteById(MyWebCase);
             }
-            webCaseMapper.deleteById(MyWebCase);
+        }
+    }
+
+    /**
+     * 递归删除用例步骤
+     *
+     * @param webCase 测试用例
+     */
+    private void delCaseStepDeep(UiWebCase webCase) {
+        if (webCase.getType() == 1) {
+            LambdaQueryWrapper<WebCaseStep> webCaseStepLambdaQueryWrapper = new LambdaQueryWrapper<>();
+            webCaseStepLambdaQueryWrapper.eq(WebCaseStep::getCaseId, webCase.getId());
+            List<WebCaseStep> webCaseSteps = webCaseStepMapper.selectList(webCaseStepLambdaQueryWrapper);
+            if (webCaseSteps != null && webCaseSteps.size() > 0) {
+                List<Integer> idList = webCaseSteps.stream().map(WebCaseStep::getId).collect(Collectors.toList());
+                webCaseStepMapper.deleteBatchIds(idList);
+            }
         }
     }
 
     /**
      * 递归遍历获取子元素
-     * @param id 父类ID
+     *
+     * @param id          父类ID
      * @param allWebCases 要遍历所有元素
      * @return 子元素列表
      */
@@ -185,6 +227,7 @@ public class UiWebCaseServiceImpl extends ServiceImpl<UiWebCaseMapper, UiWebCase
     @Override
     public Result<?> debugCase(Integer caseId,String payload, HttpServletRequest request) {
         List<UIConsole> consoles = new ArrayList<>();
+
         ExecutorService executor = Executors.newCachedThreadPool();
         if (payload!=null){
             JSONObject jsonObject = JSON.parseObject(payload);
@@ -237,16 +280,23 @@ public class UiWebCaseServiceImpl extends ServiceImpl<UiWebCaseMapper, UiWebCase
                     } else {
                         return Result.error("Appium连接Server失败");
                     }
-                } catch (Exception e) {
+                } catch (TimeoutException e) {
                     e.printStackTrace();
-                    return Result.error("Appium调试用例失败，请检查后重试");
+                    return Result.error("元素定位失败，请检查后重试");
+                } catch (InterruptedException | ExecutionException e) {
+                    e.printStackTrace();
+                    return Result.error("未知异常，请检查后重试");
+                } catch (WebDriverException exception) {
+                    exception.printStackTrace();
                 }
             }
         }
         return Result.success(consoles);
     }
 
-    // seleniumServer下载
+    /**
+     * seleniumServer下载
+     */
     @Override
     public void seleniumServerDownload(HttpServletResponse response) {
 

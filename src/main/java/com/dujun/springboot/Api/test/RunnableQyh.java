@@ -13,6 +13,7 @@ import com.dujun.springboot.data.ApiOrderData;
 import com.dujun.springboot.tools.RandomValue;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.util.StopWatch;
+
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -25,14 +26,12 @@ public class RunnableQyh implements Runnable{
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         String phone = RandomValue.getTel();
-//        phone = "17637898368";
+//        phone = "17310045947";
         Qyh qyh = new Qyh(phone);
         String city = RandomValue.getAddress();
-        HashMap<String, Object> payload = ApiOrderData.qyh_applyData("南阳市");
-        System.out.println(JSONObject.toJSONString(payload));
+        HashMap<String, Object> payload = ApiOrderData.qyh_applyData("北京市");
         CompletableFuture<String> completableFuture = CompletableFuture.supplyAsync(() -> {
             JSONObject jsonObject = qyh.fillForm(JSON.toJSONString(payload));
-            System.out.println(jsonObject);
             log.debug(jsonObject);
             return "";
         });
@@ -44,8 +43,6 @@ public class RunnableQyh implements Runnable{
         log.debug(Thread.currentThread().getName());
         qyh.request.close();
         stopWatch.stop();
-        System.out.println(stopWatch.getLastTaskTimeMillis());
-        System.out.println(stopWatch.getTotalTimeMillis());
     }
 
 }

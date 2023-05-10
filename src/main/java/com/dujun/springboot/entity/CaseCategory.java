@@ -1,22 +1,20 @@
 package com.dujun.springboot.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
-
-import java.util.ArrayList;
-import java.util.Date;
-
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
-import java.io.Serializable;
-import java.util.List;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 /**
  * <p>
- * 
+ *
  * </p>
  *
  * @author dujun
@@ -55,7 +53,7 @@ public class CaseCategory implements Serializable {
     /**
      * 0 文件夹 1 用例
      */
-    private Integer type;
+    private Integer type = 0;
 
     @TableField(exist = false)
     private List<CaseCategory> children = new ArrayList<>();

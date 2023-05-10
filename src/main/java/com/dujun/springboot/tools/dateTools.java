@@ -8,7 +8,6 @@ package com.dujun.springboot.tools;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 
 public class dateTools {
 
@@ -37,9 +36,7 @@ public class dateTools {
     }
 
     public static void main(String[] args) {
-        for (int i=0;i>-7;i--){
-            System.out.println(dateTools.currentDay(i));
-        }
+        System.out.println(currentTime());
     }
 
 

@@ -109,6 +109,6 @@ public class ActionServiceImpl extends ServiceImpl<ActionMapper, Action> impleme
             action_parent.setChildren(actionTreeDeep(action_parent.getId(),actions));
         }
         return Result.success(parentAction);
-    };
+    }
 
 }

@@ -12,6 +12,7 @@ import com.dujun.springboot.mapper.CategoryApiMapper;
 import com.dujun.springboot.mapper.PlanRoundMapper;
 import com.dujun.springboot.service.ApiInfoService;
 import org.springframework.stereotype.Service;
+
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -62,7 +63,6 @@ public class ApiInfoServiceImpl extends ServiceImpl<ApiInfoMapper, ApiInfo> impl
 
     // 保存接口信息
     public Result<?> saveApi(ApiInfo apiInfo){
-
         Long apiID = apiInfo.getApiSuiteId();
 
         // 处理前置信息
@@ -70,7 +70,7 @@ public class ApiInfoServiceImpl extends ServiceImpl<ApiInfoMapper, ApiInfo> impl
         if (setUp.size()>0){
             List<Integer> setUpIds = new ArrayList<>();
             for (PlanRound planRound : setUp) {
-                if (planRound != null){
+                if (planRound != null && planRound.getId() != null) {
                     planRound.setType(0);
                     setUpIds.add(updatePlanRound(planRound));
                 }
@@ -83,7 +83,7 @@ public class ApiInfoServiceImpl extends ServiceImpl<ApiInfoMapper, ApiInfo> impl
         if (tearDown.size()>0){
             List<Integer> tearDownIds = new ArrayList<>();
             for (PlanRound planRound : tearDown) {
-                if (planRound!=null){
+                if (planRound != null && planRound.getId() != null) {
                     planRound.setType(1);
                     tearDownIds.add(updatePlanRound(planRound));
                 }
@@ -108,7 +108,6 @@ public class ApiInfoServiceImpl extends ServiceImpl<ApiInfoMapper, ApiInfo> impl
             categoryApi.setMethod(apiMethod);
             categoryApiMapper.updateById(categoryApi);
         }
-
         return Result.success();
     }
 

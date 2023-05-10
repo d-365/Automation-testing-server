@@ -6,8 +6,13 @@
 
 package com.dujun.springboot.common.appium;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.dujun.springboot.Api.qyh.Qyh;
 import com.dujun.springboot.VO.UIConsole;
+import com.dujun.springboot.data.ApiOrderData;
 import com.dujun.springboot.entity.WebCaseStep;
+import com.dujun.springboot.tools.RandomValue;
 import com.dujun.springboot.utils.BeanContext;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.android.AndroidDriver;
@@ -166,7 +171,7 @@ public class AppActionFactory {
      */
     private UIConsole input(AppiumDriver driver, WebCaseStep caseStep){
         UIConsole uiConsole = new UIConsole();
-        String execMsg = null;
+        String execMsg;
         WebElement element = null;
         try {
             element = appUtils.getElement(driver,caseStep.getElementId());
@@ -389,6 +394,38 @@ public class AppActionFactory {
     }
 
     /**
+     * 轻易花用户填单
+     *
+     * @param driver   AppiumDriver
+     * @param caseStep 用例步骤
+     */
+    private UIConsole qyhApply(AppiumDriver driver, WebCaseStep caseStep) {
+        UIConsole uiConsole = new UIConsole();
+        String execMsg;
+        String phone = RandomValue.getTel();
+        String city;
+        if (Objects.equals(caseStep.getActionValue(), "") || caseStep.getActionValue() == null) {
+            city = "南阳市";
+        } else {
+            city = caseStep.getActionValue();
+        }
+        try {
+            Qyh qyh = new Qyh(phone);
+            HashMap<String, Object> payload = ApiOrderData.qyh_applyData(city);
+            JSONObject jsonObject = qyh.fillForm(JSON.toJSONString(payload));
+            Qyh.mysqlTools.close();
+            execMsg = String.format("步骤ID%1$s执行成功--填单完成", caseStep.getId());
+            uiConsole.setCode(0);
+        } catch (Exception e) {
+            e.printStackTrace();
+            execMsg = String.format("步骤ID%1$s执行失败-填单失败%1$S", caseStep.getId());
+            uiConsole.setCode(1);
+        }
+        uiConsole.setMsg(execMsg);
+        return uiConsole;
+    }
+
+    /**
      * 执行APPAction操作
      *
      * @param actionKey 操作方式
@@ -414,6 +451,7 @@ public class AppActionFactory {
         appFunInterHashMap.put(AppActionEnum.SWIPE_RIGHT, this::swipeRight);
         appFunInterHashMap.put(AppActionEnum.TAP_CLICK, this::tapClick);
         appFunInterHashMap.put(AppActionEnum.EXECJS, this::execJs);
+        appFunInterHashMap.put(AppActionEnum.QYHAPPLY, this::qyhApply);
         AppFunInter appFunInter = appFunInterHashMap.get(actionKey);
         return appFunInter.apply(driver, caseStep);
     }

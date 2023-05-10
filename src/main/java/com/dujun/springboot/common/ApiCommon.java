@@ -127,7 +127,7 @@ public  class ApiCommon {
 
         // 执行后置动作
         List<PlanRound> tearDown = apiInfo.getAfterExec();
-        System.out.println(tearDown);
+
         tearDown = tearDown==null?new ArrayList<>():tearDown;
         if (tearDown.size()>0){
             ArrayList<ApiConsole> tearDownResult  = ApiCommon.exec(tearDown);
@@ -190,6 +190,7 @@ public  class ApiCommon {
 
     // 单接口请求封装
     public static Result<?> apiDebug(Integer envId,ApiInfo apiInfo) {
+
         // 控制台输出
         ArrayList<ApiConsole> console = new ArrayList<>();
         CloseableHttpResponse response = null;
@@ -224,8 +225,8 @@ public  class ApiCommon {
 
         // 执行前置动作
         List<PlanRound> beforeExec = apiInfo.getBeforeExec();
-        if (beforeExec.size()>0){
-            ArrayList<ApiConsole> beforeExecResult  = ApiCommon.exec(beforeExec);
+        if (beforeExec != null & beforeExec.size() > 0) {
+            ArrayList<ApiConsole> beforeExecResult = ApiCommon.exec(beforeExec);
             console.addAll(beforeExecResult);
         }
 
@@ -274,8 +275,8 @@ public  class ApiCommon {
 
         // 执行后置动作
         List<PlanRound> tearDown = apiInfo.getAfterExec();
-        if (tearDown.size()>0){
-            ArrayList<ApiConsole> tearDownResult  = ApiCommon.exec(tearDown);
+        if (tearDown != null & tearDown.size() > 0) {
+            ArrayList<ApiConsole> tearDownResult = ApiCommon.exec(tearDown);
             console.addAll(tearDownResult);
         }
 
@@ -339,21 +340,30 @@ public  class ApiCommon {
      * @param apiInfo 接口详情
      * @return apiInfo
      */
-    public static ApiInfo setUpTearDownDispose(ApiInfo apiInfo){
+    public static ApiInfo setUpTearDownDispose(ApiInfo apiInfo) {
         // 处理前置后置信息
         List<Integer> setUpIds = apiInfo.getSetUpIds();
         List<Integer> tearDownIds = apiInfo.getTearDownIds();
         List<PlanRound> setUp = new ArrayList<>();
         List<PlanRound> tearDown = new ArrayList<>();
-        if (setUpIds.size()>0){
+
+        if (setUpIds != null && setUpIds.size() > 0) {
             for (Integer setUpId : setUpIds) {
                 setUp.add(planRoundMapper.selectById(setUpId));
             }
         }
-        if (tearDownIds.size()>0){
+        if (setUpIds != null && tearDownIds.size() > 0) {
             for (Integer tearDownId : tearDownIds) {
                 tearDown.add(planRoundMapper.selectById(tearDownId));
             }
+        }
+        if (setUp.size() == 0) {
+            PlanRound planRound = new PlanRound();
+            setUp.add(planRound);
+        }
+        if (tearDown.size() == 0) {
+            PlanRound round = new PlanRound();
+            tearDown.add(round);
         }
         apiInfo.setBeforeExec(setUp);
         apiInfo.setAfterExec(tearDown);
@@ -438,6 +448,7 @@ public  class ApiCommon {
         return consoleMsg;
 
     }
+
     /**
      * @param expectValue  期望值
      * @param realityValue   实际值
@@ -487,99 +498,106 @@ public  class ApiCommon {
      * @param jsonObject 源json串
      * @param extractExpress  解析表达式
      */
-    public static String  parseJson(JSONObject jsonObject,String extractExpress ){
-        String finalValue = "";
-        if(Objects.equals(extractExpress, "")){
-            return "解析表达式不能为空"; }
+    public static String  parseJson(JSONObject jsonObject,String extractExpress ) {
+        String finalValue = "无法解析表达式值";
+        if (Objects.equals(extractExpress, "")) {
+            return "解析表达式不能为空";
+        }
         JSONObject ParseJsonObject = jsonObject;
         JSONArray parseJsonArray = null;
-        if (extractExpress.contains(".")){
-            String[] strings = extractExpress.split("\\.");
-            for (int i = 0; i < strings.length; i++) {
-                if (i<strings.length-1){
-                    if(strings[i].contains("[")){
-                        String[] parseArrayList =  strings[i].split("\\[");
-                        for (String s : parseArrayList) {
-                            if (s.endsWith("]")) {
-                                s = s.substring(0, s.length() - 1);
-                            }
-                            if (s.matches("[0-9]+")) {
-                                assert parseJsonArray != null;
-                                ParseJsonObject = (JSONObject) parseJsonArray.get(Integer.parseInt(s));
-                            } else {
-                                try {
-                                    parseJsonArray = ParseJsonObject.getJSONArray(s);
-                                } catch (ClassCastException castException) {
-                                    return "无法解析表达式值" + s;
+        try {
+            if (extractExpress.contains(".")) {
+                String[] strings = extractExpress.split("\\.");
+                for (int i = 0; i < strings.length; i++) {
+                    if (i < strings.length - 1) {
+                        if (strings[i].contains("[")) {
+                            String[] parseArrayList = strings[i].split("\\[");
+                            for (String s : parseArrayList) {
+                                if (s.endsWith("]")) {
+                                    s = s.substring(0, s.length() - 1);
                                 }
+                                if (s.matches("[0-9]+")) {
+                                    assert parseJsonArray != null;
+                                    ParseJsonObject = (JSONObject) parseJsonArray.get(Integer.parseInt(s));
+                                } else {
+                                    try {
+                                        parseJsonArray = ParseJsonObject.getJSONArray(s);
+                                    } catch (ClassCastException castException) {
+                                        return "无法解析表达式值" + s;
+                                    }
 
-                            }
-                        }
-                    }else {
-                        try{
-                            ParseJsonObject = JSONObject.parseObject((ParseJsonObject.getString(strings[i])));
-                        }catch (JSONException jsonException){
-                            return "无法解析表达式值:"+ strings[i];
-                        }
-                    }
-                }
-                else {
-                    if(strings[i].contains("[")){
-                        String[] parseArrayList =  strings[i].split("\\[");
-                        for (String s : parseArrayList) {
-                            if (s.endsWith("]")) {
-                                s = s.substring(0, s.length() - 1);
-                            }
-                            if (s.matches("[0-9]+")) {
-                                assert parseJsonArray != null;
-                                finalValue = (String) parseJsonArray.get(Integer.parseInt(s));
-                            } else {
-                                try {
-                                    parseJsonArray = ParseJsonObject.getJSONArray(s);
-                                } catch (ClassCastException castException) {
-                                    castException.printStackTrace();
-                                    return "无法解析表达式值" + s;
                                 }
-
+                            }
+                        } else {
+                            try {
+                                ParseJsonObject = JSONObject.parseObject((ParseJsonObject.getString(strings[i])));
+                            } catch (JSONException jsonException) {
+                                return "无法解析表达式值:" + strings[i];
                             }
                         }
-                    }else {
-                        finalValue=ParseJsonObject.getString(strings[i]);
-                    }
-                }
-            }
-        }else {
-            if(extractExpress.contains("[")){
-                String[] parseArrayList =  extractExpress.split("\\[");
-                for (String s : parseArrayList) {
-                    //
-                    if (s.endsWith("]")) {
-                        s = s.substring(0, s.length() - 1);
-                    }
-                    if (s.matches("[0-9]+")) {
-                        assert parseJsonArray != null;
-                        finalValue =  (String) parseJsonArray.get(Integer.parseInt(s));
                     } else {
-                        try {
-                            parseJsonArray = ParseJsonObject.getJSONArray(s);
-                        } catch (ClassCastException castException) {
-                            castException.printStackTrace();
-                            return "无法解析表达式值" + s;
+                        if (strings[i].contains("[")) {
+                            String[] parseArrayList = strings[i].split("\\[");
+                            for (String s : parseArrayList) {
+                                if (s.endsWith("]")) {
+                                    s = s.substring(0, s.length() - 1);
+                                }
+                                if (s.matches("[0-9]+")) {
+                                    assert parseJsonArray != null;
+                                    finalValue = (String) parseJsonArray.get(Integer.parseInt(s));
+                                } else {
+                                    try {
+                                        parseJsonArray = ParseJsonObject.getJSONArray(s);
+                                    } catch (ClassCastException castException) {
+                                        castException.printStackTrace();
+                                        return "无法解析表达式值" + s;
+                                    }
+                                }
+                            }
+                        } else {
+                            finalValue = ParseJsonObject.getString(strings[i]);
                         }
-
                     }
                 }
-            }else {
-                finalValue = jsonObject.getString(extractExpress);
+            } else {
+                if (extractExpress.contains("[")) {
+                    String[] parseArrayList = extractExpress.split("\\[");
+                    for (String s : parseArrayList) {
+                        //
+                        if (s.endsWith("]")) {
+                            s = s.substring(0, s.length() - 1);
+                        }
+                        if (s.matches("[0-9]+")) {
+                            assert parseJsonArray != null;
+                            finalValue = (String) parseJsonArray.get(Integer.parseInt(s));
+                        } else {
+                            try {
+                                parseJsonArray = ParseJsonObject.getJSONArray(s);
+                            } catch (ClassCastException castException) {
+                                castException.printStackTrace();
+                                return "无法解析表达式值" + s;
+                            }
+
+                        }
+                    }
+                } else {
+                    finalValue = jsonObject.getString(extractExpress);
+                }
             }
-        }
-        if (finalValue == null){
-            return "无法解析表达式值";
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return finalValue;
     }
-    //参数表达式解析(响应头)
-    public static  String parseHeader(ArrayList<HashMap<String,String>> rspHeader ,String express){
+
+    /**
+     * //参数表达式解析(响应头)
+     *
+     * @param rspHeader 请求头
+     * @param express   表达式
+     * @return String
+     */
+    public static String parseHeader(ArrayList<HashMap<String, String>> rspHeader, String express) {
         String finalValue = "";
         for (HashMap<String, String> hashMap : rspHeader) {
             finalValue = hashMap.get(express);
@@ -594,13 +612,12 @@ public  class ApiCommon {
      * @param rspHeader 响应体
      */
     public static void apiExtract(ArrayList<RspExtract> reqExtract, JSONObject rspJson, String rspCode, ArrayList<HashMap<String,String>> rspHeader){
-
         for(RspExtract extract : reqExtract){
-            if(extract.getDataSource()!=null&& extract.getExtractExpress()!=null){
+            if (extract.getDataSource() != null && extract.getExtractExpress() != null) {
                 // 数据源
-                String  dataSource = extract.getDataSource().trim();
+                String dataSource = extract.getDataSource().trim();
                 // 未解析表达式内容
-                String  extractExpress = extract.getExtractExpress().trim();
+                String extractExpress = extract.getExtractExpress().trim();
                 // 变量名称
                 String varName = extract.getVarName();
                 // 变量值
@@ -629,14 +646,12 @@ public  class ApiCommon {
             }
 
         }
-
     }
 
     // 获取用例执行后的接口参数
     public static Map<String, String> getGlobalParams(){
         return apiGlobalParams;
     }
-
 
     // 解析请求头
     public static HashMap<String,String> parseHeaders(ArrayList<HashMap> headerList){
@@ -659,7 +674,6 @@ public  class ApiCommon {
                 }
 
                 headers.put(key,value);
-
             }
         }
         return headers;
@@ -801,22 +815,24 @@ public  class ApiCommon {
     public static ArrayList<ApiConsole> exec(List<PlanRound> exec){
         ArrayList<ApiConsole> consoleMsg = new ArrayList<>();
         for (PlanRound planRound : exec) {
-            ApiConsole apiConsole = new ApiConsole();
-            Integer actionId = planRound.getActionId();
-            String actionValue = planRound.getParams();
-            String operationData = planRound.getOperateData();
-            // 获取Action类型
-            Action action = actionMapper.selectById(actionId);
-            actionEnum AcType = actionEnum.valueOf(action.getActionKey());
-            if (AcType==actionEnum.QUERYSQL||AcType==actionEnum.UPDATESQL){
-                DbConfig dbConfig = dbConfigMapper.selectById(operationData);
-                UIConsole  uiConsole =  seleniumUtils.runAction(action.getActionKey(), dbConfig,actionValue);
-                String msg = uiConsole.getMsg();
-                Integer code = uiConsole.getCode();
-                apiConsole.setMsg(msg);
-                apiConsole.setSuccess(code == 0);
+            if (planRound.getId() != null) {
+                ApiConsole apiConsole = new ApiConsole();
+                Integer actionId = planRound.getActionId();
+                String actionValue = planRound.getParams();
+                String operationData = planRound.getOperateData();
+                // 获取Action类型
+                Action action = actionMapper.selectById(actionId);
+                actionEnum AcType = actionEnum.valueOf(action.getActionKey());
+                if (AcType == actionEnum.QUERYSQL || AcType == actionEnum.UPDATESQL) {
+                    DbConfig dbConfig = dbConfigMapper.selectById(operationData);
+                    UIConsole uiConsole = seleniumUtils.runAction(action.getActionKey(), dbConfig, actionValue);
+                    String msg = uiConsole.getMsg();
+                    Integer code = uiConsole.getCode();
+                    apiConsole.setMsg(msg);
+                    apiConsole.setSuccess(code == 0);
+                }
+                consoleMsg.add(apiConsole);
             }
-            consoleMsg.add(apiConsole);
         }
         return  consoleMsg;
     }

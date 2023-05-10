@@ -6,14 +6,20 @@
 
 package com.dujun.springboot.common.selenium;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.dujun.springboot.Api.qyh.Qyh;
 import com.dujun.springboot.VO.UIConsole;
 import com.dujun.springboot.common.actionEnum;
+import com.dujun.springboot.data.ApiOrderData;
 import com.dujun.springboot.entity.WebCaseStep;
+import com.dujun.springboot.tools.RandomValue;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
 import java.util.HashMap;
 import java.util.Objects;
 
@@ -400,15 +406,47 @@ public class ActionFactory {
         return uiConsole;
     }
 
+    /**
+     * 轻易花用户填单
+     *
+     * @param driver   AppiumDriver
+     * @param caseStep 用例步骤
+     */
+    private UIConsole qyhApply(WebDriver driver, WebCaseStep caseStep) {
+        UIConsole uiConsole = new UIConsole();
+        String execMsg;
+        String phone = RandomValue.getTel();
+        String city;
+        if (Objects.equals(caseStep.getActionValue(), "") || caseStep.getActionValue() == null) {
+            city = "南阳市";
+        } else {
+            city = caseStep.getActionValue();
+        }
+        try {
+            Qyh qyh = new Qyh(phone);
+            HashMap<String, Object> payload = ApiOrderData.qyh_applyData(city);
+            JSONObject jsonObject = qyh.fillForm(JSON.toJSONString(payload));
+            Qyh.mysqlTools.close();
+            execMsg = String.format("步骤ID%1$s执行成功--填单完成", caseStep.getId());
+            uiConsole.setCode(0);
+        } catch (Exception e) {
+            e.printStackTrace();
+            execMsg = String.format("步骤ID%1$s执行失败-填单失败%1$S", caseStep.getId());
+            uiConsole.setCode(1);
+        }
+        uiConsole.setMsg(execMsg);
+        return uiConsole;
+    }
+
     public UIConsole execAction(actionEnum actionType, WebDriver driver, WebCaseStep caseStep) {
         HashMap<actionEnum, MyFunctionalInterface> myActionMap = new HashMap<>();
         myActionMap.put(actionEnum.OPENURL, this::openUrl);
         myActionMap.put(actionEnum.CLICK, this::click);
-        myActionMap.put(actionEnum.INPUT,this::input);
-        myActionMap.put(actionEnum.SLEEP,this::sleep);
-        myActionMap.put(actionEnum.FORWARD,this::forward);
-        myActionMap.put(actionEnum.BACK,this::back);
-        myActionMap.put(actionEnum.CLEAR,this::clear);
+        myActionMap.put(actionEnum.INPUT, this::input);
+        myActionMap.put(actionEnum.SLEEP, this::sleep);
+        myActionMap.put(actionEnum.FORWARD, this::forward);
+        myActionMap.put(actionEnum.BACK, this::back);
+        myActionMap.put(actionEnum.CLEAR, this::clear);
         myActionMap.put(actionEnum.REFRESH,this::refresh);
         myActionMap.put(actionEnum.GETCOLOR,this::getColor);
         myActionMap.put(actionEnum.GETBACKGROUNDCOLOR,this::getBackGroundColor);
@@ -420,6 +458,7 @@ public class ActionFactory {
         myActionMap.put(actionEnum.SWITCHFRAMEBYNAME,this::switchFrameByName);
         myActionMap.put(actionEnum.SWITCHFRAMEBYELEMENT, this::switchFrameByElement);
         myActionMap.put(actionEnum.TODEFAULTCONTENT, this::toDefaultContent);
+        myActionMap.put(actionEnum.QYHAPPLY, this::qyhApply);
         myActionMap.put(actionEnum.DEFAULT, this::defaultAction);
         MyFunctionalInterface functionalInterface = myActionMap.get(actionType);
         return functionalInterface.apply(driver,caseStep);

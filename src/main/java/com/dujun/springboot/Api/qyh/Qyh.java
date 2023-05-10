@@ -83,34 +83,39 @@ public class Qyh {
     }
 
     // 通用的headers(json)
-    public HashMap<String,String> header_json(){
-        return new HashMap<String, String>(){{
-            put("Content-Type","application/json;charset=UTF-8");
-            put("token",token);
+    public HashMap<String, String> header_json() {
+        return new HashMap<String, String>() {{
+            put("Content-Type", "application/json;charset=UTF-8");
+            put("token", token);
         }};
     }
 
-    // 填单
-    public JSONObject fillForm(String payload){
-        apply_step();
-        redis_OrderInit();
-        String url = domain+"/api/customer/v1/orderCondition/fillForm";
-        CloseableHttpResponse response = request.post(url,header_json(), payload);
-        return request.getResponseJson(response);
+    public static void main(String[] args) {
+
     }
 
     // 获取手机对应订单ID
-    public  String getOrderId(){
-        String sql = String.format("SELECT id FROM qyh.qyh_order WHERE customer_phone = %s ORDER BY id DESC LIMIT 1",phone);
+    public String getOrderId() {
+        String sql = String.format("SELECT id FROM qyh.qyh_order WHERE customer_phone = %s ORDER BY id DESC LIMIT 1", phone);
         try {
             ResultSet resultSet = mysqlTools.executeQuery(sql);
-            if (resultSet.next()){
+            if (resultSet.next()) {
                 return resultSet.getString("id");
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
         return "";
+    }
+
+    // 填单
+    public JSONObject fillForm(String payload) {
+        apply_step();
+        redis_OrderInit();
+        String url = domain + "/api/customer/v1/orderCondition/fillForm";
+        System.out.println(payload);
+        CloseableHttpResponse response = request.post(url, header_json(), payload);
+        return request.getResponseJson(response);
     }
 
 

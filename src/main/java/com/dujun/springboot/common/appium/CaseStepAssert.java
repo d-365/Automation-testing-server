@@ -11,12 +11,9 @@ import com.dujun.springboot.common.selenium.WebAssertType;
 import com.dujun.springboot.entity.WebCaseStep;
 import io.appium.java_client.AppiumDriver;
 import lombok.extern.log4j.Log4j2;
-import org.hibernate.mapping.TableOwner;
 import org.springframework.stereotype.Component;
-import org.testng.Assert;
 
 import java.util.HashMap;
-import java.util.Objects;
 
 @Component
 @Log4j2
@@ -66,7 +63,6 @@ public class CaseStepAssert {
      */
     private void toastAssert(AppiumDriver driver, WebCaseStep caseStep,AssertConsole assertConsole) {
         String toast = AppiumApi.catch_toast(driver,caseStep.getAssertValue());
-        System.out.println(toast);
         log.debug(String.format("----------------------执行toast断言操作%1$s--------------------",caseStep.getId()));
         assertConsole.setRealityValue(toast);
        if (!toast.equals("")){

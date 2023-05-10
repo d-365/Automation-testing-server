@@ -124,21 +124,25 @@ public class WebPageServiceImpl extends ServiceImpl<WebPageMapper, WebPage> impl
                 webPage.getChildren().addAll(pageList);
             }
         }
-        if (webPage.getChildren().size()>0&&webPage.getType()!=null){
+        if (webPage.getChildren().size() > 0 && webPage.getType() != null) {
             webPage.getChildren().forEach(this::pageEleDeep);
         }
 
     }
 
-    // 更新用例步骤
+    /**
+     * 更新用例步骤
+     */
     @Override
     public Result<?> upCaseStep(List<WebCaseStep> caseSteps) {
         for (WebCaseStep caseStep : caseSteps) {
-            if (Objects.equals(caseStep.getStepDescribe(), "")){return Result.error("操作描述不能为空");}
+            if (Objects.equals(caseStep.getStepDescribe(), "")) {
+                return Result.error("操作描述不能为空");
+            }
             try {
-                if (caseStep.getId() == null){
+                if (caseStep.getId() == null) {
                     caseStepMapper.insert(caseStep);
-                }else {
+                } else {
                     caseStepMapper.updateById(caseStep);
                 }
             }catch (Exception e){

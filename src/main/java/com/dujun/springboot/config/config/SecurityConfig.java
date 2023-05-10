@@ -41,7 +41,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
 
         final String[] SECURITY_IGNORE_API_PATH = {
-                "/user/login", "/mq/*", "/webSocket/*","/test/*"
+                "/user/login", "/mq/*", "/webSocket/*"
         };
 
         http.csrf().disable()

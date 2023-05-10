@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="DefaultSuite" parallel="tests"> <!-- 测试套件名称 -->
+    <test name="TestDu"> <!-- 测试名称 -->
+        <packages>
+            <package name="com.dujun.springboot.temp"/>
+        </packages>
+    </test>
+    <test name="TestDu2"> <!-- 测试名称 -->
+        <packages>
+            <package name="com.dujun.springboot.temp"/>
+        </packages>
+    </test>
+</suite>

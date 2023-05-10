@@ -54,11 +54,17 @@ public class encryptionUtils {
 
     /**
      * Base64解密
+     *
      * @param cipherText String
      * @return String
      */
-    public static String base64Decryption(String cipherText){
-        return  Base64Coder.decodeString(cipherText);
+    public static String base64Decryption(String cipherText) {
+        return Base64Coder.decodeString(cipherText);
+    }
+
+    public static void main(String[] args) {
+        System.out.println(md5Encryption("123456"));
+
     }
 
 }

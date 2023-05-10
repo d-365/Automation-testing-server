@@ -9,6 +9,7 @@ import com.dujun.springboot.entity.PageElement;
 import com.dujun.springboot.mapper.PageElementMapper;
 import com.dujun.springboot.service.PageElementService;
 import org.springframework.stereotype.Service;
+
 import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.List;
@@ -32,13 +33,17 @@ public class PageElementServiceImpl extends ServiceImpl<PageElementMapper, PageE
     public Result<?> elementList(HashMap<Object,Object> pageElement) {
         // 解析参数
         Integer pageId = (Integer) pageElement.get("pageId");
+
         // current
-        long current = Long.parseLong(pageElement.getOrDefault("current",1).toString());
-        long size = Long.parseLong(pageElement.getOrDefault("size",10).toString());
+        long current = Long.parseLong(pageElement.getOrDefault("current", 1).toString());
+        long size = Long.parseLong(pageElement.getOrDefault("size", 10).toString());
         IPage<PageElement> elementPage = new Page<>(current, size);
         QueryWrapper<PageElement> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("page_id",pageId);
-        IPage<PageElement> pageElements = pageElementMapper.selectPage(elementPage,queryWrapper);
+        if (pageElement.get("elementName") != null && !"".equals(pageElement.get("elementName"))) {
+            queryWrapper.like("element_name", pageElement.get("elementName"));
+        }
+        queryWrapper.eq("page_id", pageId);
+        IPage<PageElement> pageElements = pageElementMapper.selectPage(elementPage, queryWrapper);
         return Result.success(pageElements);
     }
 

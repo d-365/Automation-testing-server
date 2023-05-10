@@ -1,7 +1,7 @@
 # 测试环境
 test:
   domain:
-    qyh: http://testmapi.qyihua.com
+    qyh: https://testqyh.qyihua.com
     qs: http://testadmin.qyhnet.com
   redis:
     qyh:

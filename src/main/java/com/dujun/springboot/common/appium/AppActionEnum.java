@@ -19,7 +19,8 @@ public enum AppActionEnum {
     SWIPE_LEFT("向左滑动"),
     SWIPE_RIGHT("向右滑动"),
     TAP_CLICK("使用界面坐标（比例系数）进行定位点击"),
-    EXECJS("执行JS命令");
+    EXECJS("执行JS命令"),
+    QYHAPPLY("轻易花APP用户填单");
 
     private final String describe;
 
