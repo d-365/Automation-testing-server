@@ -68,19 +68,25 @@ public class ApiOrderData {
         Integer money = RandomValue.getInteger(1, 90);
         Integer education = RandomValue.getInteger(1, 4);
         return new HashMap<String, Object>() {{
-            put("loanMoney", 6);
+            put("loanMoney", money);
             put("loanTime", 1);
             put("loanGoal", 0); //资金用途
             put("province", "浙江省");
             put("city", city);
             put("education", education);
-            put("occupation", 0); // 职业身份
+            put("occupation", 2); // 职业身份
+//            put("occupationData", JSON.toJSONString(new HashMap<String, Object>() {{
+//                put("month_income", 1999);
+//                put("income_type", 2);
+//                put("work_unit", "测试专用");
+//                put("workage", 2);
+//            }}));
             put("occupationData", JSON.toJSONString(new HashMap<String, Object>() {{
-                put("month_income", 1999);
-                put("income_type", 2);
-                put("work_unit", "测试专用");
-                put("workage", 2);
+                put("year_income", 299999);
+                put("is_license", 0);
+                put("operating_years", 11);
             }}));
+
             put("socialSecurity", 6);
             put("accumulationFund", 6);
             put("isHasHouse", 1);

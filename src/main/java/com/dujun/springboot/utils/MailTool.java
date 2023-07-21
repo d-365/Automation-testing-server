@@ -18,7 +18,7 @@ import java.util.Properties;
 public class MailTool {
     private static final String From = "859893448@qq.com";//邮件发送人
     private static final String Host = "smtp.qq.com";//邮件传输协议
-    private static final String password = "wsrbthmniifobdef";//邮件校验码
+    private static final String password = "rjzpajdrvsixbcci";//邮件校验码
 
 
     // 发送邮件（不包含附件）
@@ -128,8 +128,7 @@ public class MailTool {
     public static void main(String[] args) {
         String[] s = new  String[]{"17637898368@163.com"};
         File[] file = new File[]{
-                new File("C:\\Users\\dujun\\Pictures\\usually\\photo.jpg"),
-                new File("C:\\Users\\dujun\\Pictures\\usually\\courgette.log")
+                new File("C:\\Users\\dujun\\Downloads\\photo\\1 (2).png"),
         };
         String[] names = new String[]{
                 "1.png","courgette.log"

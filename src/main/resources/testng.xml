@@ -1,14 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
-<suite name="DefaultSuite" parallel="tests"> <!-- 测试套件名称 -->
-    <test name="TestDu"> <!-- 测试名称 -->
-        <packages>
-            <package name="com.dujun.springboot.temp"/>
-        </packages>
+<suite name="DefaultSuite" parallel="methods"> <!-- 测试套件名称 -->
+    <test name="TestDu1"> <!-- 测试名称 -->
+        <classes>
+            <class name="com.dujun.springboot.temp.AutoTest"/>
+        </classes>
     </test>
-    <test name="TestDu2"> <!-- 测试名称 -->
-        <packages>
-            <package name="com.dujun.springboot.temp"/>
-        </packages>
-    </test>
+    <!--    <test name="TestDu"> &lt;!&ndash; 测试名称 &ndash;&gt;-->
+    <!--        <packages> &lt;!&ndash;测试包 &ndash;&gt;-->
+    <!--            <package name="com.dujun.springboot.temp"/>-->
+    <!--        </packages>-->
+    <!--    </test>-->
+    <listeners>
+        <listener class-name="org.testng.reporters.XMLReporter"/>
+    </listeners>
 </suite>

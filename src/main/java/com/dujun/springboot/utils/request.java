@@ -71,7 +71,7 @@ public class request {
                 }
             }
             // 发送get请求
-            response= httpClient.execute(request);
+            response = httpClient.execute(request);
 
         } catch (URISyntaxException | IOException e) {
             e.printStackTrace();
@@ -79,14 +79,36 @@ public class request {
         return response;
     }
 
+
+    // get 传递参数 带请求头信息
+    public CloseableHttpResponse get(String url, HashMap<String, String> headers) {
+        try {
+            // 创建get请求
+            HttpGet request = new HttpGet(url);
+            // 装载header信息
+            for (Map.Entry<String, String> entry : headers.entrySet()) {
+                if (entry.getKey() != null && entry.getValue() != null) {
+                    request.setHeader(entry.getKey(), entry.getValue());
+                }
+            }
+            // 发送get请求
+            response = httpClient.execute(request);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return response;
+    }
+
+
     // post（传递json类型数据)
-    public  CloseableHttpResponse post(String url, HashMap<String, String> headers, String payload){
+    public CloseableHttpResponse post(String url, HashMap<String, String> headers, String payload) {
         HttpPost request = new HttpPost(url);
         request.setConfig(requestConfig);
         // 加载请求头
-        for(String key : headers.keySet()){
-            if(key!=null){
-                request.addHeader(key,headers.get(key));
+        for (String key : headers.keySet()) {
+            if (key != null) {
+                request.addHeader(key, headers.get(key));
             }
         }
         try {

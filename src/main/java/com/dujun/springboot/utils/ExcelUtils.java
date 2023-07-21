@@ -9,9 +9,12 @@ package com.dujun.springboot.utils;
 import com.dujun.springboot.config.annotation.ExportAnnotation;
 import lombok.var;
 import org.apache.poi.hssf.usermodel.*;
-import org.apache.poi.ss.usermodel.HorizontalAlignment;
-import org.apache.poi.ss.usermodel.VerticalAlignment;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.platform.commons.util.StringUtils;
+
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -185,5 +188,38 @@ public class ExcelUtils {
             }
         }
     }
+
+    /**
+     * 读取Excel
+     *
+     * @param filePath  文件路径
+     * @param sheetName sheet名字
+     * @return 二维数组
+     */
+    public static Object[][] readExcelData(String filePath, String sheetName) throws IOException {
+        FileInputStream file = new FileInputStream(filePath);
+        Workbook workbook = new XSSFWorkbook(file);
+        Sheet sheet = workbook.getSheet(sheetName);
+        int rowCount = sheet.getLastRowNum();
+        int columnCount = sheet.getRow(0).getLastCellNum();
+        Object[][] data = new Object[rowCount][columnCount];
+        for (int i = 0; i < rowCount; i++) {
+            Row row = sheet.getRow(i + 1);
+            for (int j = 0; j < columnCount; j++) {
+                Cell cell = row.getCell(j);
+                CellType cellType = cell.getCellType();
+                if (cellType == CellType.STRING) {
+                    data[i][j] = cell.getStringCellValue();
+                } else if (cellType == CellType.NUMERIC) {
+                    data[i][j] = cell.getNumericCellValue();
+                } // 其他数据类型的处理
+
+            }
+        }
+        workbook.close();
+        file.close();
+        return data;
+    }
+
 
 }
