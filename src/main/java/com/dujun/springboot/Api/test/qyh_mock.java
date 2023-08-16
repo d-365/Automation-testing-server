@@ -6,19 +6,13 @@
 
 package com.dujun.springboot.Api.test;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.dujun.springboot.Api.qyh.Qyh;
-import com.dujun.springboot.data.ApiOrderData;
 import com.dujun.springboot.tools.RandomValue;
 import com.dujun.springboot.utils.MysqlTools;
-import com.dujun.springboot.utils.request;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.junit.Assert;
 import org.junit.jupiter.api.Test;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.ResultSet;
-import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -40,74 +34,54 @@ public class qyh_mock {
     }
 
     @Test
+    @Transactional
     public void crm_init() {
         // 新建公司+ 公司主账户
         MysqlTools mysqlTools = new MysqlTools();
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < 30; i++) {
             data_init(mysqlTools);
-//            crm_addAdvertising(mysqlTools);
         }
         // 更新账户余额
         String sql = "UPDATE qyh.crm_company_account SET total_money = 5000 , recharge_money = 2500 ,free_money = 2500;";
         String sql2 = "UPDATE qyh.crm_advertising_distribution SET user_status = 1;";
         String sql3 = "UPDATE qyh.crm_drk_user SET certification_status = 1";
+        String sql4 = "UPDATE qyh.crm_advertising SET is_sub_ad_blind = 1 WHERE is_sub_ad = 1";
+        mysqlTools.execute(sql4);
         mysqlTools.execute(sql);
         mysqlTools.execute(sql2);
         mysqlTools.execute(sql3);
         mysqlTools.close();
     }
 
-    public void data_init(MysqlTools mysqlTools){
+    public void data_init(MysqlTools mysqlTools) {
+        // 扣款方式  1 主账户扣款 2 员工账户扣款
+        Integer deductType = 1;
         // 新建公司+ 公司主账户
         String phone = RandomValue.getTel();
-        System.out.println("公司名称"+phone);
+        System.out.println("公司名称" + phone);
+        // 公司人数
         Integer randomInteger = RandomValue.getInteger(1, 10);
-        randomInteger = 1;
-        String companySql = String.format("INSERT INTO `qyh`.`crm_company` (`company_name`, `company_number`, `brand_name`, `creator_id`, `creator_name`) VALUES ('%1$s', '%2$s', '%1$s', '83', 'd');", phone, randomInteger);
+        String companySql = String.format("INSERT INTO `qyh`.`crm_company` (`company_name`, `company_number`, `brand_name`, `creator_id`, `creator_name`,`deduct_type`) VALUES ('%1$s', '%2$s', '%1$s', '83', 'd','%3$s');", phone, randomInteger, deductType);
         String companyQuerySql = String.format("SELECT id FROM qyh.crm_company WHERE company_name = %s LIMIT 1;", phone);
         try {
             mysqlTools.execute(companySql);
             ResultSet resultSet = mysqlTools.executeQuery(companyQuerySql);
             if (resultSet.next()) {
                 String companyId = resultSet.getString("id");
-                System.out.println(companyId+"公司ID");
-                // 创建公司账户
-                String drkUserSql = String.format("INSERT INTO `qyh`.`crm_drk_user`(`company_id`, `account_type`, `account`, `name`, `password`, `phone`, `role`, `creator_id`, `creator_name`, `status`, `client_ip`, `remark`, `openid`, `is_thread_remind`, `is_balance_remind`, `balance_remind_money`)VALUES('%1$s', '1', '%2$s', 'interface', '889ce4c35f61a2d05b58cea33ff1f0ad', '%2$s', '1', '83', 'd', '1', '1942171814', NULL, NULL, '0', '0', '0');", companyId,phone);
+                System.out.println(companyId + "公司ID");
+                // 创建公司主账户
+                String drkUserSql = String.format("INSERT INTO `qyh`.`crm_drk_user` (`company_id`, `account_type`, `account`, `name`, `password`, `phone`, `current_blind_phone`, `blind_status`, `role`, `creator_id`, `creator_name`, `status`, `client_ip`, `remark`, `openid`, `is_thread_remind`, `is_balance_remind`, `balance_remind_money`, `last_real_name`, `last_id_card`, `last_real_name_time`, `current_real_name`, `current_id_card`, `current_real_name_time`, `certification_status`, `read_status`,`city`, `recycle_time`, `change_blind_status`) VALUES ('%1$s', '1', '17637898369', '杜军', NULL, '%2$s','%2$s', '1', '1', '97', '17637898367', '1', '3080472432', NULL, NULL, '0', '0', '0', NULL, NULL, NULL, '', '', NULL, '1','1', '安顺市', NULL, '0');", companyId, phone);
                 mysqlTools.execute(drkUserSql);
-                String queryUid = String.format("SELECT id FROM qyh.crm_drk_user WHERE company_id = %s;",companyId);
+                String queryUid = String.format("SELECT id FROM qyh.crm_drk_user WHERE company_id = %s;", companyId);
                 ResultSet resultSets = mysqlTools.executeQuery(queryUid);
-                if (resultSets.next()){
+                if (resultSets.next()) {
                     String uid = resultSets.getString("id");
-                    String userSql = String.format("INSERT INTO `qyh`.`crm_company_account` (`company_id`, `account_id`, `total_money`, `recharge_money`, `free_money`, `status`, `today_consume`, `day_budget`, `today_distributed`, `total_distributed`, `creator_id`) VALUES ('%1$s', '%2$s', '5000', '2500', '2500', '1', '0', NULL, '0', '44', '1113');",companyId,uid);
+                    String userSql = String.format("INSERT INTO `qyh`.`crm_company_account` (`company_id`, `account_id`, `total_money`, `recharge_money`, `free_money`, `status`, `today_consume`, `day_budget`, `today_distributed`, `total_distributed`, `creator_id`) VALUES ('%1$s', '%2$s', '5000', '2500', '2500', '1', '0', NULL, '0', '44', '1113');", companyId, uid);
                     mysqlTools.execute(userSql);
                     // 创建广告获取广告ID
-                    String adName = (companyId + "--" + RandomValue.getInteger(1,99999));
-                    String city =  "北京市";
-                    String advertisingSql = String.format("INSERT INTO `qyh`.`crm_advertising` (`system_id`, `system_name`, `company_id`, `company_name`, `advertising_name`, `deduct_type`, `plan`, `put_city`, `is_open`, `open_permissions`, `user_status`, `loan_money_min`, `loan_money_max`, `sex`, `occupation`, `education`, `income_min`, `income_max`, `income_type`, `work_age_min`, `work_age_max`, `min_age`, `max_age`, `provident_fund`, `social_security`, `is_car`, `is_house`, `credit_record`, `credit_money`, `credit_money_min`, `credit_money_max`, `wld`, `wld_min`, `wld_max`, `zmf_min`, `zmf_max`, `insurance`, `license`, `today_take_order`, `total_take_order`, `take_order_type`, `order_limit`, `day_order_limit`, `night_order_limit`, `order_time_start`, `order_time_end`, `hour_time_start`, `hour_time_end`, `requirement`, `no_requirement`, `budget_config`, `cpc_price`, `bid_price`, `suggested_price`, `drk_suggested_price`, `remark`) VALUES ('83', 'd', '%1$s', '%2$s', '%3$s', '2', 'B', '%4$s', '1', '1', '1', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '50', '50', '50', NULL, NULL);",companyId,phone,adName,city);
-                    mysqlTools.execute(advertisingSql);
-                    String adIdSql = String.format("SELECT id FROM qyh.crm_advertising WHERE advertising_name = '%s';",adName);
-                    try {
-                        ResultSet adResult =  mysqlTools.executeQuery(adIdSql);
-                        if (adResult.next()){
-                            String adId = adResult.getString("id");
-                            //创建员工账户
-                            String insertSonAccount = String.format("INSERT INTO `qyh`.`crm_drk_user` (`company_id`, `account_type`, `account`, `name`, `password`, `phone`, `role`, `creator_id`, `creator_name`, `status`, `client_ip`, `remark`, `openid`, `is_thread_remind`, `is_balance_remind`, `balance_remind_money`) VALUES (%1$s, '2', '%2$s', '%2$s', '05257b278941a55249719b7dfeac7bb1', NULL, '2', NULL, NULL, '1', '2104903452', NULL, NULL, '0', '0', '0');",companyId,adName);
-                            mysqlTools.execute(insertSonAccount);
-                            // 查询员工账户Id
-                            String querySonId = String.format("SELECT id from qyh.crm_drk_user WHERE account = '%2$s' AND company_id = '%1$s';",companyId,adName);
-                            ResultSet sonResult = mysqlTools.executeQuery(querySonId);
-                            if (sonResult.next()){
-                                String sonAccountId = sonResult.getString("id");
-                                //初始化员工账户数据
-                                String sonAccountInit = String.format("INSERT INTO `qyh`.`crm_company_account` (`company_id`, `account_id`, `total_money`, `recharge_money`, `free_money`, `status`, `today_consume`, `day_budget`, `today_distributed`, `total_distributed`, `creator_id`) VALUES (%1$s, %2$s, '0', '0', '0', '1', '0', NULL, '0', '0', '1113');",companyId,sonAccountId);
-                                mysqlTools.execute(sonAccountInit);
-                                // 广告和子账户关联
-                                String relevanceSql = String.format("INSERT INTO `qyh`.`crm_advertising_distribution` (`user_id`, `advertising_id`, `open_permissions`,user_status) VALUES (%1$s, %2$s, '1',1);",sonAccountId,adId);
-                                mysqlTools.execute(relevanceSql);
-                            }
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                    String city = "北京市";
+                    for (int i = 0; i < 1; i++) {
+                        crm_addAdvertising(mysqlTools, deductType, companyId, phone, city);
                     }
                 }
             }
@@ -117,32 +91,37 @@ public class qyh_mock {
     }
 
     /**
-     * 测试用
+     * 测试用 员工账号扣款广告-- 关联员工账户
      */
-    public void crm_addAdvertising(MysqlTools mysqlTools) {
-        // 公司ID
-        Integer companyId = 298;
-        String companyName = "13005238707";
+    public void crm_addAdvertising(MysqlTools mysqlTools, Integer deductType, String companyId, String companyName, String city) throws Exception {
         // 创建广告获取广告ID
         String adName = (companyId + "--" + RandomValue.getInteger(1, 99999));
-        String city = "北京市";
-        String advertisingSql = String.format("INSERT INTO `qyh`.`crm_advertising` (`system_id`, `system_name`, `company_id`, `company_name`, `advertising_name`, `deduct_type`, `plan`, `put_city`, `is_open`, `open_permissions`, `user_status`, `loan_money_min`, `loan_money_max`, `sex`, `occupation`, `education`, `income_min`, `income_max`, `income_type`, `work_age_min`, `work_age_max`, `min_age`, `max_age`, `provident_fund`, `social_security`, `is_car`, `is_house`, `credit_record`, `credit_money`, `credit_money_min`, `credit_money_max`, `wld`, `wld_min`, `wld_max`, `zmf_min`, `zmf_max`, `insurance`, `license`, `today_take_order`, `total_take_order`, `take_order_type`, `order_limit`, `day_order_limit`, `night_order_limit`, `order_time_start`, `order_time_end`, `hour_time_start`, `hour_time_end`, `requirement`, `no_requirement`, `budget_config`, `cpc_price`, `bid_price`, `suggested_price`, `drk_suggested_price`, `remark`) VALUES ('83', 'd', '%1$s', '%2$s', '%3$s', '2', 'B', '%4$s', '1', '1', '1', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '50', '50', '50', NULL, NULL);", companyId, companyName, adName, city);
+        String advertisingSql = String.format("INSERT INTO `qyh`.`crm_advertising` (`system_id`, `system_name`, `company_id`, `company_name`, `advertising_name`,`plan`, `put_city`, `is_open`, `open_permissions`, `user_status`, `loan_money_min`, `loan_money_max`, `sex`, `occupation`, `education`, `income_min`, `income_max`, `income_type`, `work_age_min`, `work_age_max`, `min_age`, `max_age`, `provident_fund`, `social_security`, `is_car`, `is_house`, `credit_record`, `credit_money`, `credit_money_min`, `credit_money_max`, `wld`, `wld_min`, `wld_max`, `zmf_min`, `zmf_max`, `insurance`, `license`, `today_take_order`, `total_take_order`, `take_order_type`, `order_limit`, `day_order_limit`, `night_order_limit`, `order_time_start`, `order_time_end`, `hour_time_start`, `hour_time_end`, `requirement`, `no_requirement`, `budget_config`, `cpc_price`, `bid_price`, `suggested_price`, `drk_suggested_price`, `remark`) VALUES ('83', 'd', '%1$s', '%2$s', '%3$s', 'B', '%4$s', '1', '1', '1', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '50', '50', '50', NULL, NULL);", companyId, companyName, adName, city);
         mysqlTools.execute(advertisingSql);
         String adIdSql = String.format("SELECT id FROM qyh.crm_advertising WHERE advertising_name = '%s';", adName);
+        ResultSet adResult = mysqlTools.executeQuery(adIdSql);
+        String adId = null;
+        if (adResult.next()) {
+            adId = adResult.getString("id");
+        }
+        // 主账户扣款广告--关联子广告
+        if (deductType == 1) {
+            String fatherAdvertising = String.format("INSERT INTO `qyh`.`crm_advertising` (`system_id`, `system_name`, `company_id`, `company_name`, `advertising_name`,`plan`, `put_city`, `is_open`, `open_permissions`, `user_status`, `loan_money_min`, `loan_money_max`, `sex`, `occupation`, `education`, `income_min`, `income_max`, `income_type`, `work_age_min`, `work_age_max`, `min_age`, `max_age`, `provident_fund`, `social_security`, `is_car`, `is_house`, `credit_record`, `credit_money`, `credit_money_min`, `credit_money_max`, `wld`, `wld_min`, `wld_max`, `zmf_min`, `zmf_max`, `insurance`, `license`, `today_take_order`, `total_take_order`, `take_order_type`, `order_limit`, `day_order_limit`, `night_order_limit`, `order_time_start`, `order_time_end`, `hour_time_start`, `hour_time_end`, `requirement`, `no_requirement`, `budget_config`, `cpc_price`, `bid_price`, `suggested_price`, `drk_suggested_price`, `remark`,`host_ad_id`,`is_sub_ad`) VALUES ('83', 'd', '%1$s', '%2$s', '%3$s', 'B', '%4$s', '1', '1', '1', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '30', '30', '30', NULL, NULL,'%5$s',1);", companyId, companyName, adName, city, adId);
+            mysqlTools.execute(fatherAdvertising);
+        }
         try {
-            ResultSet adResult =  mysqlTools.executeQuery(adIdSql);
-            if (adResult.next()){
-                String adId = adResult.getString("id");
+            for (int i = 0; i < 5; i++) {
+                String blindPhone = RandomValue.getTel();
                 //创建员工账户
-                String insertSonAccount = String.format("INSERT INTO `qyh`.`crm_drk_user` (`company_id`, `account_type`, `account`, `name`, `password`, `phone`, `role`, `creator_id`, `creator_name`, `status`, `client_ip`, `remark`, `openid`, `is_thread_remind`, `is_balance_remind`, `balance_remind_money`) VALUES (%1$s, '2', '%2$s', '%2$s', '05257b278941a55249719b7dfeac7bb1', NULL, '2', NULL, NULL, '1', '2104903452', NULL, NULL, '0', '0', '0');",companyId,adName);
+                String insertSonAccount = String.format("INSERT INTO `qyh`.`crm_drk_user` (`company_id`, `account_type`, `account`, `name`, `password`, `phone`, `current_blind_phone`, `blind_status`, `role`, `creator_id`, `creator_name`, `status`, `client_ip`, `remark`, `openid`, `is_thread_remind`, `is_balance_remind`, `balance_remind_money`, `last_real_name`, `last_id_card`, `last_real_name_time`, `current_real_name`, `current_id_card`, `current_real_name_time`, `certification_status`, `read_status`,`city`, `recycle_time`, `change_blind_status`) VALUES ('%1$s', '2', '17637898369', '杜军', NULL, '%2$s','%2$s', '1', '1', '97', '17637898367', '1', '3080472432', NULL, NULL, '0', '0', '0', NULL, NULL, NULL, '', '', NULL, '1','1', '安顺市', NULL, '0');", companyId, blindPhone);
                 mysqlTools.execute(insertSonAccount);
                 // 查询员工账户Id
-                String querySonId = String.format("SELECT id from qyh.crm_drk_user WHERE account = '%2$s' AND company_id = '%1$s';",companyId,adName);
+                String querySonId = String.format("SELECT id from qyh.crm_drk_user WHERE current_blind_phone = '%2$s' AND company_id = '%1$s';", companyId, blindPhone);
                 ResultSet sonResult = mysqlTools.executeQuery(querySonId);
-                if (sonResult.next()){
+                if (sonResult.next()) {
                     String sonAccountId = sonResult.getString("id");
                     //初始化员工账户数据
-                    String sonAccountInit = String.format("INSERT INTO `qyh`.`crm_company_account` (`company_id`, `account_id`, `total_money`, `recharge_money`, `free_money`, `status`, `today_consume`, `day_budget`, `today_distributed`, `total_distributed`, `creator_id`) VALUES (%1$s, %2$s, '0', '0', '0', '1', '0', NULL, '0', '0', '1113');",companyId,sonAccountId);
+                    String sonAccountInit = String.format("INSERT INTO `qyh`.`crm_company_account` (`company_id`, `account_id`, `total_money`, `recharge_money`, `free_money`, `status`, `today_consume`, `day_budget`, `today_distributed`, `total_distributed`, `creator_id`) VALUES (%1$s, %2$s, '0', '0', '0', '1', '0', NULL, '0', '0', '1113');", companyId, sonAccountId);
                     mysqlTools.execute(sonAccountInit);
                     // 广告和子账户关联
                     String relevanceSql = String.format("INSERT INTO `qyh`.`crm_advertising_distribution` (`user_id`, `advertising_id`, `open_permissions`,user_status) VALUES (%1$s, %2$s, '1',1);",sonAccountId,adId);
@@ -153,93 +132,5 @@ public class qyh_mock {
             e.printStackTrace();
         }
     }
-
-    @Test
-    public void weight(){
-        MysqlTools mysqlTools = new MysqlTools();
-        // 第一单
-        int i;
-        for (i =1;i<=6;i++){
-            if (i==1){
-                //                    第一单
-//                    1 -- 100 * 50
-//                    2 -- 100 * 150  对接
-                String adId1 = getAdId(mysqlTools);
-                Assert.assertEquals(adId1,"5611");
-            }
-            if (i==2){
-                // 第二单
-//                    1  --  100 * 50  对接
-//                    2  --   20 * 100
-                String adId2 = getAdId(mysqlTools);
-                Assert.assertEquals(adId2,"5602");
-            }
-            if (i==3){
-//                    1： 20 * 50
-//                    2： 20 * 100 对接
-                String adId3 = getAdId(mysqlTools);
-                Assert.assertEquals(adId3,"5611");
-            }
-            if (i==4){
-                //                    1： 20 * 50  对接
-//                    2： 5 * 100
-                String adId4 = getAdId(mysqlTools);
-                Assert.assertEquals(adId4,"5602");
-            }
-            if (i==5){
-                //                    1： 20 * 50
-//                    2： 5 * 100 对接
-                String adId5 = getAdId(mysqlTools);
-                Assert.assertEquals(adId5,"5602");
-            }
-            if (i==6){
-                //1： 20 * 50
-//                    2： 5 * 100 对接。。。。。。
-                String adId6 = getAdId(mysqlTools);
-                Assert.assertEquals(adId6,"5611");
-            }
-        }
-        Qyh.mysqlTools.close();
-    }
-
-    public String getAdId(MysqlTools mysqlTools){
-        String phone = RandomValue.getTel();
-        Qyh qyh = new Qyh(phone);
-        HashMap<String,Object> payload = ApiOrderData.qyh_applyData("北京市");
-        qyh.fillForm(JSON.toJSONString(payload));
-        String queryAdId = String.format("SELECT crm_ad_id FROM qyh.qyh_order WHERE customer_phone = '%1$s';",phone);
-        String adId = null;
-        try {
-            Thread.sleep(5000);
-            ResultSet resultSet = mysqlTools.executeQuery(queryAdId);
-            if (resultSet.next()){
-                adId = resultSet.getString("crm_ad_id");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return adId;
-    }
-
-    /**
-     * 开启广告
-     */
-    public static void openStatus(){
-        String url = "http://testcrm.qyhnet.com/api/crm/admin/v1/advertising/updateUserStatus";
-        HashMap<String,String> header = new HashMap<String, String>(){{
-            put("Content-Type","application/json;charset=UTF-8");
-            put("token","eyJhbGciOiJIUzUxMiJ9.eyJyb2xlIjo1Nywic3RhZmZOYW1lIjoiZHVqdW4iLCJ1c2VyVHlwZSI6ImNybSIsImV4cCI6MTcwMTUwMzIzNCwiaWF0IjoxNjY5OTY3MjM0LCJzdGFmZklkIjo4Mn0.zQ-z8stDJEGGuW_vz_VMWDwSEmY3Kvxb_WGIdUnwt3nk5wWA8Q9fAs3Jkbfo441THt1aGDXjjoznN-L2mXNq5Q");
-        }};
-        JSONObject payload = new JSONObject(){{
-            put("id",5940);
-            put("userStatus","1");
-        }};
-        request request = new request();
-        System.out.println(payload.toString());
-        CloseableHttpResponse response =  request.post(url,header,payload.toJSONString());
-        JSONObject jsonObject = request.getResponseJson(response);
-        System.out.println(jsonObject);
-    }
-
 
 }

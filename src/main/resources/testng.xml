@@ -2,16 +2,24 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
 <suite name="DefaultSuite" parallel="methods"> <!-- 测试套件名称 -->
     <test name="TestDu1"> <!-- 测试名称 -->
-        <classes>
-            <class name="com.dujun.springboot.temp.AutoTest"/>
-        </classes>
+        <parameter name="name" value="dujun"/>
+        <parameter name="age" value="18"/>
+        <groups>
+            <run>
+                <include name="A-2"/>
+            </run>
+        </groups>
+        <!--        <classes>-->
+        <!--            <class name="com.dujun.springboot.temp.AutoTest2">-->
+        <!--                <methods>-->
+        <!--                    <exclude name="test_1"/>-->
+        <!--                </methods>-->
+        <!--            </class>-->
+        <!--        </classes>-->
+        <packages>
+            <package name="com.dujun.springboot.temp">
+            </package>
+        </packages>
+
     </test>
-    <!--    <test name="TestDu"> &lt;!&ndash; 测试名称 &ndash;&gt;-->
-    <!--        <packages> &lt;!&ndash;测试包 &ndash;&gt;-->
-    <!--            <package name="com.dujun.springboot.temp"/>-->
-    <!--        </packages>-->
-    <!--    </test>-->
-    <listeners>
-        <listener class-name="org.testng.reporters.XMLReporter"/>
-    </listeners>
 </suite>

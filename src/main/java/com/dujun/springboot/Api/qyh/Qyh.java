@@ -85,7 +85,7 @@ public class Qyh {
     public void user_init(){
         int age = RandomValue.getNum(20,80);
         int sex = RandomValue.getInteger(1,2);
-        mysqlTools.execute(String.format("UPDATE qyh.qyh_customer_user SET real_name='test', sex=%1$s,age = %2$s WHERE phone = '%3$s';",sex,age,phone));
+        mysqlTools.execute(String.format("UPDATE qyh.qyh_customer_user SET real_name='test', sex=%1$s,age = %2$s,status = 1   WHERE phone = '%3$s';", sex, age, phone));
     }
 
     // 通用的headers(json)
@@ -115,6 +115,7 @@ public class Qyh {
         apply_step();
         redis_OrderInit();
         String url = domain + "/api/customer/v1/orderCondition/fillForm";
+        url = domain + "/api/customer/v1/manual/choose/fillForm";
         CloseableHttpResponse response = request.post(url, header_json(), payload);
         return request.getResponseJson(response);
     }
@@ -145,7 +146,6 @@ public class Qyh {
         CloseableHttpResponse response = request.get(url, header_json());
         return request.getResponseJson(response);
     }
-
 
     /**
      * 城市列表
