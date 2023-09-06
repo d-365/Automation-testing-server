@@ -32,13 +32,12 @@ public class AutoTest {
         return data;
     }
 
-    @Test(dataProvider = "myDataProvider", groups = {"A-2"})
+//    @Test(dataProvider = "myDataProvider", groups = {"A-2"})
     public void test_22(String data1, String data2) {
         System.out.println("B-1");
     }
 
     @Parameters({"age", "name"})
-    @Test(groups = {"A-2"})
     public void test_3(String names, String age) {
         System.out.println("B-2");
     }

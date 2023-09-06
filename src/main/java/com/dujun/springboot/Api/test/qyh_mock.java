@@ -9,19 +9,22 @@ package com.dujun.springboot.Api.test;
 import com.dujun.springboot.Api.qyh.Qyh;
 import com.dujun.springboot.tools.RandomValue;
 import com.dujun.springboot.utils.MysqlTools;
+import com.dujun.springboot.utils.request;
 import org.junit.jupiter.api.Test;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.ResultSet;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class qyh_mock {
 
     @Test
-    public void test_apply() throws InterruptedException {
+    public void test_apply() {
         ExecutorService es = Executors.newCachedThreadPool();
-        for (int i = 0; i < 1; i++) {
+        for (int i = 0; i < 9; i++) {
             es.submit(new RunnableQyh());
         }
         es.shutdown();
@@ -34,11 +37,22 @@ public class qyh_mock {
     }
 
     @Test
+    public void test_demo1() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        System.out.println(sdf.format(new Date()));
+        for (int i = 0; i < 1; i++) {
+            request request = new request();
+            request.get("https://testqyh.qyihua.com/promotio/assets/js/vendor.47330f08.js");
+        }
+        System.out.println(sdf.format(new Date()));
+    }
+
+    @Test
     @Transactional
     public void crm_init() {
         // 新建公司+ 公司主账户
         MysqlTools mysqlTools = new MysqlTools();
-        for (int i = 0; i < 30; i++) {
+        for (int i = 0; i < 1; i++) {
             data_init(mysqlTools);
         }
         // 更新账户余额
@@ -124,7 +138,7 @@ public class qyh_mock {
                     String sonAccountInit = String.format("INSERT INTO `qyh`.`crm_company_account` (`company_id`, `account_id`, `total_money`, `recharge_money`, `free_money`, `status`, `today_consume`, `day_budget`, `today_distributed`, `total_distributed`, `creator_id`) VALUES (%1$s, %2$s, '0', '0', '0', '1', '0', NULL, '0', '0', '1113');", companyId, sonAccountId);
                     mysqlTools.execute(sonAccountInit);
                     // 广告和子账户关联
-                    String relevanceSql = String.format("INSERT INTO `qyh`.`crm_advertising_distribution` (`user_id`, `advertising_id`, `open_permissions`,user_status) VALUES (%1$s, %2$s, '1',1);",sonAccountId,adId);
+                    String relevanceSql = String.format("INSERT INTO `qyh`.`crm_advertising_distribution` (`user_id`, `advertising_id`, `open_permissions`,user_status) VALUES (%1$s, %2$s, '1',1);", sonAccountId, adId);
                     mysqlTools.execute(relevanceSql);
                 }
             }
@@ -132,5 +146,17 @@ public class qyh_mock {
             e.printStackTrace();
         }
     }
+
+}
+
+class demo1 implements Runnable {
+
+    request request = new request();
+
+    @Override
+    public void run() {
+        request.get("https://testqyh.qyihua.com/promotio/assets/js/vendor.47330f08.js");
+    }
+
 
 }

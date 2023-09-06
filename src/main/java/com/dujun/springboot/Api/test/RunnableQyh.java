@@ -29,7 +29,7 @@ public class RunnableQyh implements Runnable{
 //        phone = "17310045947";
         Qyh qyh = new Qyh(phone);
         String city = RandomValue.getAddress();
-        HashMap<String, Object> payload = ApiOrderData.qyh_applyData("重庆市");
+        HashMap<String, Object> payload = ApiOrderData.qyh_applyData("北京市");
         CompletableFuture<String> completableFuture = CompletableFuture.supplyAsync(() -> {
             JSONObject jsonObject = qyh.fillForm(JSON.toJSONString(payload));
             log.debug(jsonObject);

@@ -17,7 +17,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
@@ -30,8 +30,13 @@ import java.util.Map;
 public class request {
 
     //创建HttpClient对象
-     CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-     CloseableHttpResponse response = null;
+//    CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+    CloseableHttpClient httpClient = HttpClients.custom()
+            .disableContentCompression()  // 关闭内容压缩
+            .disableRedirectHandling()    // 关闭重定向处理
+            .disableCookieManagement()    // 关闭 Cookie 管理
+            .build();
+    CloseableHttpResponse response = null;
 
      RequestConfig requestConfig = RequestConfig.custom()
             .setConnectTimeout(10000)
@@ -92,6 +97,8 @@ public class request {
                 }
             }
             // 发送get请求
+            request.setConfig(requestConfig);
+
             response = httpClient.execute(request);
 
         } catch (IOException e) {
