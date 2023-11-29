@@ -27,7 +27,7 @@ public class MyGenerator {
 
     private static final String dbName = "tester_plat";
     private static final String driverClassName = "com.mysql.cj.jdbc.Driver";
-    private static final String dbUrl = "jdbc:mysql://118.31.184.240:3306/" + dbName + "?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8";
+    private static final String dbUrl = "jdbc:mysql://47.97.41.177:3306/" + dbName + "?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8";
     private static final String dbUsername = "root";
     private static final String dbPassword = "3wHNY2Bq";
     private static final String basePackageName = "com.dujun.springboot";

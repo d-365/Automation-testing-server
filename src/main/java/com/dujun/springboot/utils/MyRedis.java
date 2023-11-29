@@ -11,7 +11,7 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
-import java.util.*;
+import java.util.Set;
 
 public class MyRedis {
 
@@ -197,7 +197,7 @@ class RedisTest {
 
     @Test
     public void test_fun1() {
-        MyRedis myRedis = new MyRedis("118.31.184.240", "b840fc02");
+        MyRedis myRedis = new MyRedis("47.97.41.177", "b840fc02");
         System.out.println(myRedis.zCard("zadd"));
         myRedis.close();
     }

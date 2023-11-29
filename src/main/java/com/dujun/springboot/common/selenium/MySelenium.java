@@ -14,23 +14,19 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.logging.LogType;
-import org.openqa.selenium.logging.LoggingPreferences;
 import org.openqa.selenium.print.PrintOptions;
-import org.openqa.selenium.remote.CapabilityType;
-import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.LocalFileDetector;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.Color;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Set;
-import java.util.logging.Level;
 
 public class MySelenium {
 
@@ -39,9 +35,6 @@ public class MySelenium {
 
     // 获取本机指定浏览器WebDriver
     public static WebDriver getDriver(String browser) {
-        if (browser == null) {
-            browser = "chrome";
-        }
         switch (browser.toLowerCase()) {
             case "firefox":
                 WebDriverManager.firefoxdriver();
@@ -50,15 +43,18 @@ public class MySelenium {
                 return driver;
             case "chrome":
             default:
-                WebDriverManager.chromedriver().setup();
-                ChromeOptions chromeOptions = new ChromeOptions();
-                chromeOptions.setPageLoadStrategy(PageLoadStrategy.NORMAL);
-                // 为了获取console的日志输出
-                LoggingPreferences logPrefs = new LoggingPreferences();
-                logPrefs.enable(LogType.BROWSER, Level.INFO);//输入为info的日志
-                chromeOptions.setCapability(CapabilityType.LOGGING_PREFS, logPrefs);
-                chromeOptions.setCapability(ChromeOptions.CAPABILITY, chromeOptions);
-                driver = new ChromeDriver(chromeOptions);
+                System.setProperty("webdriver.chrome.driver", "D:\\seleniumDriver\\chromedriver.exe");
+                ChromeOptions options = new ChromeOptions();
+                options.setExperimentalOption("useAutomationExtension", false);
+                options.addArguments("--disable-extensions");
+                options.addArguments("--remote-allow-origins=*");//解决 403 出错问题
+                driver = new ChromeDriver(options);
+
+//                ChromeDriverService service = new ChromeDriverService.Builder()
+//                        .usingAnyFreePort()
+//                        .build();
+//                ChromeOptions options = new ChromeOptions();
+//                driver = new ChromeDriver(service,options);
                 return driver;
 
         }

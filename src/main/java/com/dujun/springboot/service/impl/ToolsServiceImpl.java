@@ -21,7 +21,6 @@ import com.dujun.springboot.service.ToolsService;
 import com.dujun.springboot.tools.RandomValue;
 import com.dujun.springboot.utils.MysqlTools;
 import lombok.extern.slf4j.Slf4j;
-import org.quartz.impl.matchers.StringMatcher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -51,7 +50,7 @@ public class ToolsServiceImpl implements ToolsService {
     private StringRedisTemplate redisTemplate;
 
     public static MysqlTools mysqlConnection() {
-        return new MysqlTools("jdbc:mysql://118.31.184.240:3306", "root", "3wHNY2Bq");
+        return new MysqlTools("jdbc:mysql://47.97.41.177:3306", "root", "3wHNY2Bq");
     }
 
     /**

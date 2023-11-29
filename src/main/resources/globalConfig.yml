@@ -8,7 +8,7 @@ test:
       ip: "120.55.125.94"
       password: "4A$2QgF4g7Orz*"
   database:
-    jdbcurl: jdbc:mysql://118.31.184.240:3306
+    jdbcurl: jdbc:mysql://47.97.41.177:3306
     user: root
     password: 3wHNY2Bq
   report:

@@ -25,7 +25,7 @@ public class qyh_mock {
     @Test
     public void test_apply() {
         ExecutorService es = Executors.newCachedThreadPool();
-        for (int i = 0; i < 9; i++) {
+        for (int i = 0; i < 5; i++) {
             es.submit(new RunnableQyh());
         }
         es.shutdown();
